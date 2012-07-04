@@ -1,0 +1,16 @@
+{
+  "id": "bash", 
+  "command": "bash -c 'echo $BASH_VERSION > version'",
+  "description": "Gather information about the Bourne Again SHell",
+  "output spec": {
+    "shlibdeps": {
+      "type": "shlibdeps",
+      "binary": "bash"
+    }, 
+    "version": {
+      "type": "file",
+      "source": "version"
+    } 
+  }, 
+  "version": 0
+}

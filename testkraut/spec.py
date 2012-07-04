@@ -12,15 +12,15 @@ __docformat__ = 'restructuredtext'
 
 import json
 
-__allowed_spec_keys__ = \
-        ['command',
-         'depends',
-         'description',
-         'id'
-         'input spec',
-         'output spec',
-         'version'
-        ]
+__allowed_spec_keys__ = [
+        'command',
+        'depends',
+        'description',
+        'id',
+        'input spec',
+        'output spec',
+        'version',
+    ]
 
 class SPEC(dict):
     def __init__(self, src=None):
