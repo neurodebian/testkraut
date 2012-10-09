@@ -39,3 +39,16 @@ Dump of discussion with Satra
   resolve data dependencies with outputs from other tests)
 - a tests definition specifies: test inputs, test dependencies (e.g. software),
   and an (optional) evaluative statement
+
+Dump of discussion with Alex
+----------------------------
+
+- A test fails or passes
+- Evaluation assesses the quality of the test results (but doesn't necessarily
+  let a test fail)
+- Dashboard-level evaluation will provide highly aggregated analysis (e.g.
+  distributions of evalutation metrics)
+- Threshold levels for evaluation might need to be pulled from the dashboard
+- Compare test output spec to actual content of the testbed after a test run
+- Write little tool to check a test spec for comprehensive usage of all test
+  output in evaluations
