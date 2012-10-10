@@ -12,9 +12,216 @@ __docformat__ = 'restructuredtext'
 
 import os
 import shutil
+from . import utils
 from .utils import run_command, get_shlibdeps, which
+from .spec import SPEC
 
-class Runner(object):
+# stupid dummy for now
+def debug(channel, msg):
+    print channel, msg
+
+# stupid dummy for now
+def verbose(level, msg):
+    print msg
+
+class BaseRunner(object):
+    def __init__(self, testlib='lib'):
+        """
+        Parameters
+        ----------
+        testlib: path
+          Location of the test library.
+        testbed_basedir: path
+          Directory where local (non-VM, non-chroot) testbeds will be created.
+        """
+        self._testlib = os.path.abspath(testlib)
+
+    def __call__(self, spec):
+        testlib_filepath = os.path.join(self._testlib, spec, 'spec.json')
+        if os.path.isfile(testlib_filepath):
+            # open spec from test library
+            spec = SPEC(open(testlib_filepath))
+        elif os.path.isfile(spec):
+            # open explicit spec file
+            spec = SPEC(open(spec))
+        else:
+            # spec is given as a str?
+            spec = SPEC(spec)
+        verbose(1, "processing test SPEC '%s'" %spec['id'])
+        verbose(1, "check dependencies")
+        verbose(1, "prepare testbed")
+        self._prepare_testbed(spec)
+        verbose(1, "run test")
+        test_success = self._run_test(spec)
+        if not test_success:
+            return False
+        verbose(1, "evaluate test results")
+        return True
+
+    def _prepare_testbed(self, spec):
+        raise NotImplementedError
+
+    def _run_test(self, spec):
+        type_ = spec['test']['type']
+        if type_ == 'nipype_workflow':
+            if __debug__:
+                debug('RUNNER', 'run Nipype workflow test')
+            return self._run_nipype_workflow(spec)
+        else:
+            raise ValueError("unknown test type '%s'" % type_)
+
+    def _check_output_presence(self, spec):
+        raise NotImplementedError
+
+
+def check_file_hash(filepath, inspec):
+    # hash match check
+    for hashtype in ('md5sum', 'sha1sum'):
+        if hashtype in inspec:
+            targethash = inspec[hashtype]
+            hasher = getattr(utils, hashtype)
+            observedhash = hasher(filepath)
+            if targethash != observedhash:
+                if __debug__:
+                    debug('RUNNER',
+                          "hash for '%s' does not match ('%s' != '%s')"
+                          % (filepath, observedhash, targethash))
+                return False
+            else:
+                if __debug__:
+                    debug('RUNNER',
+                          "hash for '%s' matches ('%s')"
+                          % (filepath, observedhash))
+                return True
+    if __debug__:
+        debug('RUNNER', "no hash for '%s' found" % filepath)
+    return None
+
+def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
+    if inspec is None:
+        inspec = dict()
+    if filename is None:
+        filename = inspec['value']
+    filepath = os.path.join(testlibdir, testid, filename)
+    if not os.path.isfile(filepath):
+        if __debug__:
+            debug('RUNNER', "file '%s' not present at '%s'"
+                            % (filename, filepath))
+        return None
+    if check_file_hash(filepath, inspec) in (True, None):
+        # if there is no hash we need to trust
+        return filepath
+    return None
+
+def prepare_local_testbed(spec, dst, testlibdir, force=False):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    inspecs = spec.get('input spec', {})
+    # locate and copy test input into testbed
+    for inspec_id in inspecs:
+        inspec = inspecs[inspec_id]
+        type_ = inspec['type']
+        if type_ == 'file':
+            # try finding the file locally
+            filepath = locate_file_in_testlib(testlibdir, spec['id'], inspec)
+            if filepath is None:
+                raise NotImplementedError("come up with more ideas on locating files")
+            if force or not os.path.isfile(
+                    os.path.join(dst, os.path.basename(filepath))):
+                shutil.copy(filepath, dst)
+            else:
+                if __debug__:
+                    debug('RUNNER',
+                          "skip copying already present file '%s'" % filepath)
+        else:
+            raise ValueError("unknown input spec type '%s'" % type_)
+    # place test code/script itself
+    testspec = spec['test']
+    if 'file' in testspec:
+        testfilepath = locate_file_in_testlib(testlibdir,
+                                              spec['id'],
+                                              filename=testspec['file'])
+        if testfilepath is None:
+            raise ValueError("file '%s' referenced in test '%s' not found"
+                             % (testspec['file'], spec['id']))
+        shutil.copy(testfilepath, dst)
+    else:
+        raise NotImplementedError("can't deal with anything but test scripts for now")
+
+
+
+#class ChrootRunner
+#class VMRunner
+class LocalRunner(BaseRunner):
+    def __init__(self, testbed_basedir='testbeds', **kwargs):
+        """
+        Parameters
+        ----------
+        testbed_basedir: path
+          Directory where local (non-VM, non-chroot) testbeds will be created.
+        """
+        BaseRunner.__init__(self, **kwargs)
+        self._testbed_basedir = os.path.abspath(testbed_basedir)
+
+    def _prepare_testbed(self, spec):
+        prepare_local_testbed(spec,
+                              os.path.join(self._testbed_basedir, spec['id']),
+                              self._testlib)
+
+    def _run_nipype_workflow(self, spec):
+        testspec = spec['test']
+        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        if 'file' in testspec:
+            testwffilepath = testspec['file']
+        else:
+            testwffilepath = 'workflow.py'
+        testwffilepath = os.path.join(testbedpath, testwffilepath)
+        # for the rest we need to execute stuff in the root of the testbed
+        initial_cwd = os.getcwdu()
+        os.chdir(testbedpath)
+        # execute the script and extract the workflow
+        locals = dict()
+        try:
+            execfile(testwffilepath, dict(), locals)
+        except Exception, e:
+            raise e.__class__(
+                    "exception while executing workflow setup script (%s): %s"
+                    % (testwffilepath, str(e)))
+        if not len(locals) or not 'test_workflow' in locals:
+            raise RuntimeError("test workflow script '%s' did not create a 'test_workflow' object"
+                               % testwffilepath)
+        workflow = locals['test_workflow']
+        # make sure nipype executes it in the right place
+        workflow.base_dir=os.path.abspath(os.path.join(testbedpath,
+                                                       '_workflow_exec'))
+        try:
+            workflow.run()
+            return self._check_output_presence(spec)
+        except RuntimeError, e:
+            verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
+            return False
+        finally:
+            os.chdir(initial_cwd)
+        return False
+
+    def _check_output_presence(self, spec):
+        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        outspec = spec.get('output spec', {})
+        missing = []
+        for ospec_id in outspec:
+            ospec = outspec[ospec_id]
+            if not ospec['type'] == 'file':
+                raise NotImplementedError("dunno how to handle non-file output yet")
+            if not os.path.isfile(ospec['value']):
+                missing.append(ospec_id)
+            # TODO check for file type
+        if len(missing):
+            raise RuntimeError("expected output(s) %s not found" % missing)
+        return True
+
+
+
+class OldRunner(object):
     def __init__(self, spec):
         self.spec = spec
         self._log_fp = None

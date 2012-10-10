@@ -14,6 +14,7 @@ import os
 import subprocess
 import select
 import datetime
+import hashlib
 
 def which(program):
     """
@@ -150,3 +151,16 @@ def get_shlibdeps(binary):
                            % (cmd, '\n'.join(ret['stderr'])))
     else:
         return [l.strip() for l in ret['stdout']]
+
+def hash(filename, method):
+    hash = method
+    with open(filename,'rb') as f: 
+        for chunk in iter(lambda: f.read(128*hash.block_size), b''): 
+             hash.update(chunk)
+    return hash.hexdigest()
+
+def sha1sum(filename):
+    return hash(filename, hashlib.sha1())
+
+def md5sum(filename):
+    return hash(filename, hashlib.md5())
