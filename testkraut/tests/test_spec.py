@@ -10,13 +10,15 @@
 
 __docformat__ = 'restructuredtext'
 
-from testkraut.spec import *
+from testkraut import spec
 from nose.tools import *
 
 def test_spec_io():
-    assert_raises(ValueError, SPEC)
+    assert_raises(ValueError, spec.SPEC)
     # must have default version
-    spec = SPEC(open('examples/demo_spec.json'))
+    sp = spec.SPEC(open('examples/demo_spec.json'))
     # no unknown keys
-    assert_raises(ValueError, spec.__setitem__, 'mike', 0)
+    assert_raises(ValueError, sp.__setitem__, 'mike', 0)
+    print spec.spec_testoutput_ids(sp)
+    print spec.spec_unused_testoutput_ids(sp)
 

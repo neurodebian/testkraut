@@ -13,14 +13,34 @@ __docformat__ = 'restructuredtext'
 import json
 
 __allowed_spec_keys__ = [
-        'command',
+        'test',
         'depends',
         'description',
         'id',
         'input spec',
         'output spec',
         'version',
+        'evaluation',
     ]
+
+def _raise(exception, why, input=None):
+    if not input is None:
+        input = ' (got: %s)' % repr(input)
+    else:
+        input = ''
+    raise exception("SPEC: %s%s" % (why, input))
+
+def _verify_tags(struct, tags, name):
+    for tag in tags:
+        if not tag in struct:
+            _raise(ValueError,
+                        "mandatory key '%s' is not in %s" % (tag, name))
+
+def _verify_spec_tags(specs, tags, name):
+    for i, os_id in enumerate(specs):
+        os = specs[os_id]
+        _verify_tags(os, tags, '%s: %s' % (name, os_id))
+
 
 class SPEC(dict):
     def __init__(self, src=None):
@@ -32,33 +52,37 @@ class SPEC(dict):
         self._check()
 
     def _check(self):
-        # mandatory ID
-        if not 'id' in self:
-            self._raise(ValueError, 'Mandatory ID not specified')
-        # assign defaults
-        for k, v in (('command', None),
-                     ('depends', list()),
-                     ('description', ''),
-                     ('input spec', dict()),
-                     ('output spec', dict()),
-                     ('version', 0)):
-            if not k in self:
-                self[k] = v
+        _verify_tags(self, ('id', 'version'), 'SPEC')
+        for i, ev in enumerate(self.get('evaluation', [])):
+            _verify_tags(ev, ('id', 'input spec', 'operator'),
+                         'evaluation %i' % i)
+        _verify_spec_tags(self.get('output spec', {}), ('type', 'value'),
+                          'output spec')
+        _verify_spec_tags(self.get('input spec', {}), ('type', 'value'),
+                          'input spec')
 
     def __setitem__(self, key, value):
         if not key in __allowed_spec_keys__:
-            self._raise(ValueError, "Refuse to add unsupported key", key)
+            _raise(ValueError, "refuse to add unsupported key", key)
         if key == 'version':
             if not isinstance(value, int) or value < 0:
-                self._raise(ValueError,
+                _raise(ValueError,
                     "version needs to be a non-negative integer value "
                     "(got: %s)." % value)
         dict.__setitem__(self, key, value)
 
-    def _raise(self, exception, why, input=None):
-        if not input is None:
-            input = ' (got: %s)' % repr(input)
-        else:
-            input = ''
-        raise exception("SPEC: %s%s" % (why, input))
+def spec_testoutput_ids(spec):
+        return spec.get('output spec', {}).keys()
+
+def spec_unused_testoutput_ids(spec):
+    out_ids = set(spec_testoutput_ids(spec))
+    for ev in spec.get('evaluation', []):
+        for eis in ev.get('input spec', {}):
+            if not isinstance(eis, dict):
+                eis = ev['input spec'].get(eis, {})
+            # now eis is always a dict
+            if eis.get('origin', None) == 'testoutput':
+                out_ids = out_ids.difference(set([eis['value']]))
+    return list(out_ids)
+
 
