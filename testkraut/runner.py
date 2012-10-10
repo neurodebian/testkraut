@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext'
 import os
 import shutil
 from . import utils
+from . import evaluators
 from .utils import run_command, get_shlibdeps, which
 from .spec import SPEC
 
@@ -38,6 +39,7 @@ class BaseRunner(object):
 
     def __call__(self, spec):
         testlib_filepath = os.path.join(self._testlib, spec, 'spec.json')
+        print  testlib_filepath
         if os.path.isfile(testlib_filepath):
             # open spec from test library
             spec = SPEC(open(testlib_filepath))
@@ -56,6 +58,7 @@ class BaseRunner(object):
         if not test_success:
             return False
         verbose(1, "evaluate test results")
+        self._evaluate_output(spec)
         return True
 
     def _prepare_testbed(self, spec):
@@ -71,6 +74,9 @@ class BaseRunner(object):
             raise ValueError("unknown test type '%s'" % type_)
 
     def _check_output_presence(self, spec):
+        raise NotImplementedError
+
+    def _evaluate_output(self, spec):
         raise NotImplementedError
 
 
@@ -218,6 +224,59 @@ class LocalRunner(BaseRunner):
         if len(missing):
             raise RuntimeError("expected output(s) %s not found" % missing)
         return True
+
+    def _evaluate_output(self, spec):
+        evalspecs = spec.get('evaluation',[])
+        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        initial_cwd = os.getcwdu()
+        os.chdir(testbedpath)
+        try:
+            for espec in evalspecs:
+                if __debug__:
+                    debug('RUNNER', "running evaluation '%s'" % espec['id'])
+                res = self._proc_eval_spec(espec, spec)
+                print res
+        finally:
+            os.chdir(initial_cwd)
+
+
+    def _proc_eval_spec(self, espec, spec):
+        op_spec = espec['operator']
+        op_type = op_spec['type']
+        if op_type in ('builtin-func', 'builtin-class'):
+            operator = getattr(evaluators, op_spec['name'])
+        else:
+            raise NotImplementedError(
+                    "dunno how to deal with operator type '%s'" % op_type)
+        # gather inputs
+        args = list()
+        kwargs = dict()
+        in_spec = espec['input spec']
+        for ins in in_spec:
+            # This distinction is bullshit and not possible with valid JSON
+            if isinstance(ins, basestring):
+                # kwarg
+                raise NotImplementedError('dunno how to handle kwargs in eval input specs')
+            else:
+                # arg
+                args.append(get_eval_input(ins, spec))
+        return operator(*args, **kwargs)
+
+
+def get_eval_input(inspec, testspec):
+    if 'origin' in inspec and inspec['origin'] == 'testoutput':
+        # reference to a test output
+        outspec = testspec['output spec'][inspec['value']]
+        if outspec['type'] == 'file':
+            return outspec['value']
+        else:
+            raise NotImplementedError(
+                "dunno how to handle references to non-file test output of '%s'"
+                % inspec['value'])
+    else:
+        raise NotImplementedError("dunno how to handle anything but output references")
+
+
 
 
 
