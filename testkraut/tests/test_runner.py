@@ -10,14 +10,15 @@
 
 __docformat__ = 'restructuredtext'
 
-from testkraut.spec import *
+from testkraut import spec
 from testkraut.runner import *
 from nose.tools import *
 
 def test_run_cmd():
     # just very simple
-    rt, out, err, merged = run_command('ls')
+    res = run_command('ls')
+    rt = res['retval']
     assert_equal(rt, 0)
-    assert_equal(err, '')
-    assert(len(out) > 0)
-    assert_equal(merged[0].split()[0], 'stdout')
+    assert_equal(len(res['stderr']), 0)
+    assert(len(res['stdout']) > 0)
+    assert_equal(res['merged'][0].split()[0], 'stdout')
