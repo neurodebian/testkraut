@@ -1,1 +1,60 @@
-../../examples/demo_spec.json
+{
+  "id": "demo", 
+  "description": "some description",
+  "depends": "fsl4.1 (>=4.1.6) | fsl5.0",
+  "test": {
+    "type": "nipype_workflow",
+    "code": "bet input output -m",
+    "file": "bet_wf.py"
+  },
+  "input spec": {
+    "head": {
+      "type": "file",
+      "datatype": "nifti",
+      "value": "head.nii.gz",
+      "origin": "http://....",
+      "md5sum": "c648dd6ff0dcad3e06189facee61d8be"
+    }
+  },
+  "output spec": {
+    "brainmask": {
+      "type": "file",
+      "datatype": "nifti",
+      "value": "output/head_brain_mask.nii.gz"
+    },
+    "brain": {
+      "type": "file",
+      "datatype": "nifti",
+      "value": "output/head_brain.nii.gz"
+    }
+  },
+  "evaluation": [
+    {
+      "id": "n_brain_mask_voxels",
+      "operator": {
+        "type": "builtin-func",
+        "name": "image_nelements_positive"
+      },
+      "input spec": [
+          {
+              "origin": "testoutput",
+              "value": "brainmask"
+          }
+      ],
+      "input spec (alt)": {
+          "val": {
+              "origin": "testoutput",
+              "value": "brainmask"
+            }
+      },
+      "output spec": {
+        "value": {
+          "type": "return",
+          "datatype": "int"
+        }
+      }
+    }
+  ],
+  "version": 0
+}
+
