@@ -1,0 +1,73 @@
+{
+  "id": "fsl-bet", 
+  "description": "some description",
+  "depends": "fsl4.1 (>=4.1.6) | fsl5.0",
+  "test": {
+    "type": "nipype_workflow",
+    "code": "bet input output -m",
+    "src": "bet_wf.py"
+  },
+  "input spec": {
+    "head": {
+      "type": "file",
+      "datatype": "nifti",
+      "value": "head.nii.gz",
+      "origin": "http://....",
+      "md5sum": "as9e8ryq4ayf"
+    }
+  },
+  "output spec": {
+    "brainmask": {
+      "type": "file",
+      "datatype": "nifti",
+      "value": "output/mask.nii.gz"
+    },
+    "brain": {
+      "type": "file",
+      "datatype": "nifti",
+      "value": "output/brain.nii.gz"
+    }
+  },
+  "evaluation": [
+    {
+      "id": "nvox",
+      "operator": {
+        "type": "builtin-operator",
+        "name": "verifynvox"
+      },
+      "input spec": {
+          "val": {
+              "origin": "testoutput",
+              "value": "brainmask"
+            },
+          "standard": {
+              "type": "int",
+              "value": 12345
+            }
+      },
+      "input spec (alt)": [
+          {
+              "type": "testoutput",
+              "value": "brainmask"
+          },
+          {
+              "type": "int",
+              "value": 12345
+          }
+      ],
+      "output spec": {
+        "nvoxverified": {
+          "type": "stdout",
+          "datatype": "bool"
+        },
+        "brain": {
+          "type": "file",
+          "datatype": "nifti",
+          "value": "output/brain.nii.gz"
+        }
+      }
+    }
+  ],
+  "version": 0
+}
+
