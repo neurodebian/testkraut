@@ -200,8 +200,23 @@ class LocalRunner(BaseRunner):
         # make sure nipype executes it in the right place
         workflow.base_dir=os.path.abspath(os.path.join(testbedpath,
                                                        '_workflow_exec'))
+        # we want content, not time based hashing
+        if 'execution' in workflow.config:
+            workflow.config['execution']['hash_method'] = "content"
+        else:
+            workflow.config['execution'] = dict(hash_method="content")
         try:
-            workflow.run()
+            exec_graph = workflow.run()
+            # try dumping provenance info
+            try:
+                from nipype.pipeline.utils import write_prov
+                write_prov(exec_graph,
+                           filename=os.path.join(workflow.base_dir,
+                                                 'provenance.json'))
+            except ImportError:
+                if __debug__:
+                    debug('RUNNER',
+                          "local nipype version doesn't support provenance capture")
             return self._check_output_presence(spec)
         except RuntimeError, e:
             verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
