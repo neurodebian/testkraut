@@ -16,14 +16,9 @@ from . import utils
 from . import evaluators
 from .utils import run_command, get_shlibdeps, which
 from .spec import SPEC
-
-# stupid dummy for now
-def debug(channel, msg):
-    print channel, msg
-
-# stupid dummy for now
-def verbose(level, msg):
-    print msg
+from .base import verbose
+if __debug__:
+    from .base import debug
 
 class BaseRunner(object):
     def __init__(self, testlib='lib'):
@@ -66,12 +61,13 @@ class BaseRunner(object):
 
     def _run_test(self, spec):
         type_ = spec['test']['type']
-        if type_ == 'nipype_workflow':
-            if __debug__:
-                debug('RUNNER', 'run Nipype workflow test')
-            return self._run_nipype_workflow(spec)
-        else:
-            raise ValueError("unknown test type '%s'" % type_)
+        try:
+            test_exec = getattr(self, '_run_%s' % type_)
+        except AttributeError:
+            raise ValueError("unsupported test type '%s'" % type_)
+        if __debug__:
+            debug('RUNNER', "run test via %s()" % test_exec.__name__)
+        return test_exec(spec)
 
     def _check_output_presence(self, spec):
         raise NotImplementedError
@@ -122,19 +118,26 @@ def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
 def prepare_local_testbed(spec, dst, testlibdir, force=False):
     if not os.path.exists(dst):
         os.makedirs(dst)
-    inspecs = spec.get('input spec', {})
+    inspecs = spec.get('input_specs', {})
     # locate and copy test input into testbed
     for inspec_id in inspecs:
         inspec = inspecs[inspec_id]
         type_ = inspec['type']
         if type_ == 'file':
             # try finding the file locally
+            testbed_filepath = inspec['value']
             filepath = locate_file_in_testlib(testlibdir, spec['id'], inspec)
+            if filepath is None and os.path.isfile(testbed_filepath):
+                # that file actually exists in the current dir
+                filepath = testbed_filepath
             if filepath is None:
                 raise NotImplementedError("come up with more ideas on locating files")
-            if force or not os.path.isfile(
-                    os.path.join(dst, os.path.basename(filepath))):
-                shutil.copy(filepath, dst)
+            dst_path = os.path.join(dst, testbed_filepath)
+            if force or not os.path.isfile(dst_path):
+                target_dir = os.path.dirname(dst_path)
+                if not os.path.exists(target_dir):
+                    os.makedirs(target_dir)
+                shutil.copy(filepath, dst_path)
             else:
                 if __debug__:
                     debug('RUNNER',
@@ -151,6 +154,9 @@ def prepare_local_testbed(spec, dst, testlibdir, force=False):
             raise ValueError("file '%s' referenced in test '%s' not found"
                              % (testspec['file'], spec['id']))
         shutil.copy(testfilepath, dst)
+    elif 'command' in testspec:
+        # nothing to move
+        pass
     else:
         raise NotImplementedError("can't deal with anything but test scripts for now")
 
@@ -225,9 +231,32 @@ class LocalRunner(BaseRunner):
             os.chdir(initial_cwd)
         return False
 
+    def _run_shell_command(self, spec):
+        import subprocess
+        testspec = spec['test']
+        cmd = testspec['command']
+        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        # for the rest we need to execute stuff in the root of the testbed
+        initial_cwd = os.getcwdu()
+        os.chdir(testbedpath)
+        try:
+            texec = subprocess.Popen(cmd,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            texec.wait()
+            print texec.stdout.read()
+            return self._check_output_presence(spec)
+        except OSError, e:
+            verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
+            return False
+        finally:
+            os.chdir(initial_cwd)
+        return False
+
     def _check_output_presence(self, spec):
         testbedpath = os.path.join(self._testbed_basedir, spec['id'])
-        outspec = spec.get('output spec', {})
+        outspec = spec.get('output_specs', {})
+        print outspec
         missing = []
         for ospec_id in outspec:
             ospec = outspec[ospec_id]
@@ -266,7 +295,7 @@ class LocalRunner(BaseRunner):
         # gather inputs
         args = list()
         kwargs = dict()
-        in_spec = espec['input spec']
+        in_spec = espec['input_specs']
         for ins in in_spec:
             # This distinction is bullshit and not possible with valid JSON
             if isinstance(ins, basestring):
@@ -281,7 +310,7 @@ class LocalRunner(BaseRunner):
 def get_eval_input(inspec, testspec):
     if 'origin' in inspec and inspec['origin'] == 'testoutput':
         # reference to a test output
-        outspec = testspec['output spec'][inspec['value']]
+        outspec = testspec['output_specs'][inspec['value']]
         if outspec['type'] == 'file':
             return outspec['value']
         else:
@@ -356,7 +385,7 @@ class OldRunner(object):
         # check the input
         # XXX check return value or rely on exceptions?
         self._log('Validate input specs')
-        self._proc_input_spec(spec['input spec'])
+        self._proc_input_spec(spec['input_specs'])
         # run the actual test command
         command = spec['command']
         ret = None
@@ -364,7 +393,7 @@ class OldRunner(object):
             self._log("Run test command [%s]" % command)
             ret = run_command(command)
         # handle test output
-        self._proc_output_spec(spec['output spec'], ret)
+        self._proc_output_spec(spec['output_specs'], ret)
         # pass the return value of the test command, or pretend all is good
         # if no command was given
         if ret is None:

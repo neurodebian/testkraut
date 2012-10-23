@@ -11,3 +11,4 @@
 __docformat__ = 'restructuredtext'
 
 import cmd_genspec
+import cmd_execute
