@@ -3,7 +3,7 @@
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 #
-#   See COPYING file distributed along with the PyMVPA package for the
+#   See COPYING file distributed along with the testkraut package for the
 #   copyright and license terms.
 #
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
@@ -14,22 +14,16 @@ __docformat__ = 'restructuredtext'
 import sys
 import argparse
 import textwrap
-import mvpa2.cmdline as mvcmd
-from mvpa2.cmdline import helpers, common_args
-from mvpa2.base import verbose, error
+import testkraut.cmdline as mvcmd
+from testkraut.cmdline import helpers, common_args
+from testkraut.base import verbose, error
 if __debug__:
-    from mvpa2.base import debug
-
-# what version are we talking
-from mvpa2.base.info import get_pymvpa_gitversion
-pymvpa_version = get_pymvpa_gitversion()
-if not pymvpa_version:
-    import mvpa2
-    pymvpa_version = mvpa2.__version__
+    from testkraut.base import debug
+import testkraut
 
 def _license_info():
     return """\
-Copyright (c) 2006-2012 PyMVPA developers
+Copyright (c) 2012 testkraut developers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +43,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-Written by Michael Hanke & Yaroslav Halchenko, and numerous other contributors.
+Written by Michael Hanke with the help of numerous other contributors.
 """
 
 # handler for common/non-command-specific cmdline arguments
@@ -86,7 +80,7 @@ Anyway, here are the currently available commands:
 helpers.parser_add_common_opt(parser, 'help')
 helpers.parser_add_common_opt(parser,
                               'version',
-                              version='pymvpa2 %s\n\n%s' % (pymvpa_version,
+                              version='testkraut %s\n\n%s' % (testkraut.__version__,
                                                           _license_info()))
 if __debug__:
     parser.add_argument(
@@ -110,7 +104,7 @@ subparsers = parser.add_subparsers()
 cmd_short_description = []
 for cmd in sorted([c for c in dir(mvcmd) if c.startswith('cmd_')]):
     cmd_name = cmd[4:]
-    subcmdmod = getattr(__import__('mvpa2.cmdline',
+    subcmdmod = getattr(__import__('testkraut.cmdline',
                                    globals(), locals(),
                                    [cmd], -1),
                         cmd)
@@ -127,7 +121,7 @@ for cmd in sorted([c for c in dir(mvcmd) if c.startswith('cmd_')]):
     # all subparser can report the version
     helpers.parser_add_common_opt(
             subparser, 'version',
-            version='pymvpa2-%s %s\n\n%s' % (cmd_name, pymvpa_version,
+            version='testkraut-%s %s\n\n%s' % (cmd_name, testkraut.__version__,
                                              _license_info()))
     # our own custom help for all commands
     helpers.parser_add_common_opt(subparser, 'help')
