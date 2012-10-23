@@ -52,3 +52,21 @@ Dump of discussion with Alex
 - Compare test output spec to actual content of the testbed after a test run
 - Write little tool to check a test spec for comprehensive usage of all test
   output in evaluations
+
+Generate test descriptions
+--------------------------
+
+via CDE
+~~~~~~~
+
+cde -o /tmp/betcde/ bet head.nii.gz brain
+find /tmp/betcde/cde-root -executable -a -type f -a ! -name '*.cde' -a ! -name '*.so'
+
+
+"depends": [
+  {
+    "type": "executable",
+    "path": "$FSLDIR/bin/remove_ext",
+    "dpkg": "fsl-5.0"
+  }
+]
