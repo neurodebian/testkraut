@@ -48,20 +48,10 @@ Written by Michael Hanke with the help of numerous other contributors.
 
 # handler for common/non-command-specific cmdline arguments
 def _proc_common_args(args):
-    # debug
-    if __debug__ and args.common_debug:
-        for dbg in args.common_debug:
-            debug.active += dbg
     # verbosity
     if __debug__:
         debug("CMDLINE", "Setting verbose.level to %s" % str(args.common_verbose))
     verbose.level = args.common_verbose
-    for pl in args.preload:
-        if __debug__:
-            debug("CMDLINE", "Executing preload script '%s'" % pl)
-        exec pl
-        pl.close()
-
 
 # setup cmdline args parser
 # main parser
@@ -85,14 +75,7 @@ helpers.parser_add_common_opt(parser,
 if __debug__:
     parser.add_argument(
         '--dbg', action='append', nargs=1, type=str, dest='common_debug',
-        help="enable debug channel (see 'info' command for available channels)")
-parser.add_argument(
-    '--preload', action='append', type=argparse.FileType('r'), default=list(),
-    help="""filename of a custom Python script that is executed prior to, and in
-    the same session as the actual command. This can be used to modify the
-    execution environment, for example creating a custom classifier
-    instance. This option can be given multiple times, and the associated
-    scripts are ran in order of their appearance on the command line.""")
+        help="enable debugging")
 parser.add_argument('--verbose', action='store', nargs='?', type=int,
                     dest='common_verbose',
                     default=0, help='output verbosity level')
