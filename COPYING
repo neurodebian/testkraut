@@ -46,12 +46,23 @@ you are to use corresponding parts.
 PyMVPA
 ------
 
+The comnmand line interface has been derived from the one of PyMVPA.
+
 ::
 
-  The comnmand line interface has been derived from the one of PyMVPA.
-
   Files: bin/testkraut, testkraut/cmdline/*
+  License: MIT
+  Copyright: 2000-2012 PyMVPA developers
 
-  MIT License
+pyprov
+------
 
-  Copyright (c) 2000-2012 PyMVPA developers
+Python implementation of the W3C's PROV-DM
+
+::
+
+  Author: Trung Dong Huynh <trungdong@donggiang.com>
+  Files: testkraut/external/prov*.py
+  License: MIT
+  Copyright: 2012 University of Southampton
+
