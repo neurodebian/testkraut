@@ -28,6 +28,7 @@ import argparse
 import os
 import itertools
 from os.path import join as opj
+from ..spec import SPEC
 from ..utils import sha1sum
 from ..base import verbose
 
@@ -187,14 +188,15 @@ def run(args):
         #shutil.rmtree(wdir)
         os.unlink('cde.options')
     # spec skeleton
-    spec = dict(id=args.id,
+    spec = SPEC(
+            dict(id=args.id,
                 description=args.description,
                 version=args.spec_version,
                 dependencies=[],
                 test={},
                 input_specs={},
                 output_specs={},
-                evaluations=[])
+                evaluations=[]))
     # in case of a shell command
     spec['test'] = dict(type='shell_command', command=args.arg)
     # record al input files
@@ -225,10 +227,12 @@ def run(args):
                 if lspl[0].count(' '):
                     continue
                 pkgname = lspl[0]
+                break
             if not pkgname is None:
-                s['debian'] = dict(package=pkgname)
+                debinfo = dict(type="debian_pkg", name=pkgname)
                 if not apt is None:
-                    s['debian']['version'] = apt[pkgname].current_ver.ver_str
+                    debinfo['version'] = apt[pkgname].current_ver.ver_str
+                s['providers'] = [debinfo]
         except OSError:
             pass
         spec['dependencies'].append(s)
@@ -238,7 +242,4 @@ def run(args):
             s = dict(type='envvar', name=env, value=os.environ[env])
             spec['dependencies'].append(s)
 
-    spec_file = open(args.spec_filename, 'w')
-    spec_file.write(json.dumps(spec, indent=2))
-    spec_file.write('\n')
-    spec_file.close()
+    spec.save(args.spec_filename)
