@@ -49,6 +49,8 @@ class SPEC(dict):
             self.update(json.load(src))
         elif isinstance(src, basestring):
             self.update(json.loads(src))
+        elif isinstance(src, dict):
+            self.update(src)
         self._check()
 
     def _check(self):
@@ -70,6 +72,18 @@ class SPEC(dict):
                     "version needs to be a non-negative integer value "
                     "(got: %s)." % value)
         dict.__setitem__(self, key, value)
+
+    def get_hash(self):
+        from hashlib import sha1
+        str_repr = json.dumps(self, separators=(',',':'), sort_keys=True)
+        return sha1(str_repr).hexdigest()
+
+    def save(self, filename):
+        spec_file = open(filename, 'w')
+        spec_file.write(json.dumps(self, indent=2, sort_keys=True))
+        spec_file.write('\n')
+        spec_file.close()
+
 
 def spec_testoutput_ids(spec):
         return spec.get('output spec', {}).keys()
