@@ -29,7 +29,7 @@ import os
 import itertools
 from os.path import join as opj
 from ..spec import SPEC
-from ..utils import sha1sum
+from ..utils import sha1sum, get_debian_pkg, get_cmd_prov_strace
 from ..base import verbose
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -45,13 +45,16 @@ def setup_parser(parser):
         '--description', default='',
         help="SPEC description")
     parser.add_argument(
+        '--author', default='', nargs=2,
+        help="SPEC author given as <'NAMES' EMAIL>")
+    parser.add_argument(
         '--sv', '--spec-version', default=0, type=int, dest='spec_version',
         metavar='VERSION', help="SPEC version")
     parser.add_argument(
         '--env', '--dump-environment', action='store_true', dest='dump_env',
         help="dump all environment variables into the SPEC")
     parser.add_argument(
-        '--no-cde', action='store_true',
+        '--no-strace', action='store_true',
         help="do not use CDE to analyze software and data dependencies.")
     parser.add_argument(
         '--nomin', '--no-minimize-inputs', action='store_true', dest='no_minimize_inputs',
@@ -95,6 +98,14 @@ def find_files(path):
                 files.append(testfile)
     return files
 
+def _proc_generates(procs, proc, starts):
+    if len(proc['generates']):
+        return True
+    for started_pid in starts[proc['pid']]:
+        generates = _proc_generates(procs, procs[started_pid], starts)
+        if generates:
+            return True
+    return False
 
 def run(args):
     import sys
@@ -116,126 +127,98 @@ def run(args):
     # assume execution within the testbed
     testbed_dir = os.path.abspath(os.curdir)
     # get the state of the union
-    prior_test_hashes = get_dir_hashes(testbed_dir, ignore=['cde.options'])
-
-    if args.no_cde:
-        retcode = 1
-    else:
-        # make an attempt to run cmd within CDE
-        wdir = tempfile.mkdtemp(prefix='tkraut_genspec')
-        cde_args = ['cde', '-o', wdir]
-        cde_args += args.arg
-        try:
-            retcode = subprocess.call(cde_args,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
-        except OSError:
-            retcode = 1
-
-    if retcode == 0:
-        cde_root = opj(wdir, 'cde-root')
-        # this needs somebody with windows foo to check for a way to do this on that
-        # platform
-        cde_testbed_dir = opj(cde_root, testbed_dir[1:])
-        with_cde = True
-    else:
-        # no need to keep the working dir
-        if not args.no_cde:
-            shutil.rmtree(wdir)
-        verbose(1, "No result from CDE execution. Attempting native run.")
-        retcode = subprocess.call(args.arg,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)
-        with_cde = False
-        if retcode != 0:
-            raise ValueError("command '%s' returned with non-zero exit code" % args.arg)
-
+    prior_test_hashes = get_dir_hashes(testbed_dir)
+    # run through strace
+    proc_info = get_cmd_prov_strace(args.arg)
+    used_files = set()
+    starts = dict(zip([p['pid'] for p in proc_info.values()],
+                      [list() for i in xrange(len(proc_info))]))
+    for proc in proc_info.values():
+        used_files = used_files.union(proc['uses'])
+        if not proc['started_by'] is None:
+            starts[proc['started_by']].append(proc['pid'])
     # testbed content after run
-    post_test_hashes = get_dir_hashes(testbed_dir, ignore=['cde.options'])
+    post_test_hashes = get_dir_hashes(testbed_dir)
     # categorize testbed content
     new_files = set(post_test_hashes).difference(prior_test_hashes)
     deleted_files = set(prior_test_hashes).difference(post_test_hashes)
     changed_files = [fn for fn in prior_test_hashes if not fn in deleted_files and prior_test_hashes[fn] != post_test_hashes[fn]]
 
-    # software dependencies
-    soft_deps = []
-    if with_cde:
-        for te in find_executables(cde_root):
-            dname, fname = os.path.split(te)
-            if fname.endswith('.so'):
-                # plugin?
-                continue
-            if fname.endswith('.cde'):
-                # cde internal
-                continue
-            if re.match(r'.*\.so\.[0-9]+', fname):
-                # unix library
-                continue
-            exec_path = opj(dname[len(cde_root):], fname)
-            soft_deps.append(exec_path)
-
-    # software dependencies
-    data_deps = []
-    if with_cde:
-        for tf in find_files(cde_testbed_dir):
-            if tf.endswith('.cde'):
-                # cde internal
-                continue
-            data_deps.append(tf[len(cde_testbed_dir) + 1:])
-
-    # cleanup
-    if with_cde:
-        #shutil.rmtree(wdir)
-        os.unlink('cde.options')
     # spec skeleton
     spec = SPEC(
             dict(id=args.id,
                 description=args.description,
                 version=args.spec_version,
-                dependencies=[],
+                components=[],
                 test={},
-                input_specs={},
-                output_specs={},
+                inputs={},
+                outputs={},
                 evaluations=[]))
+
     # in case of a shell command
     spec['test'] = dict(type='shell_command', command=args.arg)
     # record al input files
     for ipf in prior_test_hashes:
         relname = os.path.relpath(ipf)
-        if with_cde and not args.no_minimize_inputs and not relname in data_deps:
+        if not relname in used_files:
+            # skip
             continue
         s = dict(type='file', value=relname,
                  sha1sum=prior_test_hashes[ipf])
-        spec['input_specs'][relname] = s
+        spec['inputs'][relname] = s
     # record all output files
     for opf in new_files:
         relname = os.path.relpath(opf)
         s = dict(type='file', value=relname)
-        spec['output_specs'][relname] = s
-    # record all used executables
-    for exe in soft_deps:
-        s = dict(type='executable', path=exe)
-        try:
-            # provide by a Debian package?
-            dpkg = subprocess.Popen(['dpkg', '-S', exe],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
-            dpkg.wait()
-            pkgname = None
-            for line in dpkg.stdout:
-                lspl = line.split(':')
-                if lspl[0].count(' '):
-                    continue
-                pkgname = lspl[0]
-                break
+        spec['outputs'][relname] = s
+
+    # 1st pass -- store info on individual test components
+    proc_mapper = {}
+    pid_counter = 0
+    deb_pkg_cache = {}
+    for pid, proc in proc_info.iteritems():
+        executable = os.path.realpath(proc['executable'])
+        s = dict(type='process', executable=dict(path=executable),
+                 pid=pid_counter, argv=proc['argv'])
+        pid_counter += 1
+        if executable in deb_pkg_cache:
+            s['executable']['providers'] = [deb_pkg_cache[executable]]
+        else:
+            pkgname = get_debian_pkg(executable)
+            debinfo = None
             if not pkgname is None:
                 debinfo = dict(type="debian_pkg", name=pkgname)
                 if not apt is None:
                     debinfo['version'] = apt[pkgname].current_ver.ver_str
-                s['providers'] = [debinfo]
-        except OSError:
-            pass
-        spec['dependencies'].append(s)
+                s['executable']['providers'] = [debinfo]
+            deb_pkg_cache[executable] = debinfo
+        proc_mapper[proc['pid']] = s
+    # 2nd pass -- store inter-process/file dependencies
+    for pid, proc in proc_mapper.iteritems():
+        pinfo = proc_info[pid]
+        for ftype in ('uses', 'generates'):
+            flist = pinfo.get(ftype, [])
+            if len(flist):
+                proc[ftype] = [os.path.relpath(fn) for fn in flist if os.path.isfile(fn)]
+        native_parent_pid = pinfo['started_by']
+        if native_parent_pid is None:
+            # this is the mother process
+            continue
+        parent_proc_pid = proc_mapper[native_parent_pid]['pid']
+        proc['started_by'] = parent_proc_pid
+    # 3rd pass -- only store processes that are involved in some sort of file
+    # generation
+    effective_pids = []
+    for pid, proc in proc_mapper.iteritems():
+        if _proc_generates(proc_info, proc_info[pid], starts):
+            effective_pids.append(proc['pid'])
+            spec['components'].append(proc)
+    # 4th pass -- beautify PIDs
+    pid_mapper = dict(zip(effective_pids, range(len(effective_pids))))
+    for cmd_spec in spec['components']:
+        cmd_spec['pid'] = pid_mapper[cmd_spec['pid']]
+        if 'started_by' in cmd_spec:
+            cmd_spec['started_by'] = pid_mapper[cmd_spec['started_by']]
     # record full environment (if desired)
     if args.dump_env:
         for env in os.environ:
