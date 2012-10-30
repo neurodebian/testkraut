@@ -233,6 +233,6 @@ def run(args):
     if args.dump_env:
         for env in os.environ:
             s = dict(type='envvar', name=env, value=os.environ[env])
-            spec['dependencies'].append(s)
+            spec['components'].append(s)
 
     spec.save(args.spec_filename)
