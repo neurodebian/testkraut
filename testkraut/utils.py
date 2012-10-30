@@ -375,4 +375,6 @@ def get_cmd_prov_strace(cmd):
             pid_mapper[pid] = pid
     # filter all procs that have no argv
     procs = dict([(pid, procs[pid]) for pid in pid_mapper.values()])
-    return procs
+    # wait() sets the returncode
+    cmd_exec.wait()
+    return procs, cmd_exec.returncode
