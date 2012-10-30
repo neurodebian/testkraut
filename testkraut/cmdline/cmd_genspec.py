@@ -117,10 +117,8 @@ def run(args):
 
     # try using APT to obtain more info on software deps
     try:
-        import apt_pkg
-        apt_pkg.init_config()
-        apt_pkg.init_system()
-        apt = apt_pkg.Cache()
+        import apt
+        apt = apt.Cache()
     except:
         apt = None
 
@@ -129,7 +127,11 @@ def run(args):
     # get the state of the union
     prior_test_hashes = get_dir_hashes(testbed_dir)
     # run through strace
-    proc_info = get_cmd_prov_strace(args.arg)
+    proc_info, retval = get_cmd_prov_strace(args.arg)
+    print retval
+    if not retval == 0:
+        raise RuntimeError('command returned with non-zero exit code %s'
+                           % args.arg)
     used_files = set()
     starts = dict(zip([p['pid'] for p in proc_info.values()],
                       [list() for i in xrange(len(proc_info))]))
@@ -189,7 +191,15 @@ def run(args):
             if not pkgname is None:
                 debinfo = dict(type="debian_pkg", name=pkgname)
                 if not apt is None:
-                    debinfo['version'] = apt[pkgname].current_ver.ver_str
+                    pkg = apt[pkgname].installed
+                    debinfo['version'] = pkg.version
+                    debinfo['sha1'] = pkg.sha1
+                    debinfo['arch'] = pkg.architecture
+                    origin = pkg.origins[0]
+                    debinfo['origin'] = origin.origin
+                    debinfo['origin_archive'] = origin.archive
+                    debinfo['origin_site'] = origin.site
+                    debinfo['origin_trusted'] = origin.trusted
                 s['executable']['providers'] = [debinfo]
             deb_pkg_cache[executable] = debinfo
         proc_mapper[proc['pid']] = s
