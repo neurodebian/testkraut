@@ -1,60 +1,92 @@
 {
-  "id": "demo", 
-  "description": "some description",
-  "depends": "fsl4.1 (>=4.1.6) | fsl5.0",
-  "test": {
-    "type": "nipype_workflow",
-    "code": "bet input output -m",
-    "file": "bet_wf.py"
-  },
-  "input spec": {
-    "head": {
-      "type": "file",
-      "datatype": "nifti",
-      "value": "head.nii.gz",
-      "origin": "http://....",
-      "md5sum": "c648dd6ff0dcad3e06189facee61d8be"
-    }
-  },
-  "output spec": {
-    "brainmask": {
-      "type": "file",
-      "datatype": "nifti",
-      "value": "output/head_brain_mask.nii.gz"
-    },
-    "brain": {
-      "type": "file",
-      "datatype": "nifti",
-      "value": "output/head_brain.nii.gz"
-    }
-  },
-  "evaluation": [
+  "components": [
     {
-      "id": "n_brain_mask_voxels",
-      "operator": {
-        "type": "builtin-func",
-        "name": "image_nelements_positive"
-      },
-      "input spec": [
+      "argv": [
+        "/usr/share/fsl/5.0/bin/bet2", 
+        "head", 
+        "brain"
+      ], 
+      "executable": {
+        "path": "/usr/lib/fsl/5.0/bet2", 
+        "providers": [
           {
-              "origin": "testoutput",
-              "value": "brainmask"
+            "arch": "i386", 
+            "name": "fsl-5.0", 
+            "origin": "", 
+            "origin_archive": "now", 
+            "origin_site": "", 
+            "origin_trusted": false, 
+            "sha1": "", 
+            "type": "debian_pkg", 
+            "version": "5.0.1-1"
           }
-      ],
-      "input spec (alt)": {
-          "val": {
-              "origin": "testoutput",
-              "value": "brainmask"
-            }
-      },
-      "output spec": {
-        "value": {
-          "type": "return",
-          "datatype": "int"
-        }
-      }
+        ]
+      }, 
+      "generates": [
+        "brain.nii.gz"
+      ], 
+      "pid": 0, 
+      "started_by": 1, 
+      "type": "process", 
+      "uses": [
+        "head.nii.gz"
+      ]
+    }, 
+    {
+      "argv": [
+        "bet", 
+        "head.nii.gz", 
+        "brain"
+      ], 
+      "executable": {
+        "path": "/usr/lib/fsl/5.0/bet", 
+        "providers": [
+          {
+            "arch": "i386", 
+            "name": "fsl-5.0", 
+            "origin": "", 
+            "origin_archive": "now", 
+            "origin_site": "", 
+            "origin_trusted": false, 
+            "sha1": "", 
+            "type": "debian_pkg", 
+            "version": "5.0.1-1"
+          }
+        ]
+      }, 
+      "pid": 1, 
+      "type": "process", 
+      "uses": []
+    }, 
+    {
+      "name": "FSLDIR", 
+      "type": "envvar", 
+      "value": "/usr/share/fsl/5.0"
     }
-  ],
+  ], 
+  "description": "", 
+  "evaluations": [], 
+  "id": "demo", 
+  "inputs": {
+    "head.nii.gz": {
+      "sha1sum": "0e4d2c982cc051171a37b8e56eece6294640fdf5", 
+      "type": "file", 
+      "value": "head.nii.gz"
+    }
+  }, 
+  "outputs": {
+    "brain.nii.gz": {
+      "type": "file", 
+      "value": "brain.nii.gz"
+    }
+  }, 
+  "test": {
+    "command": [
+      "bet", 
+      "head.nii.gz", 
+      "brain"
+    ], 
+    "type": "shell_command"
+  }, 
   "version": 0
 }
-
