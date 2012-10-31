@@ -19,8 +19,8 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
-from .. import logging
-logger = logging.getLogger('interface')
+# XXX: temp_disable from .. import logging
+# XXX: temp_disable logger = logging.getLogger('interface')
 
 ## PROV record constants - PROV-DM LC
 # C1. Entities/Activities
@@ -1334,12 +1334,12 @@ class ProvBundle(ProvEntity):
                         other_records.remove(record_b)
                         continue
                     else:
-                        logger.debug("Inequal PROV records:")
-                        logger.debug("%s" % str(record_a))
-                        logger.debug("%s" % str(record_b))
+                        # XXX: temp_disable logger.debug("Inequal PROV records:")
+                        # XXX: temp_disable logger.debug("%s" % str(record_a))
+                        # XXX: temp_disable logger.debug("%s" % str(record_b))
                         return False
                 else:
-                    logger.debug("Could not find a record with this identifier: %s" % str(record_a._identifier))
+                    # XXX: temp_disable logger.debug("Could not find a record with this identifier: %s" % str(record_a._identifier))
                     return False
             else:
                 # Manually look for the record
@@ -1350,7 +1350,7 @@ class ProvBundle(ProvEntity):
                         found = True
                         break
                 if not found:
-                    logger.debug("Could not find this record: %s" % str(record_a))
+                    # XXX: temp_disable logger.debug("Could not find this record: %s" % str(record_a))
                     return False
         return True
             

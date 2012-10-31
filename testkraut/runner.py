@@ -20,7 +20,9 @@ from .base import verbose
 if __debug__:
     from .base import debug
 
+
 class BaseRunner(object):
+
     def __init__(self, testlib='lib'):
         """
         Parameters
@@ -34,7 +36,6 @@ class BaseRunner(object):
 
     def __call__(self, spec):
         testlib_filepath = os.path.join(self._testlib, spec, 'spec.json')
-        print  testlib_filepath
         if os.path.isfile(testlib_filepath):
             # open spec from test library
             spec = SPEC(open(testlib_filepath))
@@ -44,7 +45,8 @@ class BaseRunner(object):
         else:
             # spec is given as a str?
             spec = SPEC(spec)
-        verbose(1, "processing test SPEC '%s'" %spec['id'])
+
+        verbose(1, "processing test SPEC '%s' (%s)" % (spec['id'], spec.get_hash()))
         verbose(1, "check dependencies")
         verbose(1, "prepare testbed")
         self._prepare_testbed(spec)
@@ -118,7 +120,7 @@ def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
 def prepare_local_testbed(spec, dst, testlibdir, force=False):
     if not os.path.exists(dst):
         os.makedirs(dst)
-    inspecs = spec.get('input_specs', {})
+    inspecs = spec.get('inputs', {})
     # locate and copy test input into testbed
     for inspec_id in inspecs:
         inspec = inspecs[inspec_id]
@@ -244,7 +246,6 @@ class LocalRunner(BaseRunner):
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
             texec.wait()
-            print texec.stdout.read()
             return self._check_output_presence(spec)
         except OSError, e:
             verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
@@ -255,8 +256,7 @@ class LocalRunner(BaseRunner):
 
     def _check_output_presence(self, spec):
         testbedpath = os.path.join(self._testbed_basedir, spec['id'])
-        outspec = spec.get('output_specs', {})
-        print outspec
+        outspec = spec.get('outputs', {})
         missing = []
         for ospec_id in outspec:
             ospec = outspec[ospec_id]
@@ -279,7 +279,6 @@ class LocalRunner(BaseRunner):
                 if __debug__:
                     debug('RUNNER', "running evaluation '%s'" % espec['id'])
                 res = self._proc_eval_spec(espec, spec)
-                print res
         finally:
             os.chdir(initial_cwd)
 
@@ -295,7 +294,7 @@ class LocalRunner(BaseRunner):
         # gather inputs
         args = list()
         kwargs = dict()
-        in_spec = espec['input_specs']
+        in_spec = espec['inputs']
         for ins in in_spec:
             # This distinction is bullshit and not possible with valid JSON
             if isinstance(ins, basestring):
@@ -310,7 +309,7 @@ class LocalRunner(BaseRunner):
 def get_eval_input(inspec, testspec):
     if 'origin' in inspec and inspec['origin'] == 'testoutput':
         # reference to a test output
-        outspec = testspec['output_specs'][inspec['value']]
+        outspec = testspec['outputs'][inspec['value']]
         if outspec['type'] == 'file':
             return outspec['value']
         else:
@@ -385,7 +384,7 @@ class OldRunner(object):
         # check the input
         # XXX check return value or rely on exceptions?
         self._log('Validate input specs')
-        self._proc_input_spec(spec['input_specs'])
+        self._proc_input_spec(spec['inputs'])
         # run the actual test command
         command = spec['command']
         ret = None
@@ -393,7 +392,7 @@ class OldRunner(object):
             self._log("Run test command [%s]" % command)
             ret = run_command(command)
         # handle test output
-        self._proc_output_spec(spec['output_specs'], ret)
+        self._proc_output_spec(spec['outputs'], ret)
         # pass the return value of the test command, or pretend all is good
         # if no command was given
         if ret is None:
