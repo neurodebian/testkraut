@@ -174,7 +174,7 @@ def sha1sum(filename):
 def md5sum(filename):
     return hash(filename, hashlib.md5())
 
-def get_debian_pkg(filename):
+def get_debian_pkgname(filename):
     # provided by a Debian package?
     pkgname = None
     try:
@@ -190,6 +190,21 @@ def get_debian_pkg(filename):
         pkgname = lspl[0]
         break
     return pkgname
+
+def get_debian_pkginfo(pkgname, apt=None):
+    debinfo = dict(type="debian_pkg", name=pkgname)
+    if not apt is None:
+        pkg = apt[pkgname].installed
+        debinfo['version'] = pkg.version
+        debinfo['sha1'] = pkg.sha1
+        debinfo['arch'] = pkg.architecture
+        origin = pkg.origins[0]
+        debinfo['origin'] = origin.origin
+        debinfo['origin_archive'] = origin.archive
+        debinfo['origin_site'] = origin.site
+        debinfo['origin_trusted'] = origin.trusted
+    return debinfo
+
 
 def _get_next_pid_id(procs, pid):
     base_pid = pid

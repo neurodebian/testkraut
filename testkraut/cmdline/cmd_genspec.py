@@ -29,7 +29,8 @@ import os
 import itertools
 from os.path import join as opj
 from ..spec import SPEC
-from ..utils import sha1sum, get_debian_pkg, get_cmd_prov_strace
+from ..utils import sha1sum, get_debian_pkgname, get_debian_pkginfo, \
+                    get_cmd_prov_strace
 from ..base import verbose
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -186,20 +187,10 @@ def run(args):
         if executable in deb_pkg_cache:
             s['executable']['providers'] = [deb_pkg_cache[executable]]
         else:
-            pkgname = get_debian_pkg(executable)
+            pkgname = get_debian_pkgname(executable)
             debinfo = None
             if not pkgname is None:
-                debinfo = dict(type="debian_pkg", name=pkgname)
-                if not apt is None:
-                    pkg = apt[pkgname].installed
-                    debinfo['version'] = pkg.version
-                    debinfo['sha1'] = pkg.sha1
-                    debinfo['arch'] = pkg.architecture
-                    origin = pkg.origins[0]
-                    debinfo['origin'] = origin.origin
-                    debinfo['origin_archive'] = origin.archive
-                    debinfo['origin_site'] = origin.site
-                    debinfo['origin_trusted'] = origin.trusted
+                debinfo = get_debian_pkginfo(pkgname, apt)
                 s['executable']['providers'] = [debinfo]
             deb_pkg_cache[executable] = debinfo
         proc_mapper[proc['pid']] = s
