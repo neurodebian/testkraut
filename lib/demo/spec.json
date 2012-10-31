@@ -2,38 +2,6 @@
   "components": [
     {
       "argv": [
-        "/usr/share/fsl/5.0/bin/bet2", 
-        "head", 
-        "brain"
-      ], 
-      "executable": {
-        "path": "/usr/lib/fsl/5.0/bet2", 
-        "providers": [
-          {
-            "arch": "i386", 
-            "name": "fsl-5.0", 
-            "origin": "", 
-            "origin_archive": "now", 
-            "origin_site": "", 
-            "origin_trusted": false, 
-            "sha1": "", 
-            "type": "debian_pkg", 
-            "version": "5.0.1-1"
-          }
-        ]
-      }, 
-      "generates": [
-        "brain.nii.gz"
-      ], 
-      "pid": 0, 
-      "started_by": 1, 
-      "type": "process", 
-      "uses": [
-        "head.nii.gz"
-      ]
-    }, 
-    {
-      "argv": [
         "bet", 
         "head.nii.gz", 
         "brain"
@@ -42,21 +10,41 @@
         "path": "/usr/lib/fsl/5.0/bet", 
         "providers": [
           {
-            "arch": "i386", 
             "name": "fsl-5.0", 
-            "origin": "", 
-            "origin_archive": "now", 
-            "origin_site": "", 
-            "origin_trusted": false, 
-            "sha1": "", 
             "type": "debian_pkg", 
             "version": "5.0.1-1"
           }
         ]
       }, 
-      "pid": 1, 
+      "pid": 0, 
       "type": "process", 
       "uses": []
+    }, 
+    {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/bet2", 
+        "head", 
+        "brain"
+      ], 
+      "executable": {
+        "path": "/usr/lib/fsl/5.0/bet2", 
+        "providers": [
+          {
+            "name": "fsl-5.0", 
+            "type": "debian_pkg", 
+            "version": "5.0.1-1"
+          }
+        ]
+      }, 
+      "generates": [
+        "brain.nii.gz"
+      ], 
+      "pid": 1, 
+      "started_by": 0, 
+      "type": "process", 
+      "uses": [
+        "head.nii.gz"
+      ]
     }, 
     {
       "name": "FSLDIR", 

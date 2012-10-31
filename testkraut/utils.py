@@ -192,7 +192,7 @@ def get_debian_pkgname(filename):
     return pkgname
 
 def get_debian_pkginfo(pkgname, apt=None):
-    debinfo = dict(type="debian_pkg", name=pkgname)
+    debinfo = dict(name=pkgname)
     if not apt is None:
         pkg = apt[pkgname].installed
         debinfo['version'] = pkg.version

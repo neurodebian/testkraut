@@ -191,7 +191,10 @@ def run(args):
             debinfo = None
             if not pkgname is None:
                 debinfo = get_debian_pkginfo(pkgname, apt)
-                s['executable']['providers'] = [debinfo]
+                pkginfo = dict(name=pkgname, type='debian_pkg')
+                if 'version' in debinfo:
+                    pkginfo['version'] = debinfo['version']
+                s['executable']['providers'] = [pkginfo]
             deb_pkg_cache[executable] = debinfo
         proc_mapper[proc['pid']] = s
     # 2nd pass -- store inter-process/file dependencies
