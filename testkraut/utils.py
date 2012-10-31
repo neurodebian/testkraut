@@ -196,7 +196,7 @@ def get_debian_pkginfo(pkgname, apt=None):
     if not apt is None:
         pkg = apt[pkgname].installed
         debinfo['version'] = pkg.version
-        debinfo['sha1'] = pkg.sha1
+        debinfo['sha1sum'] = pkg.sha1
         debinfo['arch'] = pkg.architecture
         origin = pkg.origins[0]
         debinfo['origin'] = origin.origin
