@@ -4,15 +4,15 @@
       "argv": [
         "bet", 
         "head.nii.gz", 
-        "brain"
+        "brain", 
+        "-m"
       ], 
       "executable": {
         "path": "/usr/lib/fsl/5.0/bet", 
         "providers": [
           {
             "name": "fsl-5.0", 
-            "type": "debian_pkg", 
-            "version": "5.0.1-1"
+            "type": "debian_pkg"
           }
         ]
       }, 
@@ -24,20 +24,21 @@
       "argv": [
         "/usr/share/fsl/5.0/bin/bet2", 
         "head", 
-        "brain"
+        "brain", 
+        "-m"
       ], 
       "executable": {
         "path": "/usr/lib/fsl/5.0/bet2", 
         "providers": [
           {
             "name": "fsl-5.0", 
-            "type": "debian_pkg", 
-            "version": "5.0.1-1"
+            "type": "debian_pkg"
           }
         ]
       }, 
       "generates": [
-        "brain.nii.gz"
+        "brain.nii.gz", 
+        "brain_mask.nii.gz"
       ], 
       "pid": 1, 
       "started_by": 0, 
@@ -48,8 +49,7 @@
     }, 
     {
       "name": "FSLDIR", 
-      "type": "envvar", 
-      "value": "/usr/share/fsl/5.0"
+      "type": "envvar"
     }
   ], 
   "description": "", 
@@ -66,13 +66,18 @@
     "brain.nii.gz": {
       "type": "file", 
       "value": "brain.nii.gz"
+    }, 
+    "brain_mask.nii.gz": {
+      "type": "file", 
+      "value": "brain_mask.nii.gz"
     }
   }, 
   "test": {
     "command": [
       "bet", 
       "head.nii.gz", 
-      "brain"
+      "brain", 
+      "-m"
     ], 
     "type": "shell_command"
   }, 

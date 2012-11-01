@@ -52,8 +52,9 @@ def setup_parser(parser):
         '--sv', '--spec-version', default=0, type=int, dest='spec_version',
         metavar='VERSION', help="SPEC version")
     parser.add_argument(
-        '--env', '--dump-environment', action='store_true', dest='dump_env',
-        help="dump all environment variables into the SPEC")
+        '--env', '--dump-environment', metavar='REGEX', dest='dump_env',
+        help="""dump all environment variables into the SPEC whose names match
+             the regular expression""")
     parser.add_argument(
         '--no-strace', action='store_true',
         help="do not use CDE to analyze software and data dependencies.")
@@ -117,11 +118,11 @@ def run(args):
     import json
 
     # try using APT to obtain more info on software deps
-    try:
-        import apt
-        apt = apt.Cache()
-    except:
-        apt = None
+    #try:
+    #    import apt
+    #    apt = apt.Cache()
+    #except:
+    #    apt = None
 
     # assume execution within the testbed
     testbed_dir = os.path.abspath(os.curdir)
@@ -129,7 +130,6 @@ def run(args):
     prior_test_hashes = get_dir_hashes(testbed_dir)
     # run through strace
     proc_info, retval = get_cmd_prov_strace(args.arg)
-    print retval
     if not retval == 0:
         raise RuntimeError('command returned with non-zero exit code %s'
                            % args.arg)
@@ -190,10 +190,7 @@ def run(args):
             pkgname = get_debian_pkgname(executable)
             debinfo = None
             if not pkgname is None:
-                debinfo = get_debian_pkginfo(pkgname, apt)
                 pkginfo = dict(name=pkgname, type='debian_pkg')
-                if 'version' in debinfo:
-                    pkginfo['version'] = debinfo['version']
                 s['executable']['providers'] = [pkginfo]
             deb_pkg_cache[executable] = debinfo
         proc_mapper[proc['pid']] = s
@@ -224,9 +221,9 @@ def run(args):
         if 'started_by' in cmd_spec:
             cmd_spec['started_by'] = pid_mapper[cmd_spec['started_by']]
     # record full environment (if desired)
-    if args.dump_env:
+    if not args.dump_env is None:
         for env in os.environ:
-            s = dict(type='envvar', name=env, value=os.environ[env])
-            spec['components'].append(s)
-
+            if not re.match(args.dump_env, env) is None:
+                s = dict(type='envvar', name=env)
+                spec['components'].append(s)
     spec.save(args.spec_filename)
