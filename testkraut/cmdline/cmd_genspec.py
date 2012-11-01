@@ -30,7 +30,7 @@ import itertools
 from os.path import join as opj
 from ..spec import SPEC
 from ..utils import sha1sum, get_debian_pkgname, get_debian_pkginfo, \
-                    get_cmd_prov_strace
+                    get_cmd_prov_strace, guess_file_tags
 from ..base import verbose
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -167,12 +167,14 @@ def run(args):
             # skip
             continue
         s = dict(type='file', value=relname,
-                 sha1sum=prior_test_hashes[ipf])
+                 sha1sum=prior_test_hashes[ipf],
+                 tags=list(guess_file_tags(relname)))
         spec['inputs'][relname] = s
     # record all output files
     for opf in new_files:
         relname = os.path.relpath(opf)
-        s = dict(type='file', value=relname)
+        s = dict(type='file', value=relname,
+                 tags=list(guess_file_tags(relname)))
         spec['outputs'][relname] = s
 
     # 1st pass -- store info on individual test components

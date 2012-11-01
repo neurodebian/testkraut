@@ -41,6 +41,9 @@ def _verify_spec_tags(specs, tags, name):
         os = specs[os_id]
         _verify_tags(os, tags, '%s: %s' % (name, os_id))
 
+class SPECJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        return super(SPECJSONEncoder, self).default(o)
 
 class SPEC(dict):
     def __init__(self, src=None):
@@ -80,7 +83,8 @@ class SPEC(dict):
 
     def save(self, filename):
         spec_file = open(filename, 'w')
-        spec_file.write(json.dumps(self, indent=2, sort_keys=True))
+        spec_file.write(json.dumps(self, indent=2, sort_keys=True,
+                                   cls=SPECJSONEncoder))
         spec_file.write('\n')
         spec_file.close()
 

@@ -393,3 +393,22 @@ def get_cmd_prov_strace(cmd):
     # wait() sets the returncode
     cmd_exec.wait()
     return procs, cmd_exec.returncode
+
+def guess_file_tags(fname):
+    tags = set()
+    try:
+        import nibabel as nb
+        img = nb.load(fname)
+        tags.add('volumetric image')
+        tags.add('%iD' % len(img.get_shape()))
+    except:
+        pass
+    try:
+        import numpy as np
+        mat = np.loadtxt(fname)
+        tags.add('numeric data')
+        tags.add('text file')
+    except:
+        pass
+    return tags
+

@@ -2,26 +2,6 @@
   "components": [
     {
       "argv": [
-        "bet", 
-        "head.nii.gz", 
-        "brain", 
-        "-m"
-      ], 
-      "executable": {
-        "path": "/usr/lib/fsl/5.0/bet", 
-        "providers": [
-          {
-            "name": "fsl-5.0", 
-            "type": "debian_pkg"
-          }
-        ]
-      }, 
-      "pid": 0, 
-      "type": "process", 
-      "uses": []
-    }, 
-    {
-      "argv": [
         "/usr/share/fsl/5.0/bin/bet2", 
         "head", 
         "brain", 
@@ -40,15 +20,67 @@
         "brain.nii.gz", 
         "brain_mask.nii.gz"
       ], 
-      "pid": 1, 
-      "started_by": 0, 
+      "pid": 0, 
+      "started_by": 1, 
       "type": "process", 
       "uses": [
         "head.nii.gz"
       ]
     }, 
     {
+      "argv": [
+        "bet", 
+        "head.nii.gz", 
+        "brain", 
+        "-m"
+      ], 
+      "executable": {
+        "path": "/usr/lib/fsl/5.0/bet", 
+        "providers": [
+          {
+            "name": "fsl-5.0", 
+            "type": "debian_pkg"
+          }
+        ]
+      }, 
+      "pid": 1, 
+      "type": "process", 
+      "uses": []
+    }, 
+    {
       "name": "FSLDIR", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLTCLSH", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLLOCKDIR", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLWISH", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLMACHINELIST", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLOUTPUTTYPE", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLREMOTECALL", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLMULTIFILEQUIT", 
+      "type": "envvar"
+    }, 
+    {
+      "name": "FSLBROWSER", 
       "type": "envvar"
     }
   ], 
@@ -58,16 +90,28 @@
   "inputs": {
     "head.nii.gz": {
       "sha1sum": "0e4d2c982cc051171a37b8e56eece6294640fdf5", 
+      "tags": [
+        "3D", 
+        "volumetric image"
+      ], 
       "type": "file", 
       "value": "head.nii.gz"
     }
   }, 
   "outputs": {
     "brain.nii.gz": {
+      "tags": [
+        "3D", 
+        "volumetric image"
+      ], 
       "type": "file", 
       "value": "brain.nii.gz"
     }, 
     "brain_mask.nii.gz": {
+      "tags": [
+        "3D", 
+        "volumetric image"
+      ], 
       "type": "file", 
       "value": "brain_mask.nii.gz"
     }
