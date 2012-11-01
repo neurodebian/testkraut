@@ -58,13 +58,13 @@ class SPEC(dict):
 
     def _check(self):
         _verify_tags(self, ('id', 'version'), 'SPEC')
-        for i, ev in enumerate(self.get('evaluation', [])):
+        for i, ev in enumerate(self.get('evaluations', [])):
             _verify_tags(ev, ('id', 'input spec', 'operator'),
                          'evaluation %i' % i)
-        _verify_spec_tags(self.get('output spec', {}), ('type', 'value'),
-                          'output spec')
-        _verify_spec_tags(self.get('input spec', {}), ('type', 'value'),
-                          'input spec')
+        _verify_spec_tags(self.get('outputs', {}), ('type', 'value'),
+                          'outputs')
+        _verify_spec_tags(self.get('inputs', {}), ('type', 'value'),
+                          'inputs')
 
     def __setitem__(self, key, value):
         if not key in __allowed_spec_keys__:
@@ -75,6 +75,12 @@ class SPEC(dict):
                     "version needs to be a non-negative integer value "
                     "(got: %s)." % value)
         dict.__setitem__(self, key, value)
+
+    def get(self, *args):
+        # check for proper field names
+        if len(args) and not args[0] in __allowed_spec_keys__:
+            raise ValueError("refuse to access unsupported key", args[0])
+        return super(SPEC, self).get(*args)
 
     def get_hash(self):
         from hashlib import sha1
@@ -116,7 +122,7 @@ def spec_testoutput_ids(spec):
 
 def spec_unused_testoutput_ids(spec):
     out_ids = set(spec_testoutput_ids(spec))
-    for ev in spec.get('evaluation', []):
+    for ev in spec.get('evaluations', []):
         for eis in ev.get('inputs', {}):
             if not isinstance(eis, dict):
                 eis = ev['inputs'].get(eis, {})

@@ -270,7 +270,7 @@ class LocalRunner(BaseRunner):
         return True
 
     def _evaluate_output(self, spec):
-        evalspecs = spec.get('evaluation',[])
+        evalspecs = spec.get('evaluations',[])
         testbedpath = os.path.join(self._testbed_basedir, spec['id'])
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
