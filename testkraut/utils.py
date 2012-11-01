@@ -400,13 +400,13 @@ def guess_file_tags(fname):
         import nibabel as nb
         img = nb.load(fname)
         tags.add('volumetric image')
-        tags.add('%iD' % len(img.get_shape()))
+        tags.add('%iD image' % len(img.get_shape()))
     except:
         pass
     try:
         import numpy as np
         mat = np.loadtxt(fname)
-        tags.add('numeric data')
+        tags.add('space-separated values')
         tags.add('text file')
     except:
         pass
