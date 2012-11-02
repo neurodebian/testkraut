@@ -184,6 +184,9 @@ class LocalRunner(BaseRunner):
         BaseRunner.__init__(self, **kwargs)
         self._testbed_basedir = os.path.abspath(testbed_basedir)
 
+    def get_testbed_dir(self, spec):
+        return os.path.join(self._testbed_basedir, spec['id'])
+
     def _prepare_testbed(self, spec):
         prepare_local_testbed(spec,
                               os.path.join(self._testbed_basedir, spec['id']),

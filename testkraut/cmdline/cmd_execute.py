@@ -35,5 +35,7 @@ def setup_parser(parser):
 
 def run(args):
     from .. import runner as tkr
+    from ..spec import SPECJSONEncoder
     runner = tkr.LocalRunner()
-    runner(args.spec)
+    retval, spec = runner(args.spec)
+    spec.save(opj(runner.get_testbed_dir(spec), 'spec.json'))

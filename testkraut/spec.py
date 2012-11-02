@@ -11,6 +11,7 @@
 __docformat__ = 'restructuredtext'
 
 import json
+import numpy as np
 
 __allowed_spec_keys__ = [
         'test',
@@ -43,7 +44,10 @@ def _verify_spec_tags(specs, tags, name):
 
 class SPECJSONEncoder(json.JSONEncoder):
     def default(self, o):
+        if isinstance(o, np.ndarray):
+            return list(o)
         return super(SPECJSONEncoder, self).default(o)
+
 
 class SPEC(dict):
     def __init__(self, src=None):
