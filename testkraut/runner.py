@@ -12,9 +12,11 @@ __docformat__ = 'restructuredtext'
 
 import os
 import shutil
+from uuid import uuid1 as uuid
 from . import utils
 from . import evaluators
-from .utils import run_command, get_shlibdeps, which
+from .utils import run_command, get_shlibdeps, which, sha1sum, \
+        get_script_interpreter, get_debian_pkgname, get_debian_pkginfo
 from .spec import SPEC
 from .base import verbose
 if __debug__:
@@ -54,6 +56,8 @@ class BaseRunner(object):
         test_success = self._run_test(spec)
         if not test_success:
             return False, spec
+        verbose(1, "gather component information")
+        self._gather_component_info(spec)
         verbose(1, "fingerprinting results")
         self._fingerprint_output(spec)
         verbose(1, "evaluate test results")
@@ -80,6 +84,9 @@ class BaseRunner(object):
         raise NotImplementedError
 
     def _fingerprint_output(self, spec):
+        raise NotImplementedError
+
+    def _gather_component_info(self, spec):
         raise NotImplementedError
 
 
@@ -358,7 +365,79 @@ class LocalRunner(BaseRunner):
             ospec['fingerprints'] = fingerprints
         os.chdir(initial_cwd)
 
+    def _gather_component_info(self, spec):
+        entities = {}
+        # try using APT to obtain more info on software deps
+        try:
+            import apt
+            pkg_mngr = apt.Cache()
+        except:
+            pkg_mngr = None
+        for pspec in spec.get_components('process'):
+            # replace exectutable info with the full picture
+            ehash = self._describe_binary(pspec['executable']['path'],
+                                          entities,
+                                          type_='binary',
+                                          pkgdb=pkg_mngr)
+            pspec['executable'] = ehash
+        for espec in spec.get_components('envvar'):
+            # grab envvar values
+            espec['value'] = os.environ.get(espec['name'], 'UNDEFINED')
+        if len(entities):
+            # store all discovered entities in the SPEC
+            entity_specs = spec.get('entities', {})
+            entity_specs.update(entities)
+            spec['entities'] = entity_specs
 
+
+    def _describe_binary(self, path, entities, type_=None, pkgdb=None):
+        spec = dict(path=path)
+        fpath = os.path.realpath(os.path.expandvars(path))
+        spec['realpath'] = fpath
+        fhash = sha1sum(fpath)
+        spec['sha1sum'] = fhash
+        if fhash in entities:
+            # do not process twice
+            return fhash
+        else:
+            entities[fhash] = spec
+        if not type_ is None:
+            spec['type'] = type_
+        # try capturing dependencies
+        try:
+            shlibdeps = get_shlibdeps(fpath)
+            if len(shlibdeps):
+                spec['shlibdeps'] = []
+        except RuntimeError:
+            shlibdeps = list()
+        # maybe not a binary, but could be a script
+        try:
+            interpreter_path = get_script_interpreter(fpath)
+            spec['type'] = 'script'
+            spec['interpreter'] = self._describe_binary(interpreter_path,
+                                                        entities,
+                                                        pkgdb=pkgdb)
+        except ValueError:
+            # not sure what this was
+            pass
+        for dep in shlibdeps:
+            spec['shlibdeps'].append(self._describe_binary(dep, entities,
+                                                           type_='library',
+                                                           pkgdb=pkgdb))
+        provider = []
+        # provided by debian?
+        pkgname = get_debian_pkgname(fpath)
+        if not pkgname is None:
+            pkginfo = dict(type='debian_pkg', name=pkgname)
+            pkginfo.update(get_debian_pkginfo(pkgname, pkgdb))
+            if 'sha1sum' in pkginfo and len(pkginfo['sha1sum']):
+                pkghash = pkginfo['sha1sum']
+            else:
+                pkghash = uuid().hex
+            entities[pkghash] = pkginfo
+            provider.append(pkghash)
+        spec['provider'] = provider
+        return fhash
 
 def get_eval_input(inspec, testspec):
     if 'origin' in inspec and inspec['origin'] == 'testoutput':
