@@ -23,6 +23,8 @@ def get_fingerprinters(tag):
     return _tag2fx.get(tag, [])
 
 def fp_volume_image(fname, fp):
+    # this version needs an increment whenever this implementation changes
+    fp['version'] = 0
     import nibabel as nb
     import numpy as np
     from scipy.ndimage import measurements as msr
@@ -32,7 +34,12 @@ def fp_volume_image(fname, fp):
     zero_thresh = img_data > 0
     # global zscore 
     img_std = img_data.std()
-    img_data -= img_data.mean()
+    img_mean = img_data.mean()
+    fp['std'] = img_std
+    fp['mean'] = img_mean
+    fp['min'] = img_data.min()
+    fp['max'] = img_data.max()
+    img_data -= img_mean
     img_data /= img_std
     # normalized luminance histogram (needs zscores)
     luminance_hist_params = (-3, 3, 7)
@@ -86,9 +93,11 @@ def fp_volume_image(fname, fp):
                                                     index=cl_label)
             if isinstance(thresh, float) and thresh < 0:
                 # position of minima
-                cli['min_pos'] = \
-                    msr.minimum_position(img_data, labels=clusters, index=cl_label)
+                pos = msr.minimum_position(img_data, labels=clusters, index=cl_label)
+                cli['min_pos'] = pos
+                cli['min'] = img_data[pos]
             else:
                 # position of maxima
-                cli['max_pos'] = \
-                    msr.maximum_position(img_data, labels=clusters, index=cl_label)
+                pos = msr.maximum_position(img_data, labels=clusters, index=cl_label)
+                cli['max_pos'] = pos
+                cli['max'] = img_data[pos]
