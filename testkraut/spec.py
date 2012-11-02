@@ -22,6 +22,7 @@ __allowed_spec_keys__ = [
         'outputs',
         'version',
         'evaluations',
+        'entities'
     ]
 
 def _raise(exception, why, input=None):
