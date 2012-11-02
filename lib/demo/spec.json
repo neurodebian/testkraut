@@ -50,38 +50,6 @@
     {
       "name": "FSLDIR", 
       "type": "envvar"
-    }, 
-    {
-      "name": "FSLTCLSH", 
-      "type": "envvar"
-    }, 
-    {
-      "name": "FSLLOCKDIR", 
-      "type": "envvar"
-    }, 
-    {
-      "name": "FSLWISH", 
-      "type": "envvar"
-    }, 
-    {
-      "name": "FSLMACHINELIST", 
-      "type": "envvar"
-    }, 
-    {
-      "name": "FSLOUTPUTTYPE", 
-      "type": "envvar"
-    }, 
-    {
-      "name": "FSLREMOTECALL", 
-      "type": "envvar"
-    }, 
-    {
-      "name": "FSLMULTIFILEQUIT", 
-      "type": "envvar"
-    }, 
-    {
-      "name": "FSLBROWSER", 
-      "type": "envvar"
     }
   ], 
   "description": "", 
