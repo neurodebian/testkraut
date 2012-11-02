@@ -51,12 +51,16 @@ class BaseRunner(object):
         verbose(1, "prepare testbed")
         self._prepare_testbed(spec)
         verbose(1, "run test")
-        test_success = self._run_test(spec)
+        #test_success = self._run_test(spec)
+        print 'ACTUAL RUN IS DISABLED'
+        test_success = True
         if not test_success:
-            return False
+            return False, spec
+        verbose(1, "fingerprinting results")
+        self._fingerprint_output(spec)
         verbose(1, "evaluate test results")
         self._evaluate_output(spec)
-        return True
+        return True, spec
 
     def _prepare_testbed(self, spec):
         raise NotImplementedError
@@ -75,6 +79,9 @@ class BaseRunner(object):
         raise NotImplementedError
 
     def _evaluate_output(self, spec):
+        raise NotImplementedError
+
+    def _fingerprint_output(self, spec):
         raise NotImplementedError
 
 
@@ -304,6 +311,45 @@ class LocalRunner(BaseRunner):
                 # arg
                 args.append(get_eval_input(ins, spec))
         return operator(*args, **kwargs)
+
+    def _fingerprint_output(self, spec):
+        from .fingerprinting import get_fingerprinters
+        # all local to the testbed
+        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        initial_cwd = os.getcwdu()
+        os.chdir(testbedpath)
+        # for all known outputs
+        for oname, ospec in spec.get_outputs('file').iteritems():
+            # gather fingerprinting callables
+            fingerprinters = set()
+            for tag in ospec.get('tags', []):
+                fingerprinters = fingerprinters.union(get_fingerprinters(tag))
+            # store the fingerprint info in the SPEC of the respective output
+            fingerprints = ospec.get('fingerprints', {}) 
+            # for the unique set of fingerprinting functions
+            for fingerprinter in fingerprinters:
+                # their name will be used as the ID of the fingerprint
+                finger_name = fingerprinter.__name__
+                if finger_name.startswith('fp_'):
+                    # strip common name prefix
+                    finger_name = finger_name[3:]
+                # run it, catch any error
+                try:
+                    fprint = {}
+                    fingerprints[finger_name] = fprint
+                    # fill in a dict to get whetever info even if an exception
+                    # occurs during a latter stage of the fingerprinting
+                    fingerprinter(ospec['value'], fprint)
+                except Exception, e:
+                    if __debug__:
+                        raise
+                    else:
+                        verbose(4,
+                              "ignoring exception '%s' while fingerprinting '%s' with '%s'"
+                              % (str(e), oname, finger_name))
+            ospec['fingerprints'] = fingerprints
+        os.chdir(initial_cwd)
+
 
 
 def get_eval_input(inspec, testspec):
