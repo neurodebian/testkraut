@@ -28,19 +28,26 @@ def fp_volume_image(fname, fp):
     import nibabel as nb
     import numpy as np
     from scipy.ndimage import measurements as msr
+    from scipy.stats import describe
     img = nb.load(fname)
     img_data = img.get_data().astype('float') # float for z-score
     # keep a map where the original data is larger than zero
     zero_thresh = img_data > 0
-    # global zscore 
-    img_std = img_data.std()
-    img_mean = img_data.mean()
+    # basic descriptive stats
+    img_size, img_minmax, img_mean, img_var, img_skew, img_kurt = \
+            describe(img_data, axis=None)
+    img_std = np.sqrt(img_var)
     fp['std'] = img_std
     fp['mean'] = img_mean
-    fp['min'] = img_data.min()
-    fp['max'] = img_data.max()
+    fp['min'] = img_minmax[0]
+    fp['max'] = img_minmax[1]
+    fp['skewness'] = img_skew
+    fp['kurtosis'] = img_kurt
+    # global zscore 
     img_data -= img_mean
     img_data /= img_std
+    zmin = img_data.min()
+    zmax = img_data.max()
     # normalized luminance histogram (needs zscores)
     luminance_hist_params = (-3, 3, 7)
     fp['luminance_histogram_[%i,%i,%i]' % luminance_hist_params] = \
@@ -59,8 +66,14 @@ def fp_volume_image(fname, fp):
             thresh = 'orig_zero'
         else:
             if thresh < 0:
+                if thresh < zmin:
+                    # thresholding would yield nothing
+                    continue
                 thresh_map = img_data < thresh
             else:
+                if thresh > zmax:
+                    # thresholding would yield nothing
+                    continue
                 thresh_map = img_data > thresh
         nclusters = msr.label(thresh_map, output=clusters)
         # sort by cluster size

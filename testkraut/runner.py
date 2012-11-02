@@ -51,9 +51,7 @@ class BaseRunner(object):
         verbose(1, "prepare testbed")
         self._prepare_testbed(spec)
         verbose(1, "run test")
-        #test_success = self._run_test(spec)
-        print 'ACTUAL RUN IS DISABLED'
-        test_success = True
+        test_success = self._run_test(spec)
         if not test_success:
             return False, spec
         verbose(1, "fingerprinting results")
@@ -317,12 +315,18 @@ class LocalRunner(BaseRunner):
 
     def _fingerprint_output(self, spec):
         from .fingerprinting import get_fingerprinters
+        from .utils import sha1sum
         # all local to the testbed
         testbedpath = os.path.join(self._testbed_basedir, spec['id'])
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
         # for all known outputs
         for oname, ospec in spec.get_outputs('file').iteritems():
+            filename = ospec['value']
+            if __debug__:
+                debug('RUNNER',
+                      "generating fingerprints for '%s'" % filename)
+            ospec['sha1sum'] = sha1sum(filename)
             # gather fingerprinting callables
             fingerprinters = set()
             for tag in ospec.get('tags', []):
@@ -336,18 +340,19 @@ class LocalRunner(BaseRunner):
                 if finger_name.startswith('fp_'):
                     # strip common name prefix
                     finger_name = finger_name[3:]
+                if __debug__:
+                    debug('RUNNER',
+                          "generating '%s' fingerprint" % finger_name)
                 # run it, catch any error
                 try:
                     fprint = {}
                     fingerprints[finger_name] = fprint
                     # fill in a dict to get whetever info even if an exception
                     # occurs during a latter stage of the fingerprinting
-                    fingerprinter(ospec['value'], fprint)
-                except Exception, e:
+                    fingerprinter(filename, fprint)
+                except:
                     if __debug__:
-                        raise
-                    else:
-                        verbose(4,
+                        debug('RUNNER',
                               "ignoring exception '%s' while fingerprinting '%s' with '%s'"
                               % (str(e), oname, finger_name))
             ospec['fingerprints'] = fingerprints
