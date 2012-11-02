@@ -2,13 +2,13 @@
   "components": [
     {
       "argv": [
-        "/usr/share/fsl/5.0/bin/bet2", 
+        "$FSLDIR/bin/bet2", 
         "head", 
         "brain", 
         "-m"
       ], 
       "executable": {
-        "path": "/usr/lib/fsl/5.0/bet2", 
+        "path": "$FSLDIR/bin/bet2", 
         "providers": [
           {
             "name": "fsl-5.0", 
@@ -35,7 +35,7 @@
         "-m"
       ], 
       "executable": {
-        "path": "/usr/lib/fsl/5.0/bet", 
+        "path": "$FSLDIR/bin/bet", 
         "providers": [
           {
             "name": "fsl-5.0", 
