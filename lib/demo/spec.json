@@ -14,6 +14,10 @@
             "name": "fsl-5.0", 
             "type": "debian_pkg"
           }
+        ],
+        "version_file": [
+            "$FSLDIR/etc/fslversion",
+            "\\S+"
         ]
       }, 
       "generates": [
@@ -41,7 +45,8 @@
             "name": "fsl-5.0", 
             "type": "debian_pkg"
           }
-        ]
+        ],
+        "version_file": "$FSLDIR/etc/fslversion"
       }, 
       "pid": 1, 
       "type": "process", 

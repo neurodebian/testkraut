@@ -11,6 +11,7 @@
 __docformat__ = 'restructuredtext'
 
 import os
+import re
 import shutil
 from uuid import uuid1 as uuid
 from . import utils
@@ -374,12 +375,37 @@ class LocalRunner(BaseRunner):
         except:
             pkg_mngr = None
         for pspec in spec.get_components('process'):
+            espec = pspec['executable']
             # replace exectutable info with the full picture
-            ehash = self._describe_binary(pspec['executable']['path'],
+            ehash = self._describe_binary(espec['path'],
                                           entities,
                                           type_='binary',
                                           pkgdb=pkg_mngr)
             pspec['executable'] = ehash
+            # gather some more version info
+            have_version = False
+            if 'version_file' in espec:
+                verfilename = espec['version_file']
+                extract_regex = r'.*'
+                if isinstance(verfilename, list):
+                    verfilename, extract_regex = verfilename
+                # expand the filename
+                verfilename = os.path.realpath(os.path.expandvars(verfilename))
+                try:
+                    file_content = open(verfilename).read().strip()
+                    version = re.findall(extract_regex, file_content)[0]
+                    if len(version):
+                        entities[ehash]['version'] = version
+                        have_version = True
+                except:
+                    if __debug__:
+                        debug('RUNNER',
+                              "failed to read version from '%s'"
+                              % verfilename)
+            if not have_version and 'version_cmd' in espec:
+                # TODO
+                pass
+
         for espec in spec.get_components('envvar'):
             # grab envvar values
             espec['value'] = os.environ.get(espec['name'], 'UNDEFINED')
