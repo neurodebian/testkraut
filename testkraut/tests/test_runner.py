@@ -11,12 +11,13 @@
 __docformat__ = 'restructuredtext'
 
 from testkraut import spec
-from testkraut.runner import *
+from testkraut import runner
+from testkraut import utils
 from nose.tools import *
 
 def test_run_cmd():
     # just very simple
-    res = run_command('ls')
+    res = utils.run_command('ls')
     rt = res['retval']
     assert_equal(rt, 0)
     assert_equal(len(res['stderr']), 0)
