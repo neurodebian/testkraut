@@ -19,3 +19,5 @@ def test_spec_io():
     sp = spec.SPEC(open('lib/demo/spec.json'))
     # no unknown keys
     assert_raises(ValueError, sp.__setitem__, 'mike', 0)
+    # from a str
+    sp = spec.SPEC('{"id":"mike","version":0,"test":{"command":["uname"],"type":"shell_command"}}')
