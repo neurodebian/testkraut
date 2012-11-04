@@ -403,8 +403,27 @@ class LocalRunner(BaseRunner):
                               "failed to read version from '%s'"
                               % verfilename)
             if not have_version and 'version_cmd' in espec:
-                # TODO
-                pass
+                vercmd = espec['version_cmd']
+                extract_regex = r'.*'
+                if isinstance(vercmd, list):
+                    vercmd, extract_regex = vercmd
+                ret = run_command(vercmd)
+                try:
+                    # this will throw an exception if nothing is found
+                    version = re.findall(extract_regex, '\n'.join(ret['stderr']))[0]
+                    if len(version):
+                        entities[ehash]['version'] = version
+                        have_version = True
+                except:
+                    try:
+                        version = re.findall(extract_regex, '\n'.join(ret['stdout']))[0]
+                        if len(version):
+                            entities[ehash]['version'] = version
+                            have_version = True
+                    except:
+                        if __debug__:
+                            debug('RUNNER',
+                                  "failed to read version from '%s'" % vercmd)
 
         for espec in spec.get_components('envvar'):
             # grab envvar values

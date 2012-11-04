@@ -15,9 +15,9 @@
             "type": "debian_pkg"
           }
         ],
-        "version_file": [
-            "$FSLDIR/etc/fslversion",
-            "\\S+"
+        "version_cmd": [
+            "$FSLDIR/bin/bet2",
+            "BET \\(Brain Extraction Tool\\) v(\\S+) -"
         ]
       }, 
       "generates": [
