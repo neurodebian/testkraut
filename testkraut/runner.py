@@ -131,12 +131,25 @@ def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
             debug('RUNNER', "file '%s' not present at '%s'"
                             % (filename, filepath))
         return None
-    if check_file_hash(filepath, inspec) in (True, None):
-        # if there is no hash we need to trust
-        return filepath
+    return filepath
     return None
 
-def prepare_local_testbed(spec, dst, testlibdir, force=False):
+def locate_file_in_cache(cachedir, inspec):
+    if inspec is None:
+        inspec = dict()
+    if not 'sha1sum' in inspec:
+        # nothing we can do
+        return None
+    cand_filename = opj(cachedir, inspec['sha1sum'])
+    if os.path.isfile(cand_filename):
+        return cand_filename
+    else:
+        if __debug__:
+            debug('RUNNER', "file '%s' not present in cache '%s'"
+                            % (filename, cachedir))
+    return None
+
+def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, force=False):
     if not os.path.exists(dst):
         os.makedirs(dst)
     inspecs = spec.get('inputs', {})
@@ -151,8 +164,15 @@ def prepare_local_testbed(spec, dst, testlibdir, force=False):
             if filepath is None and os.path.isfile(testbed_filepath):
                 # that file actually exists in the current dir
                 filepath = testbed_filepath
+            if filepath is None and not cachedir is None:
+                # check the cache
+                filepath = locate_file_in_cache(cachedir, inspec)
             if filepath is None:
                 raise NotImplementedError("come up with more ideas on locating files")
+            if not check_file_hash(filepath, inspec) in (True, None):
+                # if there is no hash we need to trust
+                raise ValueError("input file at '%s' doesn match checksum"
+                                 % filepath)
             dst_path = opj(dst, testbed_filepath)
             if force or not os.path.isfile(dst_path):
                 target_dir = os.path.dirname(dst_path)
@@ -186,7 +206,7 @@ def prepare_local_testbed(spec, dst, testlibdir, force=False):
 #class ChrootRunner
 #class VMRunner
 class LocalRunner(BaseRunner):
-    def __init__(self, testbed_basedir='testbeds', **kwargs):
+    def __init__(self, testbed_basedir='testbeds', cachedir='filecache', **kwargs):
         """
         Parameters
         ----------
@@ -195,6 +215,7 @@ class LocalRunner(BaseRunner):
         """
         BaseRunner.__init__(self, **kwargs)
         self._testbed_basedir = os.path.abspath(testbed_basedir)
+        self._cachedir = cachedir
 
     def get_testbed_dir(self, spec):
         return opj(self._testbed_basedir, spec['id'])
@@ -202,7 +223,8 @@ class LocalRunner(BaseRunner):
     def _prepare_testbed(self, spec):
         prepare_local_testbed(spec,
                               opj(self._testbed_basedir, spec['id']),
-                              self._testlib)
+                              self._testlib,
+                              cachedir=self._cachedir)
 
     def _run_nipype_workflow(self, spec):
         testspec = spec['test']
