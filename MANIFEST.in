@@ -1,0 +1,3 @@
+include AUTHOR COPYING Makefile* MANIFEST.in setup* README.*
+include Changelog TODO
+recursive-include doc *
