@@ -15,15 +15,16 @@ import numpy as np
 from uuid import uuid1 as uuid
 
 __allowed_spec_keys__ = [
-        'test',
         'components',
         'description',
+        'entities',
+        'evaluations',
         'id',
         'inputs',
         'outputs',
+        'system',
+        'test',
         'version',
-        'evaluations',
-        'entities'
     ]
 
 def _raise(exception, why, input=None):

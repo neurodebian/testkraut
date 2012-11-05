@@ -18,7 +18,8 @@ from uuid import uuid1 as uuid
 from . import utils
 from . import evaluators
 from .utils import run_command, get_shlibdeps, which, sha1sum, \
-        get_script_interpreter, get_debian_pkgname, get_debian_pkginfo
+        get_script_interpreter, get_debian_pkgname, get_debian_pkginfo, \
+        describe_system
 from .spec import SPEC
 from .base import verbose
 if __debug__:
@@ -149,7 +150,7 @@ def locate_file_in_cache(cachedir, inspec):
                             % (cand_filename, cachedir))
     return None
 
-def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, force=False):
+def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, lazy=False):
     if not os.path.exists(dst):
         os.makedirs(dst)
     inspecs = spec.get('inputs', {})
@@ -174,7 +175,7 @@ def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, force=False):
                 raise ValueError("input file at '%s' doesn match checksum"
                                  % filepath)
             dst_path = opj(dst, testbed_filepath)
-            if force or not os.path.isfile(dst_path):
+            if not os.path.isfile(dst_path) or not lazy:
                 target_dir = os.path.dirname(dst_path)
                 if not os.path.exists(target_dir):
                     os.makedirs(target_dir)
@@ -399,6 +400,7 @@ class LocalRunner(BaseRunner):
 
     def _gather_component_info(self, spec):
         entities = {}
+        spec['system'] = describe_system()
         # try using APT to obtain more info on software deps
         try:
             import apt

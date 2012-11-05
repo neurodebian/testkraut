@@ -16,6 +16,7 @@ import subprocess
 import select
 import datetime
 import hashlib
+import platform
 
 def which(program):
     """
@@ -411,4 +412,58 @@ def guess_file_tags(fname):
     except:
         pass
     return tags
+
+def describe_system():
+    sysinfo = {}
+    for fx in ('architecture', 'machine', 'python_build', 'python_compiler',
+               'python_branch', 'python_implementation', 'python_revision',
+               'python_version', 'release', 'system'):
+        if hasattr(platform, fx):
+            sysinfo[fx] = getattr(platform, fx)()
+    # core deps
+    for pkg in ('numpy', 'scipy', 'nibabel'):
+        try:
+            imp_pkg = __import__(pkg, globals(), locals(), [], -1)
+            sysinfo['pkg_%s_version' % pkg] = imp_pkg.__version__
+        except (ImportError, AttributeError):
+            sysinfo['pkg_%s_version' % pkg] = None
+    # trigger platform hooks
+    if len(sysinfo.get('system', '')):
+        system_descr = '_describe_%s_system' % sysinfo['system'].lower()
+        if system_descr in globals():
+            globals()[system_descr](sysinfo)
+    return sysinfo
+
+def _describe_linux_system(sysinfo):
+    for fx in ('linux_distribution', 'dist'):
+        if hasattr(platform, fx):
+            sysinfo[fx] = getattr(platform, fx)()
+    if 'dist' in sysinfo:
+        # only keep the modern variant
+        if not 'linux_distribution' in sysinfo:
+            sysinfo['linux_distribution'] = sysinfo['dist']
+        del sysinfo['dist']
+    distr_info = sysinfo.get('linux_distribution', '')
+    if len(distr_info):
+        distr_descr = '_describe_%s_system' % distr_info[0].lower()
+        if distr_descr in globals():
+            globals()[distr_descr](sysinfo)
+
+def _describe_darwin_system(sysinfo):
+    for fx in ('mac_ver'):
+        if hasattr(platform, fx):
+            sysinfo[fx] = getattr(platform, fx)()
+
+def _describe_debian_system(sysinfo):
+    try:
+        import apt
+        pkg_mngr = apt.Cache()
+    except ImportError:
+        return
+    for pkg in ('numpy', 'scipy', 'nibabel', 'apt'):
+        sysinfo['pkg_%s' % pkg] = get_debian_pkginfo('python-%s' % pkg, pkg_mngr)
+
+def _describe_ubuntu_system(sysinfo):
+    _describe_debian_system(sysinfo)
+
 
