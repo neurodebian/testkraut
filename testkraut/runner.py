@@ -264,6 +264,9 @@ class LocalRunner(BaseRunner):
             texec.wait()
             # record the exit code
             testspec['exitcode'] = texec.returncode
+            # store test output
+            for chan in ('stderr', 'stdout'):
+                testspec[chan] = getattr(texec, chan).read()
             return self._check_output_presence(spec)
         except OSError, e:
             verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
