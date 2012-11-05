@@ -44,9 +44,9 @@ def main(**extra_args):
                            'testkraut.evaluators',
                            'testkraut.external',
                            ],
-          data_files = [(test, [f for f in glob(opj(test, '*'))
+          data_files = [(opj('share', 'testkraut', test), [f for f in glob(opj(test, '*'))
                                     if os.path.isfile(f)])
-                            for test in glob(opj('lib', '*')) if os.path.isdir(test)],
+                            for test in glob(opj('library', '*')) if os.path.isdir(test)],
           scripts      = glob(os.path.join('bin', '*'))
           )
 

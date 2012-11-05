@@ -16,7 +16,7 @@ from nose.tools import *
 def test_spec_io():
     assert_raises(ValueError, spec.SPEC)
     # must have default version
-    sp = spec.SPEC(open('lib/demo/spec.json'))
+    sp = spec.SPEC(open('library/demo/spec.json'))
     # no unknown keys
     assert_raises(ValueError, sp.__setitem__, 'mike', 0)
     # from a str

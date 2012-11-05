@@ -27,7 +27,7 @@ if __debug__:
 
 class BaseRunner(object):
 
-    def __init__(self, testlib='lib'):
+    def __init__(self, testlib='library'):
         """
         Parameters
         ----------
