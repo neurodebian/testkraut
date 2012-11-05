@@ -262,6 +262,8 @@ class LocalRunner(BaseRunner):
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
             texec.wait()
+            # record the exit code
+            testspec['exitcode'] = texec.returncode
             return self._check_output_presence(spec)
         except OSError, e:
             verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
