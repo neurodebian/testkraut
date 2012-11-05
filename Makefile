@@ -1,6 +1,9 @@
 BUILDDIR=$(CURDIR)/build
 MAN_DIR=$(BUILDDIR)/man
 
+PYTHON = python
+PYTHON3 = python3
+
 # Setup local PYTHONPATH depending on the version of provided $(PYTHON)
 PYVER = $(shell $(PYTHON) -c 'import sys; print(sys.version_info[0])')
 ifeq ($(PYVER),2)
@@ -19,6 +22,7 @@ htmldoc:
 
 clean:
 	rm -rf build
+	rm -f MANIFEST
 
 manpages: mkdir-MAN_DIR
 	@echo "I: Creating manpages"
