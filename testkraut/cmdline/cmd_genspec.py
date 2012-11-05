@@ -26,6 +26,7 @@ __docformat__ = 'restructuredtext'
 
 import argparse
 import os
+import re
 import itertools
 from os.path import join as opj
 from ..spec import SPEC
@@ -59,6 +60,13 @@ def setup_parser(parser):
         '--no-strace', action='store_true',
         help="do not use CDE to analyze software and data dependencies.")
     parser.add_argument(
+        '--ignore-outputs',
+        help="regular expression matching command output filenames/paths to ignore.")
+    parser.add_argument(
+        '--match-outputs',
+        help="""regular expression matching command output filenames/paths to
+             consider in the SPEC -- ignore all others.""")
+    parser.add_argument(
         '--nomin', '--no-minimize-inputs', action='store_true', dest='no_minimize_inputs',
         help="""always include all files present in the test directory as input
              files, regardless of whether they are actually used during
@@ -79,7 +87,7 @@ def get_dir_hashes(path, ignore=None):
         dirfiles = [fn for fn in itertools.imap(opj,
                                                 [dirlist[0]] * nfiles,
                                                 tocheck)]
-        dir_content += [(fn, sha1sum(fn)) for fn in dirfiles]
+        dir_content += [(fn, sha1sum(fn)) for fn in dirfiles if os.path.isfile(fn)]
     return dict(dir_content)
 
 def find_executables(path):
@@ -100,11 +108,19 @@ def find_files(path):
                 files.append(testfile)
     return files
 
-def _proc_generates(procs, proc, starts):
-    if len(proc['generates']):
-        return True
+def _proc_generates(procs, proc, starts, filter=None, ignore=None):
+    generated = proc.get('generates', [])
+    if len(generated):
+        if not ignore is None:
+            generated = [g for g in generated if ignore.match(g) is None]
+        if not filter is None:
+            generated = [g for g in generated if not filter.match(g) is None]
+        if len(generated):
+            # still files left?
+            return True
     for started_pid in starts[proc['pid']]:
-        generates = _proc_generates(procs, procs[started_pid], starts)
+        generates = _proc_generates(procs, procs[started_pid], starts,
+                                    filter=filter, ignore=ignore)
         if generates:
             return True
     return False
@@ -160,6 +176,11 @@ def run(args):
 
     # in case of a shell command
     spec['test'] = dict(type='shell_command', command=args.arg)
+    # filter files
+    if not args.ignore_outputs is None:
+        args.ignore_outputs = re.compile(args.ignore_outputs)
+    if not args.match_outputs is None:
+        args.match_outputs = re.compile(args.match_outputs)
     # record al input files
     for ipf in prior_test_hashes:
         relname = os.path.relpath(ipf)
@@ -173,6 +194,10 @@ def run(args):
     # record all output files
     for opf in new_files:
         relname = os.path.relpath(opf)
+        if (not args.ignore_outputs is None and not args.ignore_outputs.match(relname) is None) \
+           or (not args.match_outputs is None and args.match_outputs.match(relname) is None):
+            # skip
+            continue
         s = dict(type='file', value=relname,
                  tags=list(guess_file_tags(relname)))
         spec['outputs'][relname] = s
@@ -213,7 +238,9 @@ def run(args):
     # generation
     effective_pids = []
     for pid, proc in proc_mapper.iteritems():
-        if _proc_generates(proc_info, proc_info[pid], starts):
+        if _proc_generates(proc_info, proc_info[pid], starts,
+                           ignore=args.ignore_outputs,
+                           filter=args.match_outputs):
             effective_pids.append(proc['pid'])
             spec['components'].append(proc)
     # 4th pass -- beautify PIDs
