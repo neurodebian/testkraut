@@ -100,12 +100,16 @@ class SPEC(dict):
         spec_file.close()
 
     def _get_list_specs(self, category, spec_type):
+        if not category in self:
+            return []
         if spec_type is None:
             return self[category]
         else:
             return [d for d in self[category] if d['type'] == spec_type]
 
     def _get_dict_specs(self, category, spec_type):
+        if not category in self:
+            return {}
         if spec_type is None:
             return self[category]
         else:
