@@ -11,6 +11,7 @@
 __docformat__ = 'restructuredtext'
 
 import os
+from os.path import join as opj
 import re
 import shutil
 from uuid import uuid1 as uuid
@@ -38,7 +39,7 @@ class BaseRunner(object):
         self._testlib = os.path.abspath(testlib)
 
     def __call__(self, spec):
-        testlib_filepath = os.path.join(self._testlib, spec, 'spec.json')
+        testlib_filepath = opj(self._testlib, spec, 'spec.json')
         if os.path.isfile(testlib_filepath):
             # open spec from test library
             spec = SPEC(open(testlib_filepath))
@@ -63,6 +64,8 @@ class BaseRunner(object):
         self._fingerprint_output(spec)
         verbose(1, "evaluate test results")
         self._evaluate_output(spec)
+        # store full SPEC into the testbed
+        spec.save(opj(self.get_testbed_dir(spec), 'spec.json'))
         return True, spec
 
     def _prepare_testbed(self, spec):
@@ -88,6 +91,9 @@ class BaseRunner(object):
         raise NotImplementedError
 
     def _gather_component_info(self, spec):
+        raise NotImplementedError
+
+    def get_testbed_dir(self, spec):
         raise NotImplementedError
 
 
@@ -119,7 +125,7 @@ def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
         inspec = dict()
     if filename is None:
         filename = inspec['value']
-    filepath = os.path.join(testlibdir, testid, filename)
+    filepath = opj(testlibdir, testid, filename)
     if not os.path.isfile(filepath):
         if __debug__:
             debug('RUNNER', "file '%s' not present at '%s'"
@@ -147,7 +153,7 @@ def prepare_local_testbed(spec, dst, testlibdir, force=False):
                 filepath = testbed_filepath
             if filepath is None:
                 raise NotImplementedError("come up with more ideas on locating files")
-            dst_path = os.path.join(dst, testbed_filepath)
+            dst_path = opj(dst, testbed_filepath)
             if force or not os.path.isfile(dst_path):
                 target_dir = os.path.dirname(dst_path)
                 if not os.path.exists(target_dir):
@@ -191,21 +197,21 @@ class LocalRunner(BaseRunner):
         self._testbed_basedir = os.path.abspath(testbed_basedir)
 
     def get_testbed_dir(self, spec):
-        return os.path.join(self._testbed_basedir, spec['id'])
+        return opj(self._testbed_basedir, spec['id'])
 
     def _prepare_testbed(self, spec):
         prepare_local_testbed(spec,
-                              os.path.join(self._testbed_basedir, spec['id']),
+                              opj(self._testbed_basedir, spec['id']),
                               self._testlib)
 
     def _run_nipype_workflow(self, spec):
         testspec = spec['test']
-        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        testbedpath = opj(self._testbed_basedir, spec['id'])
         if 'file' in testspec:
             testwffilepath = testspec['file']
         else:
             testwffilepath = 'workflow.py'
-        testwffilepath = os.path.join(testbedpath, testwffilepath)
+        testwffilepath = opj(testbedpath, testwffilepath)
         # for the rest we need to execute stuff in the root of the testbed
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
@@ -222,8 +228,7 @@ class LocalRunner(BaseRunner):
                                % testwffilepath)
         workflow = locals['test_workflow']
         # make sure nipype executes it in the right place
-        workflow.base_dir=os.path.abspath(os.path.join(testbedpath,
-                                                       '_workflow_exec'))
+        workflow.base_dir=os.path.abspath(opj(testbedpath, '_workflow_exec'))
         # we want content, not time based hashing
         if 'execution' in workflow.config:
             workflow.config['execution']['hash_method'] = "content"
@@ -235,8 +240,7 @@ class LocalRunner(BaseRunner):
             try:
                 from nipype.pipeline.utils import write_prov
                 write_prov(exec_graph,
-                           filename=os.path.join(workflow.base_dir,
-                                                 'provenance.json'))
+                           filename=opj(workflow.base_dir, 'provenance.json'))
             except ImportError:
                 if __debug__:
                     debug('RUNNER',
@@ -253,7 +257,7 @@ class LocalRunner(BaseRunner):
         import subprocess
         testspec = spec['test']
         cmd = testspec['command']
-        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        testbedpath = opj(self._testbed_basedir, spec['id'])
         # for the rest we need to execute stuff in the root of the testbed
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
@@ -276,7 +280,7 @@ class LocalRunner(BaseRunner):
         return False
 
     def _check_output_presence(self, spec):
-        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        testbedpath = opj(self._testbed_basedir, spec['id'])
         outspec = spec.get('outputs', {})
         missing = []
         for ospec_id in outspec:
@@ -292,7 +296,7 @@ class LocalRunner(BaseRunner):
 
     def _evaluate_output(self, spec):
         evalspecs = spec.get('evaluations',[])
-        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        testbedpath = opj(self._testbed_basedir, spec['id'])
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
         try:
@@ -330,7 +334,7 @@ class LocalRunner(BaseRunner):
         from .fingerprinting import get_fingerprinters
         from .utils import sha1sum
         # all local to the testbed
-        testbedpath = os.path.join(self._testbed_basedir, spec['id'])
+        testbedpath = opj(self._testbed_basedir, spec['id'])
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
         # for all known outputs
@@ -519,7 +523,7 @@ class OldRunner(object):
         raise exception("RUNNER: %s%s" % (why, input))
 
     def _get_output_path(self, id):
-        return os.path.join('_output', id)
+        return opj('_output', id)
 
     def _log(self, msg, linebreak=True):
         fp = self._log_fp

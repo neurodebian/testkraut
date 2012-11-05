@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext'
 import tempfile
 import shutil
 import os
+from os.path import join as opj
 from testkraut import spec
 from testkraut import runner
 from testkraut import utils
@@ -72,3 +73,4 @@ def test_minimal_test_run(wdir):
     assert_equal(tspec['exitcode'], 0)
     assert_equal(tspec['stdout'].strip(), os.uname()[0])
     assert_true('stderr' in tspec)
+    assert_true(os.path.exists(opj(lr.get_testbed_dir(sp_out), 'spec.json')))
