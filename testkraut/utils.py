@@ -215,14 +215,16 @@ def _get_next_pid_id(procs, pid):
         pid_suffix += 1
     return pid
 
-def _find_parent_with_argv(procs, proc):
+def _find_parent_with_argv(procs, proc, match_argv):
     if proc['started_by'] is None:
-        raise ValueError("no information on parent process in '%s'" % proc)
+        # reached the top
+        return proc['pid']
     parent_proc = procs[proc['started_by']]
-    if not parent_proc['argv'] is None:
+    if not parent_proc['argv'] is None \
+       and not match_argv.match(parent_proc['argv'][0]) is None:
         return parent_proc['pid']
     else:
-        return _find_parent_with_argv(procs, parent_proc)
+        return _find_parent_with_argv(procs, parent_proc, match_argv)
 
 def _get_new_proc(procs, pid):
     oldpid = None
@@ -238,7 +240,10 @@ def _get_new_proc(procs, pid):
     procs[pid] = proc
     return proc, oldpid
 
-def get_cmd_prov_strace(cmd):
+def get_cmd_prov_strace(cmd, match_argv=None):
+    if match_argv is None:
+        match_argv = r'.*'
+    match_argv = re.compile(match_argv)
     cmd_prefix = ['strace', '-q', '-f', '-s', '1024',
                   '-e', 'trace=execve,clone,open,openat,unlink,unlinkat']
     cmd = cmd_prefix + cmd
@@ -374,13 +379,16 @@ def get_cmd_prov_strace(cmd):
         # -> retrace graph upwards to find a parent with info
         parent_pid = proc['started_by']
         new_parent_pid = pid_mapper.get(parent_pid,
-                                        _find_parent_with_argv(procs, proc))
+                                        _find_parent_with_argv(procs,
+                                                               proc,
+                                                               match_argv))
         # cache pid mapping: old parent -> new parent
         # (even if it woudl be the same)
         pid_mapper[parent_pid] = new_parent_pid
         # rewrite parent in current process
         proc['started_by'] = new_parent_pid
-        if proc['argv'] is None:
+        if proc['argv'] is None \
+           or match_argv.match(['argv'][0]) is None:
             # we don't want to know about this process
             # move the files it uses and generates upwards
             new_parent_proc = procs[new_parent_pid]
