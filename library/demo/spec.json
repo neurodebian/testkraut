@@ -62,7 +62,7 @@
   "id": "demo", 
   "inputs": {
     "head.nii.gz": {
-      "sha1sum": "0e4d2c982cc051171a37b8e56eece6294640fdf5", 
+      "sha1sum": "41d817176ceb99ac051d8bd066b500f3fb89be89", 
       "tags": [
         "3D", 
         "volumetric image"
