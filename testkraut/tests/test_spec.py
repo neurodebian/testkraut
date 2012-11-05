@@ -20,4 +20,4 @@ def test_spec_io():
     # no unknown keys
     assert_raises(ValueError, sp.__setitem__, 'mike', 0)
     # from a str
-    sp = spec.SPEC('{"id":"mike","version":0,"test":{"command":["uname"],"type":"shell_command"}}')
+    sp = spec.SPEC('{"test":{"command":["uname"],"type":"shell_command"}}')

@@ -10,10 +10,27 @@
 
 __docformat__ = 'restructuredtext'
 
+import tempfile
+import shutil
+import os
 from testkraut import spec
 from testkraut import runner
 from testkraut import utils
 from nose.tools import *
+
+def with_tempdir(*targs, **tkwargs):
+    def decorate(func):
+        def newfunc(*arg, **kwargs):
+            import tempfile
+            wdir = tempfile.mkdtemp(*targs, **tkwargs)
+            try:
+                func(*((wdir,) + arg), **kwargs)
+            finally:
+                import shutil
+                shutil.rmtree(wdir)
+        newfunc = make_decorator(func)(newfunc)
+        return newfunc
+    return decorate
 
 def test_run_cmd():
     # just very simple
@@ -34,3 +51,24 @@ def test_debian_stuff():
         raise SkipTest
     # I hope that most systems have this...
     assert_equal(utils.get_debian_pkgname('/etc/deluser.conf'), 'adduser')
+
+@with_tempdir()
+def test_minimal_test_run(wdir):
+    lr = runner.LocalRunner(testbed_basedir=wdir)
+    # pretty minimal test SPEC
+    sp = '{"test":{"command":["uname"],"type":"shell_command"}}'
+    sp_dict = spec.SPEC(sp)
+    # gets version and id
+    assert_true('id' in sp_dict)
+    assert_equal(sp_dict['version'], 0)
+    # run it
+    retval, sp_out = lr(sp)
+    # test passes
+    assert_true(retval)
+    # output is new dict
+    assert_false(id(sp_dict) == id(sp_out))
+    # embedded test ran fine
+    tspec = sp_out['test']
+    assert_equal(tspec['exitcode'], 0)
+    assert_equal(tspec['stdout'].strip(), os.uname()[0])
+    assert_true('stderr' in tspec)
