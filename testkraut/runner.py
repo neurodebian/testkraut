@@ -146,7 +146,7 @@ def locate_file_in_cache(cachedir, inspec):
     else:
         if __debug__:
             debug('RUNNER', "file '%s' not present in cache '%s'"
-                            % (filename, cachedir))
+                            % (cand_filename, cachedir))
     return None
 
 def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, force=False):
@@ -389,7 +389,7 @@ class LocalRunner(BaseRunner):
                     # fill in a dict to get whetever info even if an exception
                     # occurs during a latter stage of the fingerprinting
                     fingerprinter(filename, fprint)
-                except:
+                except Exception, e:
                     if __debug__:
                         debug('RUNNER',
                               "ignoring exception '%s' while fingerprinting '%s' with '%s'"

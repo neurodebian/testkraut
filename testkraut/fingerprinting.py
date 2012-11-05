@@ -58,7 +58,7 @@ def fp_volume_image(fname, fp):
         return
     # perform thresholding at various levels and compute descriptive
     # stats of the resulting clusters
-    clusters = np.empty(img_data.shape, dtype=int)
+    clusters = np.empty(img_data.shape, dtype=np.int32)
     for thresh in (zero_thresh, 2.0, 4.0, 8.0, -2.0, -4.0, -8.0):
         # create a binarized map for the respective threshold
         if not isinstance(thresh, float):
