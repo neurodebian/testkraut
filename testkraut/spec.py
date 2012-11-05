@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext'
 
 import json
 import numpy as np
+from uuid import uuid1 as uuid
 
 __allowed_spec_keys__ = [
         'test',
@@ -59,10 +60,15 @@ class SPEC(dict):
             self.update(json.loads(src))
         elif isinstance(src, dict):
             self.update(src)
+        # charge with sane defaults
+        if not 'id' in self:
+            self['id'] = uuid().hex
+        if not 'version' in self:
+            self['version'] = 0
         self._check()
 
     def _check(self):
-        _verify_tags(self, ('id', 'version'), 'SPEC')
+        _verify_tags(self, ('id', 'version', 'test'), 'SPEC')
         for i, ev in enumerate(self.get('evaluations', [])):
             _verify_tags(ev, ('id', 'input spec', 'operator'),
                          'evaluation %i' % i)
