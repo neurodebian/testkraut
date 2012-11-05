@@ -207,23 +207,26 @@ def run(args):
 
     # 1st pass -- store info on individual test components
     proc_mapper = {}
+    exec_mapper = {}
     pid_counter = 0
     deb_pkg_cache = {}
     for pid, proc in proc_info.iteritems():
         executable = os.path.realpath(proc['executable'])
-        s = dict(type='process', executable=dict(path=executable),
+        espec = dict(path=executable, type='executable')
+        s = dict(type='process', executable=executable,
                  pid=pid_counter, argv=proc['argv'])
         pid_counter += 1
         if executable in deb_pkg_cache:
-            s['executable']['providers'] = [deb_pkg_cache[executable]]
+            espec['providers'] = [deb_pkg_cache[executable]]
         else:
             pkgname = get_debian_pkgname(executable)
             debinfo = None
             if not pkgname is None:
-                pkginfo = dict(name=pkgname, type='debian_pkg')
-                s['executable']['providers'] = [pkginfo]
+                debinfo = dict(name=pkgname, type='debian_pkg')
+                espec['providers'] = [debinfo]
             deb_pkg_cache[executable] = debinfo
         proc_mapper[proc['pid']] = s
+        exec_mapper[executable] = espec
     # 2nd pass -- store inter-process/file dependencies
     for pid, proc in proc_mapper.iteritems():
         pinfo = proc_info[pid]
@@ -240,15 +243,21 @@ def run(args):
     # 3rd pass -- only store processes that are involved in some sort of file
     # generation
     effective_pids = []
+    done_exec = dict()
     for pid, proc in proc_mapper.iteritems():
         if _proc_generates(proc_info, proc_info[pid], starts,
                            ignore=args.ignore_outputs,
                            filter=args.match_outputs):
             effective_pids.append(proc['pid'])
             spec['components'].append(proc)
+            if not proc['executable'] in done_exec:
+                spec['components'].append(exec_mapper[proc['executable']])
+                done_exec[proc['executable']] = None
     # 4th pass -- beautify PIDs
     pid_mapper = dict(zip(effective_pids, range(len(effective_pids))))
     for cmd_spec in spec['components']:
+        if not cmd_spec['type'] == 'process':
+            continue
         cmd_spec['pid'] = pid_mapper[cmd_spec['pid']]
         if 'started_by' in cmd_spec:
             cmd_spec['started_by'] = pid_mapper[cmd_spec['started_by']]
