@@ -7,19 +7,7 @@
         "brain", 
         "-m"
       ], 
-      "executable": {
-        "path": "$FSLDIR/bin/bet2", 
-        "providers": [
-          {
-            "name": "fsl-5.0", 
-            "type": "debian_pkg"
-          }
-        ],
-        "version_cmd": [
-            "$FSLDIR/bin/bet2",
-            "BET \\(Brain Extraction Tool\\) v(\\S+) -"
-        ]
-      }, 
+      "executable": "$FSLDIR/bin/bet2", 
       "generates": [
         "brain.nii.gz", 
         "brain_mask.nii.gz"
@@ -32,25 +20,41 @@
       ]
     }, 
     {
+      "path": "$FSLDIR/bin/bet2", 
+      "providers": [
+        {
+          "name": "fsl-5.0", 
+          "type": "debian_pkg"
+        }
+      ], 
+      "type": "executable",
+      "version_cmd": [
+            "$FSLDIR/bin/bet2",
+            "BET \\(Brain Extraction Tool\\) v(\\S+) -"
+      ]
+    }, 
+    {
       "argv": [
         "bet", 
         "head.nii.gz", 
         "brain", 
         "-m"
       ], 
-      "executable": {
-        "path": "$FSLDIR/bin/bet", 
-        "providers": [
-          {
-            "name": "fsl-5.0", 
-            "type": "debian_pkg"
-          }
-        ],
-        "version_file": "$FSLDIR/etc/fslversion"
-      }, 
+      "executable": "$FSLDIR/bin/bet", 
       "pid": 1, 
       "type": "process", 
       "uses": []
+    }, 
+    {
+      "path": "$FSLDIR/bin/bet", 
+      "providers": [
+        {
+          "name": "fsl-5.0", 
+          "type": "debian_pkg"
+        }
+      ], 
+      "type": "executable",
+      "version_file": "$FSLDIR/etc/fslversion"
     }, 
     {
       "name": "FSLDIR", 
@@ -64,7 +68,7 @@
     "head.nii.gz": {
       "sha1sum": "41d817176ceb99ac051d8bd066b500f3fb89be89", 
       "tags": [
-        "3D", 
+        "3D image", 
         "volumetric image"
       ], 
       "type": "file", 
@@ -74,7 +78,7 @@
   "outputs": {
     "brain.nii.gz": {
       "tags": [
-        "3D", 
+        "3D image", 
         "volumetric image"
       ], 
       "type": "file", 
@@ -82,7 +86,7 @@
     }, 
     "brain_mask.nii.gz": {
       "tags": [
-        "3D", 
+        "3D image", 
         "volumetric image"
       ], 
       "type": "file", 
