@@ -40,21 +40,22 @@ def run(args):
     if not len(args.ids):
         # if none specified go through all the SPECs in the lib
         args.ids = [os.path.basename(d) for d in glob(opj(args.library, '*')) if os.path.isdir(d)]
-    print args
     wanted_files = set()
+    hash_lookup = {}
     # scan the SPECs of all tests for needed files and their sha1sums
     for test_id in args.ids:
         spec = SPEC(open(opj(args.library, test_id, 'spec.json')))
         for _, input in spec.get_inputs('file').iteritems():
             if 'sha1sum' in input:
                 wanted_files.add(input['sha1sum'])
+                hash_lookup[input['sha1sum']] = (test_id, input.get('value', ''))
     # what do we have in the cache?
     have_files = [os.path.basename(f) for f in glob(opj(args.cache, '*')) if os.path.isfile(f)]
     # what is missing
     missing_files = wanted_files.difference(have_files)
     search_cache = {}
     # search in all dirs
-    for search_dir in args.search:
+    for search_dir in (args.search + [args.library]):
         for root, dirnames, filenames in os.walk(search_dir):
             for fname in filenames:
                 fpath = opj(root, fname)
@@ -82,3 +83,8 @@ def run(args):
                 shutil.copy(fpath, dst_path)
         else:
             shutil.copy(fpath, dst_path)
+        missing_files.remove(sha1)
+    if len(missing_files):
+        verbose(0, 'cannot find needed file(s):')
+        for mf in missing_files:
+            verbose(0, '  %s: %s (%s)' % (hash_lookup[mf] + (mf,)))
