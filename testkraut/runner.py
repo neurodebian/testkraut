@@ -407,14 +407,26 @@ class LocalRunner(BaseRunner):
             pkg_mngr = apt.Cache()
         except:
             pkg_mngr = None
-        for pspec in spec.get_components('process'):
-            espec = pspec['executable']
+        # for easy lookup of processes by executable
+        pids_by_executable = {}
+        for p in spec.get_components('process'):
+            exec_path = p['executable']
+            procs = pids_by_executable.get(exec_path, [])
+            procs.append(p['pid'])
+            pids_by_executable[exec_path] = procs
+        # for easy lookup of processes by PID
+        procs_by_pid = dict((p['pid'], p) for p in spec.get_components('process'))
+        for espec in spec.get_components('executable'):
             # replace exectutable info with the full picture
             ehash = self._describe_binary(espec['path'],
                                           entities,
                                           type_='binary',
                                           pkgdb=pkg_mngr)
-            pspec['executable'] = ehash
+            # link the old info with the new one
+            espec['entity'] = ehash
+            # reference the entity hash in the proc specs
+            for p in pids_by_executable[espec['path']]:
+                procs_by_pid[p]['executable'] = ehash
             # gather some more version info
             have_version = False
             if 'version_file' in espec:
