@@ -405,6 +405,10 @@ def get_cmd_prov_strace(cmd, match_argv=None):
 
 def guess_file_tags(fname):
     tags = set()
+    if not os.path.getsize(fname):
+        # no futher tags for empty files
+        tags.add('empty')
+        return tags
     try:
         import nibabel as nb
         img = nb.load(fname)
