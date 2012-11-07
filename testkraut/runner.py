@@ -400,6 +400,7 @@ class LocalRunner(BaseRunner):
 
     def _gather_component_info(self, spec):
         entities = {}
+        spec['entities'] = entities
         spec['system'] = describe_system()
         # try using APT to obtain more info on software deps
         try:
@@ -407,27 +408,15 @@ class LocalRunner(BaseRunner):
             pkg_mngr = apt.Cache()
         except:
             pkg_mngr = None
-        # for easy lookup of processes by executable
-        pids_by_executable = {}
-        for p in spec.get_components('process'):
-            exec_path = p['executable']
-            procs = pids_by_executable.get(exec_path, [])
-            procs.append(p['pid'])
-            pids_by_executable[exec_path] = procs
-        # for easy lookup of processes by PID
-        procs_by_pid = dict((p['pid'], p) for p in spec.get_components('process'))
-        for espec in spec.get_components('executable'):
+        for exec_path, espec in spec.get('executables', {}).iteritems():
             # replace exectutable info with the full picture
-            ehash = self._describe_binary(espec['path'],
+            ehash = self._describe_binary(exec_path,
                                           entities,
                                           type_='binary',
                                           pkgdb=pkg_mngr)
             # link the old info with the new one
             espec['entity'] = ehash
-            # reference the entity hash in the proc specs
-            for p in pids_by_executable[espec['path']]:
-                procs_by_pid[p]['executable'] = ehash
-            # gather some more version info
+            # check version information
             have_version = False
             if 'version_file' in espec:
                 verfilename = espec['version_file']
@@ -470,14 +459,12 @@ class LocalRunner(BaseRunner):
                             debug('RUNNER',
                                   "failed to read version from '%s'" % vercmd)
 
-        for espec in spec.get_components('envvar'):
+        for env in spec.get('environment', {}):
             # grab envvar values
-            espec['value'] = os.environ.get(espec['name'], 'UNDEFINED')
-        if len(entities):
-            # store all discovered entities in the SPEC
-            entity_specs = spec.get('entities', {})
-            entity_specs.update(entities)
-            spec['entities'] = entity_specs
+            spec['environment'][env] = os.environ.get(ename, 'UNDEFINED')
+        if not len(entities):
+            # remove unnecessary dict
+            del spec['entities']
 
 
     def _describe_binary(self, path, entities, type_=None, pkgdb=None):

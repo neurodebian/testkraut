@@ -109,14 +109,6 @@ class SPEC(dict):
         spec_file.write('\n')
         spec_file.close()
 
-    def _get_list_specs(self, category, spec_type):
-        if not category in self:
-            return []
-        if spec_type is None:
-            return self[category]
-        else:
-            return [d for d in self[category] if d['type'] == spec_type]
-
     def _get_dict_specs(self, category, spec_type):
         if not category in self:
             return {}
@@ -125,9 +117,6 @@ class SPEC(dict):
         else:
             specs = self[category] 
             return dict([(s, specs[s]) for s in specs if specs[s]['type'] == spec_type])
-
-    def get_components(self, type_=None):
-        return self._get_list_specs('components', spec_type=type_)
 
     def get_inputs(self, type_=None):
         return self._get_dict_specs('inputs', spec_type=type_)
@@ -138,16 +127,3 @@ class SPEC(dict):
 
 def spec_testoutput_ids(spec):
         return spec.get('outputs', {}).keys()
-
-def spec_unused_testoutput_ids(spec):
-    out_ids = set(spec_testoutput_ids(spec))
-    for ev in spec.get('evaluations', []):
-        for eis in ev.get('inputs', {}):
-            if not isinstance(eis, dict):
-                eis = ev['inputs'].get(eis, {})
-            # now eis is always a dict
-            if eis.get('origin', None) == 'testoutput':
-                out_ids = out_ids.difference(set([eis['value']]))
-    return list(out_ids)
-
-
