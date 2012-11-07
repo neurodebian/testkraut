@@ -15,13 +15,16 @@ import numpy as np
 from uuid import uuid1 as uuid
 
 __allowed_spec_keys__ = [
-        'components',
+        'dependencies',
         'description',
         'entities',
+        'environment',
         'evaluations',
+        'executables',
         'id',
         'inputs',
         'outputs',
+        'processes',
         'system',
         'test',
         'version',

@@ -171,7 +171,9 @@ def run(args):
             dict(id=args.id,
                 description=args.description,
                 version=args.spec_version,
-                components=[],
+                processes={},
+                executables={},
+                environment={},
                 test={},
                 inputs={},
                 outputs={},
@@ -205,66 +207,61 @@ def run(args):
                  tags=list(guess_file_tags(relname)))
         spec['outputs'][relname] = s
 
-    # 1st pass -- store info on individual test components
+    # and now get all info into the SPEC
+    dep_mapper = {}
+    spec['dependencies'] = dep_mapper
     proc_mapper = {}
+    spec['processes'] = proc_mapper
     exec_mapper = {}
+    spec['executables'] = exec_mapper
     pid_counter = 0
-    deb_pkg_cache = {}
+    pid_native2new = {}
+    exec2pkg = {}
+    # which processes are (indirectly) involved in some sort of output generation
+    effective_pids = [proc['pid'] for pid, proc in proc_info.iteritems()
+                        if _proc_generates(proc_info, proc, starts,
+                           ignore=args.ignore_outputs,
+                           filter=args.match_outputs)]
     for pid, proc in proc_info.iteritems():
+        if not pid in effective_pids:
+            # skip all procs that do not generate or start something that generates
+            continue
+        # discover the corresponding executable
         executable = os.path.realpath(proc['executable'])
-        espec = dict(path=executable, type='executable')
-        s = dict(type='process', executable=executable,
-                 pid=pid_counter, argv=proc['argv'])
+        espec = dict()
+        exec_mapper[executable] = espec
+        # make a record of this process
+        pspec = dict(executable=executable,
+                     #pid=pid_counter, argv=proc['argv'])
+                     argv=proc['argv'])
+        for ftype in ('uses', 'generates'):
+            flist = proc.get(ftype, [])
+            if len(flist):
+                pspec[ftype] = [os.path.relpath(fn) for fn in flist if os.path.isfile(fn)]
+        proc_mapper[pid_counter] = pspec
+        ## map old to new PID
+        pid_native2new[proc['pid']] = pid_counter
         pid_counter += 1
-        if executable in deb_pkg_cache:
-            espec['providers'] = [deb_pkg_cache[executable]]
-        else:
+        if not executable in exec2pkg:
+            # we haven't seen this binary yet
             pkgname = get_debian_pkgname(executable)
             debinfo = None
             if not pkgname is None:
+                dpkg_deps = dep_mapper.get('dpkg', {})
                 debinfo = dict(name=pkgname, type='debian_pkg')
-                espec['providers'] = [debinfo]
-            deb_pkg_cache[executable] = debinfo
-        proc_mapper[proc['pid']] = s
-        exec_mapper[executable] = espec
-    # 2nd pass -- store inter-process/file dependencies
-    for pid, proc in proc_mapper.iteritems():
-        pinfo = proc_info[pid]
-        for ftype in ('uses', 'generates'):
-            flist = pinfo.get(ftype, [])
-            if len(flist):
-                proc[ftype] = [os.path.relpath(fn) for fn in flist if os.path.isfile(fn)]
-        native_parent_pid = pinfo['started_by']
+                dpkg_deps[pkgname] = dict() # add some more info
+                dep_mapper['dpkg'] = dpkg_deps
+            exec2pkg[executable] = debinfo
+    ## 2nd pass -- store inter-process deps using new/simplified PIDs
+    for pid, proc in proc_info.iteritems():
+        native_parent_pid = proc['started_by']
         if native_parent_pid is None:
             # this is the mother process
             continue
-        parent_proc_pid = proc_mapper[native_parent_pid]['pid']
-        proc['started_by'] = parent_proc_pid
-    # 3rd pass -- only store processes that are involved in some sort of file
-    # generation
-    effective_pids = []
-    done_exec = dict()
-    for pid, proc in proc_mapper.iteritems():
-        if _proc_generates(proc_info, proc_info[pid], starts,
-                           ignore=args.ignore_outputs,
-                           filter=args.match_outputs):
-            effective_pids.append(proc['pid'])
-            spec['components'].append(proc)
-            if not proc['executable'] in done_exec:
-                spec['components'].append(exec_mapper[proc['executable']])
-                done_exec[proc['executable']] = None
-    # 4th pass -- beautify PIDs
-    pid_mapper = dict(zip(effective_pids, range(len(effective_pids))))
-    for cmd_spec in spec['components']:
-        if not cmd_spec['type'] == 'process':
-            continue
-        cmd_spec['pid'] = pid_mapper[cmd_spec['pid']]
-        if 'started_by' in cmd_spec:
-            cmd_spec['started_by'] = pid_mapper[cmd_spec['started_by']]
+        proc_mapper[pid_native2new[pid]]['started_by'] = pid_native2new[native_parent_pid]
     # record full environment (if desired)
     if not args.dump_env is None:
         for env in os.environ:
             if not re.match(args.dump_env, env) is None:
-                s = dict(type='envvar', name=env)
-                spec['components'].append(s)
+                spec['environment'][env] = {}
     spec.save(args.spec_filename)
