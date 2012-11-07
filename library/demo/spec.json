@@ -1,68 +1,23 @@
 {
-  "components": [
-    {
-      "argv": [
-        "$FSLDIR/bin/bet2", 
-        "head", 
-        "brain", 
-        "-m"
-      ], 
-      "executable": "$FSLDIR/bin/bet2", 
-      "generates": [
-        "brain.nii.gz", 
-        "brain_mask.nii.gz"
-      ], 
-      "pid": 0, 
-      "started_by": 1, 
-      "type": "process", 
-      "uses": [
-        "head.nii.gz"
-      ]
-    }, 
-    {
-      "path": "$FSLDIR/bin/bet2", 
-      "providers": [
-        {
-          "name": "fsl-5.0", 
-          "type": "debian_pkg"
-        }
-      ], 
-      "type": "executable",
+  "dependencies": {
+    "dpkg": "fsl-5.0"
+  }, 
+  "description": "", 
+  "environment": {
+    "FSLDIR": {}
+  }, 
+  "evaluations": [], 
+  "executables": {
+    "$FSLDIR/bin/bet": {
       "version_cmd": [
             "$FSLDIR/bin/bet2",
             "BET \\(Brain Extraction Tool\\) v(\\S+) -"
       ]
     }, 
-    {
-      "argv": [
-        "bet", 
-        "head.nii.gz", 
-        "brain", 
-        "-m"
-      ], 
-      "executable": "$FSLDIR/bin/bet", 
-      "pid": 1, 
-      "type": "process", 
-      "uses": []
-    }, 
-    {
-      "path": "$FSLDIR/bin/bet", 
-      "providers": [
-        {
-          "name": "fsl-5.0", 
-          "type": "debian_pkg"
-        }
-      ], 
-      "type": "executable",
+    "$FSLDIR/bin/bet2": {
       "version_file": "$FSLDIR/etc/fslversion"
-    }, 
-    {
-      "name": "FSLDIR", 
-      "type": "envvar"
     }
-  ], 
-  "description": "", 
-  "evaluations": [], 
+  }, 
   "id": "demo", 
   "inputs": {
     "head.nii.gz": {
@@ -91,6 +46,36 @@
       ], 
       "type": "file", 
       "value": "brain_mask.nii.gz"
+    }
+  }, 
+  "processes": {
+    "0": {
+      "argv": [
+        "$FSLDIR/bin/bet2", 
+        "head", 
+        "brain", 
+        "-m"
+      ], 
+      "executable": "$FSLDIR/bin/bet2", 
+      "generates": [
+        "brain.nii.gz", 
+        "brain_mask.nii.gz"
+      ], 
+      "started_by": 1, 
+      "uses": [
+        "head.nii.gz"
+      ]
+    }, 
+    "1": {
+      "argv": [
+        "bet", 
+        "head.nii.gz", 
+        "brain", 
+        "-m"
+      ], 
+      "executable": "$FSLDIR/bin/bet", 
+      "started_by": null, 
+      "uses": []
     }
   }, 
   "test": {
