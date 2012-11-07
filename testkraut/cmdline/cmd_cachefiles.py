@@ -35,6 +35,8 @@ def setup_parser(parser):
             help="path to the file cache")
     parser.add_argument('-s', '--search', action='append', default=[],
             help="files to search (wildcardspath to the test library")
+    parser.add_argument('--copy', action='store_true',
+            help="copy files into the cache instead of symlinking them")
 
 def run(args):
     if not len(args.ids):
@@ -61,23 +63,28 @@ def run(args):
                 fpath = opj(root, fname)
                 sha1 = sha1sum(fpath)
                 if sha1 in missing_files:
-                    search_cache[sha1] = fpath
+                    # make path relative to cache dir
+                    search_cache[sha1] = os.path.relpath(fpath, args.cache)
     # ensure the cache is there
     if not os.path.exists(args.cache):
         os.makedirs(args.cache)
     # copy/link them into the cache
     for sha1, fpath in search_cache.iteritems():
         dst_path = opj(args.cache, sha1)
-        done = False
-        if hasattr(os, 'symlink'):
+        if os.path.lexists(dst_path):
+            if os.path.islink(dst_path):
+                # remove existing symlink
+                os.remove(dst_path)
+            else:
+                verbose(0, "Will not replace existing non-symlink cache content: [%s: %s (%s)]"
+                           % (hash_lookup[sha1] + (sha1,)))
+        if not args.copy:
             os.symlink(fpath, dst_path)
         elif hasattr(os, 'link'):
+            # be nice and try hard-linking
             try:
-                print 'LINK'
                 os.link(fpath, dst_path)
-                print 'POSTLINK'
             except OSError:
-                raise
                 # silently fail if linking doesn't work (e.g.
                 # cross-device link ... will recover later
                 shutil.copy(fpath, dst_path)
