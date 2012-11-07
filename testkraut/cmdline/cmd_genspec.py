@@ -216,7 +216,7 @@ def run(args):
     spec['executables'] = exec_mapper
     pid_counter = 0
     pid_native2new = {}
-    exec2pkg = {}
+    exec2pkg = set()
     # which processes are (indirectly) involved in some sort of output generation
     effective_pids = [proc['pid'] for pid, proc in proc_info.iteritems()
                         if _proc_generates(proc_info, proc, starts,
@@ -238,6 +238,8 @@ def run(args):
             flist = proc.get(ftype, [])
             if len(flist):
                 pspec[ftype] = [os.path.relpath(fn) for fn in flist if os.path.isfile(fn)]
+        if 'started_by' in proc:
+            pspec['started_by'] = proc['started_by']
         proc_mapper[pid_counter] = pspec
         ## map old to new PID
         pid_native2new[proc['pid']] = pid_counter
@@ -245,20 +247,23 @@ def run(args):
         if not executable in exec2pkg:
             # we haven't seen this binary yet
             pkgname = get_debian_pkgname(executable)
-            debinfo = None
             if not pkgname is None:
-                dpkg_deps = dep_mapper.get('dpkg', {})
-                debinfo = dict(name=pkgname, type='debian_pkg')
-                dpkg_deps[pkgname] = dict() # add some more info
+                dpkg_deps = dep_mapper.get('dpkg', set())
+                dpkg_deps.add(pkgname)
                 dep_mapper['dpkg'] = dpkg_deps
-            exec2pkg[executable] = debinfo
+            exec2pkg.add(executable)
     ## 2nd pass -- store inter-process deps using new/simplified PIDs
-    for pid, proc in proc_info.iteritems():
+    for pid, proc in proc_mapper.iteritems():
+        if not 'started_by' in proc:
+            continue
         native_parent_pid = proc['started_by']
         if native_parent_pid is None:
             # this is the mother process
             continue
-        proc_mapper[pid_native2new[pid]]['started_by'] = pid_native2new[native_parent_pid]
+        proc['started_by'] = pid_native2new[native_parent_pid]
+    if 'dpkg' in dep_mapper:
+        # do a dpkg style dependency statement
+        dep_mapper['dpkg'] = ' ,'.join(dep_mapper['dpkg'])
     # record full environment (if desired)
     if not args.dump_env is None:
         for env in os.environ:
