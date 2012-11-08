@@ -26,6 +26,8 @@ Objectives
 - Gather comprehensive information about the software environment
 - Integrate test case written in arbitrary languages or toolkits with minimal
   overhead
+- Make it possible to easily deploy the system on users' machines to
+  verify their environments
 
 Dump of discussion with Satra
 -----------------------------
@@ -47,7 +49,7 @@ Dump of discussion with Alex
 - Evaluation assesses the quality of the test results (but doesn't necessarily
   let a test fail)
 - Dashboard-level evaluation will provide highly aggregated analysis (e.g.
-  distributions of evalutation metrics)
+  distributions of evaluation metrics)
 - Threshold levels for evaluation might need to be pulled from the dashboard
 - Compare test output spec to actual content of the testbed after a test run
 - Write little tool to check a test spec for comprehensive usage of all test
@@ -70,3 +72,19 @@ find /tmp/betcde/cde-root -executable -a -type f -a ! -name '*.cde' -a ! -name '
     "dpkg": "fsl-5.0"
   }
 ]
+
+via Tomoyo (Just an idea)
+-------------------------
+
+Tomoyo is a lightweight and easy-to-use MAC (Mandatory Access Control)
+system for Linux, available in stock Linux kernel and tools shipped on
+Debian.  In Learning mode it can easily collect provenance information
+on what executables/libraries were used for a particular parent
+process, what files were accessed, environment variables, etc.
+
+Pros:
+  should have virtually no run-time impact
+
+Cons:
+   might require admin privileges to get into learning mode and
+   harvest result information
