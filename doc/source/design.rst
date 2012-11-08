@@ -88,3 +88,9 @@ Pros:
 Cons:
    might require admin privileges to get into learning mode and
    harvest result information
+
+On SPECs
+--------
+
+All nested dicts -- except for leaves of the tree. That implies that no list
+can be used anywhere inside the tree!!

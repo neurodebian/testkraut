@@ -19,9 +19,10 @@ from .prov import (ProvBundle, ProvElement,
                    PROV_REC_DELEGATION, PROV_REC_ENTITY, PROV_REC_GENERATION,
                    PROV_REC_INFLUENCE, PROV_REC_INVALIDATION, PROV_REC_END,
                    PROV_REC_MEMBERSHIP, PROV_REC_MENTION,
-                   PROV_REC_SPECIALIZATION, PROV_REC_START, PROV_REC_USAGE)
-from ..utils.misc import package_check
-package_check('pydot')
+                   PROV_REC_SPECIALIZATION, PROV_REC_START, PROV_REC_USAGE,
+                   PROV_REC_COLLECTION)
+#from ..utils.misc import package_check
+#package_check('pydot')
 import pydot
 
 # Visual styles for various elements (nodes) and relations (edges)
@@ -31,7 +32,7 @@ DOT_PROV_STYLE = {
     PROV_REC_ENTITY: {'shape': 'oval', 'style': 'filled', 'fillcolor': 'aliceblue'},
     PROV_REC_ACTIVITY: {'shape': 'box', 'style': 'filled', 'fillcolor': 'lemonchiffon'},
     PROV_REC_AGENT: {'shape': 'house', 'style': 'filled', 'fillcolor': 'yellow'},
-    #    PROV_REC_COLLECTION: {'label': 'wasGeneratedBy', 'fontsize': 10.0},
+    PROV_REC_COLLECTION: {'shape': 'oval'},
     PROV_REC_BUNDLE: {'shape': 'folder', 'style': 'filled', 'fillcolor': 'aliceblue'},
     # Relations
     PROV_REC_GENERATION: {'label': 'wasGeneratedBy', 'fontsize': '10.0', 'color': 'darkgreen', 'fontcolor': 'darkgreen'},
