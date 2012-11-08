@@ -14,7 +14,7 @@ Doesn't work nicely when input data is under /tmp
 
 Examples:
 
-$ testkraut genspec --id demo -o test.spec -- bash -c "cat spec.json > newstuff"
+$ testkraut generate --id demo -o test.spec -- bash -c "cat spec.json > newstuff"
 
 TODO: ADD OUTPUT DESCRIPTION
 """
@@ -58,7 +58,7 @@ def setup_parser(parser):
              the regular expression""")
     parser.add_argument(
         '--no-strace', action='store_true',
-        help="do not use CDE to analyze software and data dependencies.")
+        help="do not use strace to analyze software and data dependencies.")
     parser.add_argument(
         '--ignore-outputs',
         help="regular expression matching command output filenames/paths to ignore.")
@@ -73,8 +73,8 @@ def setup_parser(parser):
         '--nomin', '--no-minimize-inputs', action='store_true', dest='no_minimize_inputs',
         help="""always include all files present in the test directory as input
              files, regardless of whether they are actually used during
-             execution. This option only has an effect when CDE is used. If it
-             is not available, no minimization is performed anyway. If CDE is
+             execution. This option only has an effect when strace is used. If it
+             is not available, no minimization is performed anyway. If strace is
              not able to properly track file access, resulting in insufficent
              input SPECs, enable the option.""")
     parser.add_argument('arg', nargs='+', metavar='ARGS',
