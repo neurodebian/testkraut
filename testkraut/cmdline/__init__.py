@@ -10,7 +10,7 @@
 
 __docformat__ = 'restructuredtext'
 
-import cmd_genspec
+import cmd_generate
 import cmd_execute
 import cmd_cachefiles
 import cmd_diff
