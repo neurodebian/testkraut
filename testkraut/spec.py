@@ -124,14 +124,14 @@ class SPEC(dict):
     def get_outputs(self, type_=None):
         return self._get_dict_specs('outputs', spec_type=type_)
 
-    def diff(self, spec):
-        return diff(self, spec)
+    def diff(self, spec, **kwargs):
+        return diff(self, spec, **kwargs)
 
 
 def spec_testoutput_ids(spec):
         return spec.get('outputs', {}).keys()
 
-def diff(fr, to):
+def diff(fr, to, recursiv_list=False):
     if not type(fr) == type(to):
         # different type
         return {'from': fr, 'to': to, '%%magic%%': 'diff'}
@@ -150,7 +150,7 @@ def diff(fr, to):
             dtree[missing] = {'to': to, '%%magic%%': 'diff'}
         # compare intersecting keys
         for key in fr_keys.intersection(to_keys):
-            value_diff = diff(fr[key], to[key])
+            value_diff = diff(fr[key], to[key], recursiv_list)
             if not value_diff is None:
                 dtree[key] = value_diff
         if len(dtree):
@@ -160,7 +160,9 @@ def diff(fr, to):
     elif isinstance(fr, basestring):
         # any string
         if not fr == to:
-            return {'ndiff': difflib.ndiff([fr], [to]), '%%magic%%': 'diff'}
+            return {'ndiff': difflib.ndiff(('%s\n' % fr).splitlines(True),
+                                           ('%s\n' % to).splitlines(True)),
+                    '%%magic%%': 'diff'}
         else:
             return None
     elif isinstance(fr, float) or isinstance(fr, int):
@@ -181,32 +183,34 @@ def diff(fr, to):
             if seqmatch[0][0] == 'equal':
                 # all the same
                 return None
-            elif seqmatch[0][0] == 'replace':
-                # all different
-                return {'from': fr, 'to': to, '%%magic%%': 'diff'}
-            else:
-                # either 'from' or 'to' were empty
-                return {'from': fr, 'to': to, '%%magic%%': 'diff'}
+            if recursiv_list:
+                if seqmatch[0][0] == 'replace':
+                    # all different
+                    return {'from': fr, 'to': to, '%%magic%%': 'diff'}
+                else:
+                    # either 'from' or 'to' were empty
+                    return {'from': fr, 'to': to, '%%magic%%': 'diff'}
+        if recursiv_list and \
+            len([None for s in seqmatch
+                 if s[0] == 'equal'
+                    or (s[0] == 'replace' 
+                          and s[2] == s[4] and s[1] == s[3])]) \
+            == len(seqmatch):
+            # only some values changed, but hopefully no shifts
+            out = []
+            for s in seqmatch:
+                if s[0] == 'equal':
+                    out.extend(fr[s[1]:s[2]])
+                elif s[0] == 'replace':
+                    for i in xrange(s[1], s[2]):
+                        out.append(diff(fr[i], to[i], recursiv_list))
+                else:
+                    # all other conditions should be caught by top-level IF
+                    raise RuntimeError('impossible opcode in sequence match')
+            return out
         else:
-            if len([None for s in seqmatch
-                     if s[0] == 'equal'
-                        or (s[0] == 'replace' 
-                              and s[2] == s[4] and s[1] == s[3])]):
-                # only some values changed, but hopefully no shifts
-                out = []
-                for s in seqmatch:
-                    if s[0] == 'equal':
-                        out.extend(fr[s[1]:s[2]])
-                    elif s[0] == 'replace':
-                        for i in xrange(s[1], s[2]):
-                            out.append(diff(fr[i], to[i]))
-                    else:
-                        # all other conditions should be caught by top-level IF
-                        raise RuntimeError('impossible opcode in sequence match')
-                return out
-            else:
-                # complicated
-                return {'seqmatch': seqmatch, '%%magic%%': 'diff'}
+            # complicated
+            return {'seqmatch': seqmatch, '%%magic%%': 'diff'}
     raise RuntimeError('unhandled condition is SPEC diff')
 
 
