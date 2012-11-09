@@ -1,10 +1,8 @@
 testkraut -- hopefully not yet another software testing framework
 =================================================================
 
-  *Note: testkraut is still in its infancy -- some of what is written here could still
-  be an anticipation of the near future.*
-
-:More documentation: https://testkraut.rtfd.org/
+  *Note: testkraut is still in its infancy -- some of what is written here
+  could still be an anticipation of the near future.*
 
 Anyway, this is nevertheless a framework for software testing. That being said,
 testkraut tries to minimize the overlap with the scopes of unit testing,
@@ -29,6 +27,8 @@ of a test run. Such a description allows for decoupling test result generation
 and analysis -- opening up the opportunity to "crowd-source" software testing
 efforts, and aggregate results beyond the scope of a single project, lab,
 company, or site.
+
+:More documentation: https://testkraut.readthedocs.org
 
 Prototypes of a testkraut user
 ------------------------------
