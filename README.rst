@@ -4,6 +4,8 @@ testkraut -- hopefully not yet another software testing framework
   *Note: testkraut is still in its infancy -- some of what is written here could still
   be an anticipation of the near future.*
 
+:More documentation: https://testkraut.rtfd.org/
+
 Anyway, this is nevertheless a framework for software testing. That being said,
 testkraut tries to minimize the overlap with the scopes of unit testing,
 regression testing, and continuous integration testing. Instead, it aims to
