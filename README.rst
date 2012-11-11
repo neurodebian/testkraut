@@ -1,12 +1,6 @@
 testkraut -- hopefully not yet another software testing framework
 =================================================================
 
-.. raw:: html
-
-  <a href="http://travis-ci.org/neurodebian/testkraut">
-    <img src="https://secure.travis-ci.org/neurodebian/testkraut.png"
-         alt="Build Status" style="max-width:100%;"></a>
-
   *Note: testkraut is still in its infancy -- some of what is written here
   could still be an anticipation of the near future.*
 
