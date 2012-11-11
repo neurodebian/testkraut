@@ -37,7 +37,7 @@ manpages: mkdir-MAN_DIR
 				"bin/testkraut $${cmd}" > $(MAN_DIR)/testkraut-$${cmd}.1 ; \
 	done
 
-tests:
+test:
 	PYTHONPATH=$(LPYTHONPATH) $(NOSETESTS) --nocapture .
 
 
