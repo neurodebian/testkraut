@@ -196,6 +196,9 @@ def get_debian_pkginfo(pkgname, apt=None):
     debinfo = dict(name=pkgname)
     if not apt is None:
         pkg = apt[pkgname].installed
+        if pkg is None:
+            # no such package installed
+            return debinfo
         debinfo['version'] = pkg.version
         debinfo['sha1sum'] = pkg.sha1
         debinfo['arch'] = pkg.architecture

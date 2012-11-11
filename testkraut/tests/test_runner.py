@@ -18,6 +18,7 @@ from testkraut import spec
 from testkraut import runner
 from testkraut import utils
 from nose.tools import *
+import nose
 
 def with_tempdir(*targs, **tkwargs):
     def decorate(func):
@@ -47,9 +48,9 @@ def test_debian_stuff():
         import platform
         dist = platform.linux_distribution()[0]
         if not dist in ['debian']:
-            raise SkipTest
+            raise nose.SkipTest
     except:
-        raise SkipTest
+        raise nose.SkipTest
     # I hope that most systems have this...
     assert_equal(utils.get_debian_pkgname('/etc/deluser.conf'), 'adduser')
 
