@@ -3,6 +3,7 @@ MAN_DIR=$(BUILDDIR)/man
 
 PYTHON = python
 PYTHON3 = python3
+NOSETESTS = $(PYTHON) $(shell which nosetests)
 
 # Setup local PYTHONPATH depending on the version of provided $(PYTHON)
 PYVER = $(shell $(PYTHON) -c 'import sys; print(sys.version_info[0])')
@@ -35,6 +36,10 @@ manpages: mkdir-MAN_DIR
 			--help-option="--help-np" -N -n "$$summary" \
 				"bin/testkraut $${cmd}" > $(MAN_DIR)/testkraut-$${cmd}.1 ; \
 	done
+
+tests:
+	PYTHONPATH=$(LPYTHONPATH) $(NOSETESTS) --nocapture .
+
 
 #
 # Little helpers
