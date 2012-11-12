@@ -486,7 +486,6 @@ class LocalRunner(BaseRunner):
             spec['shlibdeps'].append(self._describe_binary(dep, entities,
                                                            type_='library',
                                                            pkgdb=pkgdb))
-        provider = []
         # provided by a package?
         pkgname = self._pkg_mngr.get_pkg_name(fpath)
         if not pkgname is None:
@@ -497,8 +496,7 @@ class LocalRunner(BaseRunner):
             else:
                 pkghash = uuid().hex
             entities[pkghash] = pkginfo
-            provider.append(pkghash)
-        spec['provider'] = provider
+            spec['provider'] = pkghash
         return fhash
 
 def get_eval_input(inspec, testspec):
