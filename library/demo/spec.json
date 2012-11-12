@@ -4,7 +4,8 @@
   }, 
   "description": "", 
   "environment": {
-    "FSLDIR": {}
+    "FSLDIR": {},
+    "FSLOUTPUTTYPE": {}
   }, 
   "evaluations": [], 
   "executables": {
@@ -80,7 +81,7 @@
   }, 
   "test": {
     "command": [
-      "bet", 
+      "$FSLDIR/bin/bet", 
       "head.nii.gz", 
       "brain", 
       "-m"
