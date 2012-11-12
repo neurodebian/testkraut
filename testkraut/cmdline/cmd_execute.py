@@ -31,10 +31,12 @@ parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 def setup_parser(parser):
     parser.add_argument('spec', metavar='SPEC',
         help="""SPEC filename or testlibary ID""")
+    parser.add_argument('-l', '--library', default='library',
+            help="path to the test library")
 
 def run(args):
     from .. import runner as tkr
     from ..spec import SPECJSONEncoder
-    runner = tkr.LocalRunner()
+    runner = tkr.LocalRunner(testlib=args.library)
     retval, spec = runner(args.spec)
     spec.save(opj(runner.get_testbed_dir(spec), 'spec.json'))
