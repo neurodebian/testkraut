@@ -47,33 +47,28 @@ def test_run_cmd():
 def test_minimal_test_run(wdir):
     lr = runner.LocalRunner(testbed_basedir=wdir)
     # pretty minimal test SPEC
-    sp = '{"test":{"command":["uname"],"type":"shell_command"}}'
-    sp_dict = spec.SPEC(sp)
+    sp = spec.SPEC('{"test":{"command":["uname"],"type":"shell_command"}}')
     # gets version and id
-    assert_true('id' in sp_dict)
-    assert_equal(sp_dict['version'], 0)
+    assert_true('id' in sp)
+    assert_equal(sp['version'], 0)
     # run it
-    retval, sp_out = lr(sp)
+    retval = lr(sp)
     # test passes
     assert_true(retval)
-    # output is new dict
-    assert_false(id(sp_dict) == id(sp_out))
     # embedded test ran fine
-    tspec = sp_out['test']
+    tspec = sp['test']
     assert_equal(tspec['exitcode'], 0)
     assert_equal(tspec['stdout'].strip(), os.uname()[0])
     assert_true('stderr' in tspec)
-    assert_true(os.path.exists(opj(lr.get_testbed_dir(sp_out), 'spec.json')))
 
 @with_tempdir()
 def test_failed_run(wdir):
     lr = runner.LocalRunner(testbed_basedir=wdir)
     # pretty minimal test SPEC
-    sp = '{"test":{"command":["stupidddd111"],"type":"shell_command"}}'
-    sp_dict = spec.SPEC(sp)
+    sp = spec.SPEC('{"test":{"command":["stupidddd111"],"type":"shell_command"}}')
     # run it
-    retval, sp_out = lr(sp)
+    retval = lr(sp)
     assert_false(retval == 0)
     # but should still come with system info
-    assert_true('system' in sp_out)
-    assert_true('stderr' in sp_out['test'])
+    assert_true('system' in sp)
+    assert_true('stderr' in sp['test'])

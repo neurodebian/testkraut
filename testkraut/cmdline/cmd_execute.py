@@ -52,7 +52,7 @@ def run(args):
         # spec is given as a str?
         spec = SPEC(args.spec)
     try:
-        retval, spec = runner(spec)
+        retval = runner(spec)
     finally:
         spec.save(opj(runner.get_testbed_dir(spec), 'spec.json'))
     if not retval:

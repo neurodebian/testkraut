@@ -25,7 +25,15 @@ import logging
 lgr = logging.getLogger(__name__)
 
 class BaseRunner(object):
+    """Execute a test SPEC.
 
+    A runner instance is called with a SPEC object. The runner uses the SPEC to
+    check the requirements of the test, execute the test, and finally evaluate
+    the test outputs and gather information on the computational environment.
+    All collected information is added to the input SPEC object. Even in the
+    event of a test failure the input SPEC will contain all information
+    collected up to the point of failure.
+    """
     def __init__(self, testlib='library'):
         """
         Parameters
@@ -38,18 +46,6 @@ class BaseRunner(object):
         self._testlib = os.path.abspath(testlib)
 
     def __call__(self, spec):
-        if not isinstance(spec, SPEC):
-            testlib_filepath = opj(self._testlib, spec, 'spec.json')
-            if os.path.isfile(testlib_filepath):
-                # open spec from test library
-                spec = SPEC(open(testlib_filepath))
-            elif os.path.isfile(spec):
-                # open explicit spec file
-                spec = SPEC(open(spec))
-            else:
-                # spec is given as a str?
-                spec = SPEC(spec)
-
         lgr.info("processing test SPEC '%s' (%s)" % (spec['id'], spec.get_hash()))
         lgr.info("check requirements")
         self._check_requirements(spec)
@@ -58,16 +54,14 @@ class BaseRunner(object):
         lgr.info("run test")
         test_success = self._run_test(spec)
         if not test_success:
-            return False, spec
+            return False
         lgr.info("gather component information")
         self._gather_component_info(spec)
         lgr.info("fingerprinting results")
         self._fingerprint_output(spec)
         lgr.info("evaluate test results")
         self._evaluate_output(spec)
-        # store full SPEC into the testbed
-        spec.save(opj(self.get_testbed_dir(spec), 'spec.json'))
-        return True, spec
+        return True
 
     def _prepare_testbed(self, spec):
         raise NotImplementedError
