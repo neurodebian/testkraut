@@ -243,9 +243,9 @@ def run(args):
             # we haven't seen this binary yet
             pkgname = pkg_mngr.get_pkg_name(executable)
             if not pkgname is None:
-                pkg_deps = dep_mapper.get(pkg_mngr.get_pkg_mngr_type(), set())
+                pkg_deps = dep_mapper.get(pkg_mngr.get_platform_name(), set())
                 pkg_deps.add(pkgname)
-                dep_mapper[pkg_mngr.get_pkg_mngr_type()] = pkg_deps
+                dep_mapper[pkg_mngr.get_platform_name()] = pkg_deps
             exec2pkg.add(executable)
     ## 2nd pass -- store inter-process deps using new/simplified PIDs
     for pid, proc in proc_mapper.iteritems():
@@ -256,9 +256,9 @@ def run(args):
             # this is the mother process
             continue
         proc['started_by'] = pid_native2new[native_parent_pid]
-    if 'dpkg' in dep_mapper:
+    if 'deb' in dep_mapper:
         # do a dpkg style dependency statement
-        dep_mapper['dpkg'] = ' ,'.join(dep_mapper['dpkg'])
+        dep_mapper['deb'] = ' ,'.join(dep_mapper['deb'])
     # record full environment (if desired)
     if not args.dump_env is None:
         for env in os.environ:

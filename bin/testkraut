@@ -17,7 +17,6 @@ import textwrap
 import logging
 import testkraut.cmdline as mvcmd
 from testkraut.cmdline import helpers, common_args
-from testkraut.base import error
 import testkraut
 
 def _license_info():
@@ -154,4 +153,4 @@ else:
     try:
         args.func(args)
     except Exception as exc:
-        error('%s (%s)' % (str(exc), exc.__class__.__name__))
+        logging.error('%s (%s)' % (str(exc), exc.__class__.__name__))
