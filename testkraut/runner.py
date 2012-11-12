@@ -316,19 +316,19 @@ class LocalRunner(BaseRunner):
         return True
 
     def _evaluate_output(self, spec):
-        evalspecs = spec.get('evaluations',[])
+        evalspecs = spec.get('evaluations',{})
         testbedpath = opj(self._testbed_basedir, spec['id'])
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
         try:
-            for espec in evalspecs:
+            for eid, espec in evalspecs.iteritems():
                 lgr.debug("running evaluation '%s'" % espec['id'])
-                res = self._proc_eval_spec(espec, spec)
+                res = self._proc_eval_spec(eid, espec, spec)
         finally:
             os.chdir(initial_cwd)
 
 
-    def _proc_eval_spec(self, espec, spec):
+    def _proc_eval_spec(self, eid, espec, spec):
         op_spec = espec['operator']
         op_type = op_spec['type']
         if op_type in ('builtin-func', 'builtin-class'):

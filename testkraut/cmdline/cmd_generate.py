@@ -172,7 +172,7 @@ def run(args):
                 test={},
                 inputs={},
                 outputs={},
-                evaluations=[]))
+                evaluations={}))
 
     # in case of a shell command
     spec['test'] = dict(type='shell_command', command=args.arg)

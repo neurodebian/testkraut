@@ -73,7 +73,7 @@ class SPEC(dict):
 
     def _check(self):
         _verify_tags(self, ('id', 'version', 'test'), 'SPEC')
-        for i, ev in enumerate(self.get('evaluations', [])):
+        for i, ev in enumerate(self.get('evaluations', {})):
             _verify_tags(ev, ('id', 'input spec', 'operator'),
                          'evaluation %i' % i)
         _verify_spec_tags(self.get('outputs', {}), ('type', 'value'),
