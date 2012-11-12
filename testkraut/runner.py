@@ -38,17 +38,17 @@ class BaseRunner(object):
         self._testlib = os.path.abspath(testlib)
 
     def __call__(self, spec):
-        testlib_filepath = opj(self._testlib, spec, 'spec.json')
-        print testlib_filepath
-        if os.path.isfile(testlib_filepath):
-            # open spec from test library
-            spec = SPEC(open(testlib_filepath))
-        elif os.path.isfile(spec):
-            # open explicit spec file
-            spec = SPEC(open(spec))
-        else:
-            # spec is given as a str?
-            spec = SPEC(spec)
+        if not isinstance(spec, SPEC):
+            testlib_filepath = opj(self._testlib, spec, 'spec.json')
+            if os.path.isfile(testlib_filepath):
+                # open spec from test library
+                spec = SPEC(open(testlib_filepath))
+            elif os.path.isfile(spec):
+                # open explicit spec file
+                spec = SPEC(open(spec))
+            else:
+                # spec is given as a str?
+                spec = SPEC(spec)
 
         lgr.info("processing test SPEC '%s' (%s)" % (spec['id'], spec.get_hash()))
         lgr.info("check requirements")
@@ -271,23 +271,30 @@ class LocalRunner(BaseRunner):
         import subprocess
         testspec = spec['test']
         cmd = testspec['command']
+        if isinstance(cmd, list):
+            # convert into a cmd string to execute via shell
+            # to get all envvar expansion ...
+            cmd = subprocess.list2cmdline(cmd)
         testbedpath = opj(self._testbed_basedir, spec['id'])
         # for the rest we need to execute stuff in the root of the testbed
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
         try:
+            lgr.debug("attempting to execute command '%s'" % cmd)
             texec = subprocess.Popen(cmd,
                                     stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+                                    stderr=subprocess.PIPE,
+                                    shell=True)
             texec.wait()
             # record the exit code
             testspec['exitcode'] = texec.returncode
             # store test output
             for chan in ('stderr', 'stdout'):
                 testspec[chan] = getattr(texec, chan).read()
+                lgr.debug('%s: %s' % (chan, testspec[chan]))
             return self._check_output_presence(spec)
         except OSError, e:
-            lgr.info("%s: %s" % (e.__class__.__name__, str(e)))
+            lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
             return False
         finally:
             os.chdir(initial_cwd)
