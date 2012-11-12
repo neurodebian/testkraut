@@ -25,7 +25,6 @@ __docformat__ = 'restructuredtext'
 import argparse
 import os
 from os.path import join as opj
-from ..base import verbose
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 

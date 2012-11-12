@@ -15,7 +15,6 @@ __docformat__ = 'restructuredtext'
 # man: -*- % generate a test SPEC from an arbitrary command call
 
 import argparse
-from ..base import verbose
 from ..spec import SPEC
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)

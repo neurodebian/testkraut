@@ -32,7 +32,6 @@ from os.path import join as opj
 from ..spec import SPEC
 from ..utils import sha1sum, get_debian_pkgname, get_debian_pkginfo, \
                     get_cmd_prov_strace, guess_file_tags
-from ..base import verbose
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 

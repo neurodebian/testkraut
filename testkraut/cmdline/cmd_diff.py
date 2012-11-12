@@ -17,7 +17,6 @@ __docformat__ = 'restructuredtext'
 
 import sys
 import argparse
-from ..base import verbose
 from ..spec import SPEC
 
 try:

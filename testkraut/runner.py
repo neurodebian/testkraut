@@ -21,10 +21,8 @@ from .utils import run_command, get_shlibdeps, which, sha1sum, \
         get_script_interpreter, get_debian_pkgname, get_debian_pkginfo, \
         describe_system
 from .spec import SPEC
-from .base import verbose
-if __debug__:
-    from .base import debug
-
+import logging
+lgr = logging.getLogger(__name__)
 
 class BaseRunner(object):
 
@@ -51,19 +49,19 @@ class BaseRunner(object):
             # spec is given as a str?
             spec = SPEC(spec)
 
-        verbose(1, "processing test SPEC '%s' (%s)" % (spec['id'], spec.get_hash()))
-        verbose(1, "check dependencies")
-        verbose(1, "prepare testbed")
+        lgr.info("processing test SPEC '%s' (%s)" % (spec['id'], spec.get_hash()))
+        lgr.info("check dependencies")
+        lgr.info("prepare testbed")
         self._prepare_testbed(spec)
-        verbose(1, "run test")
+        lgr.info("run test")
         test_success = self._run_test(spec)
         if not test_success:
             return False, spec
-        verbose(1, "gather component information")
+        lgr.info("gather component information")
         self._gather_component_info(spec)
-        verbose(1, "fingerprinting results")
+        lgr.info("fingerprinting results")
         self._fingerprint_output(spec)
-        verbose(1, "evaluate test results")
+        lgr.info("evaluate test results")
         self._evaluate_output(spec)
         # store full SPEC into the testbed
         spec.save(opj(self.get_testbed_dir(spec), 'spec.json'))
@@ -78,8 +76,7 @@ class BaseRunner(object):
             test_exec = getattr(self, '_run_%s' % type_)
         except AttributeError:
             raise ValueError("unsupported test type '%s'" % type_)
-        if __debug__:
-            debug('RUNNER', "run test via %s()" % test_exec.__name__)
+        lgr.debug('RUNNER', "run test via %s()" % test_exec.__name__)
         return test_exec(spec)
 
     def _check_output_presence(self, spec):
@@ -106,19 +103,16 @@ def check_file_hash(filepath, inspec):
             hasher = getattr(utils, hashtype)
             observedhash = hasher(filepath)
             if targethash != observedhash:
-                if __debug__:
-                    debug('RUNNER',
+                lgr.debug('RUNNER',
                           "hash for '%s' does not match ('%s' != '%s')"
                           % (filepath, observedhash, targethash))
                 return False
             else:
-                if __debug__:
-                    debug('RUNNER',
+                lgr.debug('RUNNER',
                           "hash for '%s' matches ('%s')"
                           % (filepath, observedhash))
                 return True
-    if __debug__:
-        debug('RUNNER', "no hash for '%s' found" % filepath)
+    lgr.debug('RUNNER', "no hash for '%s' found" % filepath)
     return None
 
 def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
@@ -128,8 +122,7 @@ def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
         filename = inspec['value']
     filepath = opj(testlibdir, testid, filename)
     if not os.path.isfile(filepath):
-        if __debug__:
-            debug('RUNNER', "file '%s' not present at '%s'"
+        lgr.debug('RUNNER', "file '%s' not present at '%s'"
                             % (filename, filepath))
         return None
     return filepath
@@ -145,8 +138,7 @@ def locate_file_in_cache(cachedir, inspec):
     if os.path.isfile(cand_filename):
         return cand_filename
     else:
-        if __debug__:
-            debug('RUNNER', "file '%s' not present in cache '%s'"
+        lgr.debug('RUNNER', "file '%s' not present in cache '%s'"
                             % (cand_filename, cachedir))
     return None
 
@@ -181,8 +173,7 @@ def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, lazy=False):
                     os.makedirs(target_dir)
                 shutil.copy(filepath, dst_path)
             else:
-                if __debug__:
-                    debug('RUNNER',
+                lgr.debug('RUNNER',
                           "skip copying already present file '%s'" % filepath)
         else:
             raise ValueError("unknown input spec type '%s'" % type_)
@@ -265,12 +256,11 @@ class LocalRunner(BaseRunner):
                 write_prov(exec_graph,
                            filename=opj(workflow.base_dir, 'provenance.json'))
             except ImportError:
-                if __debug__:
-                    debug('RUNNER',
+                lgr.debug('RUNNER',
                           "local nipype version doesn't support provenance capture")
             return self._check_output_presence(spec)
         except RuntimeError, e:
-            verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
+            lgr.info("%s: %s" % (e.__class__.__name__, str(e)))
             return False
         finally:
             os.chdir(initial_cwd)
@@ -296,7 +286,7 @@ class LocalRunner(BaseRunner):
                 testspec[chan] = getattr(texec, chan).read()
             return self._check_output_presence(spec)
         except OSError, e:
-            verbose(1, "%s: %s" % (e.__class__.__name__, str(e)))
+            lgr.info("%s: %s" % (e.__class__.__name__, str(e)))
             return False
         finally:
             os.chdir(initial_cwd)
@@ -324,8 +314,7 @@ class LocalRunner(BaseRunner):
         os.chdir(testbedpath)
         try:
             for espec in evalspecs:
-                if __debug__:
-                    debug('RUNNER', "running evaluation '%s'" % espec['id'])
+                lgr.debug('RUNNER', "running evaluation '%s'" % espec['id'])
                 res = self._proc_eval_spec(espec, spec)
         finally:
             os.chdir(initial_cwd)
@@ -363,8 +352,7 @@ class LocalRunner(BaseRunner):
         # for all known outputs
         for oname, ospec in spec.get_outputs('file').iteritems():
             filename = ospec['value']
-            if __debug__:
-                debug('RUNNER',
+            lgr.debug('RUNNER',
                       "generating fingerprints for '%s'" % filename)
             ospec['sha1sum'] = sha1sum(filename)
             # gather fingerprinting callables
@@ -380,8 +368,7 @@ class LocalRunner(BaseRunner):
                 if finger_name.startswith('fp_'):
                     # strip common name prefix
                     finger_name = finger_name[3:]
-                if __debug__:
-                    debug('RUNNER',
+                lgr.debug('RUNNER',
                           "generating '%s' fingerprint" % finger_name)
                 # run it, catch any error
                 try:
@@ -391,8 +378,7 @@ class LocalRunner(BaseRunner):
                     # occurs during a latter stage of the fingerprinting
                     fingerprinter(filename, fprint)
                 except Exception, e:
-                    if __debug__:
-                        debug('RUNNER',
+                    lgr.debug('RUNNER',
                               "ignoring exception '%s' while fingerprinting '%s' with '%s'"
                               % (str(e), oname, finger_name))
             ospec['fingerprints'] = fingerprints
@@ -432,8 +418,7 @@ class LocalRunner(BaseRunner):
                         entities[ehash]['version'] = version
                         have_version = True
                 except:
-                    if __debug__:
-                        debug('RUNNER',
+                    lgr.debug('RUNNER',
                               "failed to read version from '%s'"
                               % verfilename)
             if not have_version and 'version_cmd' in espec:
@@ -455,8 +440,7 @@ class LocalRunner(BaseRunner):
                             entities[ehash]['version'] = version
                             have_version = True
                     except:
-                        if __debug__:
-                            debug('RUNNER',
+                        lgr.debug('RUNNER',
                                   "failed to read version from '%s'" % vercmd)
 
         for env in spec.get('environment', {}):

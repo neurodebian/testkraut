@@ -15,4 +15,4 @@ from nose.tools import *
 
 def test_sysinfo():
     sysinfo = utils.describe_system()
-    print sysinfo
+    assert_true('python_version' in sysinfo)

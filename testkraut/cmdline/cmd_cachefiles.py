@@ -20,7 +20,6 @@ import os
 import shutil
 from os.path import join as opj
 from glob import glob
-from ..base import verbose
 from ..spec import SPEC
 from ..utils import sha1sum
 
@@ -39,6 +38,7 @@ def setup_parser(parser):
             help="copy files into the cache instead of symlinking them")
 
 def run(args):
+    lgr = args.logger
     if not len(args.ids):
         # if none specified go through all the SPECs in the lib
         args.ids = [os.path.basename(d) for d in glob(opj(args.library, '*')) if os.path.isdir(d)]
@@ -76,8 +76,9 @@ def run(args):
                 # remove existing symlink
                 os.remove(dst_path)
             else:
-                verbose(0, "Will not replace existing non-symlink cache content: [%s: %s (%s)]"
-                           % (hash_lookup[sha1] + (sha1,)))
+                lgr.warning(
+                    "Will not replace existing non-symlink cache content: [%s: %s (%s)]"
+                    % (hash_lookup[sha1] + (sha1,)))
         if not args.copy:
             os.symlink(fpath, dst_path)
         elif hasattr(os, 'link'):
@@ -92,6 +93,6 @@ def run(args):
             shutil.copy(fpath, dst_path)
         missing_files.remove(sha1)
     if len(missing_files):
-        verbose(0, 'cannot find needed file(s):')
+        lgr.warning('cannot find needed file(s):')
         for mf in missing_files:
-            verbose(0, '  %s: %s (%s)' % (hash_lookup[mf] + (mf,)))
+            lgr.warning('  %s: %s (%s)' % (hash_lookup[mf] + (mf,)))
