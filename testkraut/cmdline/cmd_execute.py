@@ -54,7 +54,10 @@ def run(args):
     try:
         retval = runner(spec)
     finally:
-        spec.save(opj(runner.get_testbed_dir(spec), 'spec.json'))
+        tbd = runner.get_testbed_dir(spec)
+        if os.path.exists(tbd):
+            # if we got a testbed, be sure to dump all info that we gathered
+            spec.save(opj(tbd, 'spec.json'))
     if not retval:
         args.logger.critical("test '%s' failed" % args.spec)
         args.logger.info(spec.get('test', {}).get('stdout', ''))
