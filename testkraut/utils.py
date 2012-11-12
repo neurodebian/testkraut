@@ -17,6 +17,7 @@ import select
 import datetime
 import hashlib
 import platform
+from .pkg_mngr import PkgManager
 
 def which(program):
     """
@@ -174,41 +175,6 @@ def sha1sum(filename):
 
 def md5sum(filename):
     return hash(filename, hashlib.md5())
-
-def get_debian_pkgname(filename):
-    # provided by a Debian package?
-    pkgname = None
-    try:
-        ret = run_command('dpkg -S %s' % filename)
-    except OSError:
-        return None
-    if not ret['retval'] == 0:
-        return None
-    for line in ret['stdout']:
-        lspl = line.split(':')
-        if lspl[0].count(' '):
-            continue
-        pkgname = lspl[0]
-        break
-    return pkgname
-
-def get_debian_pkginfo(pkgname, apt=None):
-    debinfo = dict(name=pkgname)
-    if not apt is None:
-        pkg = apt[pkgname].installed
-        if pkg is None:
-            # no such package installed
-            return debinfo
-        debinfo['version'] = pkg.version
-        debinfo['sha1sum'] = pkg.sha1
-        debinfo['arch'] = pkg.architecture
-        origin = pkg.origins[0]
-        debinfo['origin'] = origin.origin
-        debinfo['origin_archive'] = origin.archive
-        debinfo['origin_site'] = origin.site
-        debinfo['origin_trusted'] = origin.trusted
-    return debinfo
-
 
 def _get_next_pid_id(procs, pid):
     base_pid = pid
@@ -458,6 +424,7 @@ def _describe_linux_system(sysinfo):
         if not 'linux_distribution' in sysinfo:
             sysinfo['linux_distribution'] = sysinfo['dist']
         del sysinfo['dist']
+    # system hooks
     distr_info = sysinfo.get('linux_distribution', '')
     if len(distr_info):
         distr_descr = '_describe_%s_system' % distr_info[0].lower()
@@ -470,13 +437,9 @@ def _describe_darwin_system(sysinfo):
             sysinfo[fx] = getattr(platform, fx)()
 
 def _describe_debian_system(sysinfo):
-    try:
-        import apt
-        pkg_mngr = apt.Cache()
-    except ImportError:
-        return
+    pkg_mngr = PkgManager()
     for pkg in ('numpy', 'scipy', 'nibabel', 'apt'):
-        sysinfo['pkg_%s' % pkg] = get_debian_pkginfo('python-%s' % pkg, pkg_mngr)
+        sysinfo['pkg_%s' % pkg] = pkg_mngr.get_pkg_info('python-%s' % pkg)
 
 def _describe_ubuntu_system(sysinfo):
     _describe_debian_system(sysinfo)

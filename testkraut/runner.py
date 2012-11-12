@@ -18,8 +18,8 @@ from uuid import uuid1 as uuid
 from . import utils
 from . import evaluators
 from .utils import run_command, get_shlibdeps, which, sha1sum, \
-        get_script_interpreter, get_debian_pkgname, get_debian_pkginfo, \
-        describe_system
+        get_script_interpreter, describe_system
+from .pkg_mngr import PkgManager
 from .spec import SPEC
 import logging
 lgr = logging.getLogger(__name__)
@@ -208,6 +208,7 @@ class LocalRunner(BaseRunner):
         BaseRunner.__init__(self, **kwargs)
         self._testbed_basedir = os.path.abspath(testbed_basedir)
         self._cachedir = cachedir
+        self._pkg_mngr = PkgManager()
 
     def get_testbed_dir(self, spec):
         return opj(self._testbed_basedir, spec['id'])
@@ -486,11 +487,11 @@ class LocalRunner(BaseRunner):
                                                            type_='library',
                                                            pkgdb=pkgdb))
         provider = []
-        # provided by debian?
-        pkgname = get_debian_pkgname(fpath)
+        # provided by a package?
+        pkgname = self._pkg_mngr.get_pkg_name(fpath)
         if not pkgname is None:
-            pkginfo = dict(type='debian_pkg', name=pkgname)
-            pkginfo.update(get_debian_pkginfo(pkgname, pkgdb))
+            pkginfo = dict(type=pkg_mngr.get_platform_name(), name=pkgname)
+            pkginfo.update(pkg_mngr.get_pkg_info(pkgname))
             if 'sha1sum' in pkginfo and len(pkginfo['sha1sum']):
                 pkghash = pkginfo['sha1sum']
             else:

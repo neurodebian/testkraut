@@ -30,8 +30,8 @@ import re
 import itertools
 from os.path import join as opj
 from ..spec import SPEC
-from ..utils import sha1sum, get_debian_pkgname, get_debian_pkginfo, \
-                    get_cmd_prov_strace, guess_file_tags
+from ..utils import sha1sum, get_cmd_prov_strace, guess_file_tags
+from ..pkg_mngr import PkgManager
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -135,12 +135,8 @@ def run(args):
     import shutil
     import json
 
-    # try using APT to obtain more info on software deps
-    #try:
-    #    import apt
-    #    apt = apt.Cache()
-    #except:
-    #    apt = None
+    # try using a local package manager to obtain more info on software deps
+    pkg_mngr = PkgManager()
 
     # assume execution within the testbed
     testbed_dir = os.path.abspath(os.curdir)
@@ -245,11 +241,11 @@ def run(args):
         pid_counter += 1
         if not executable in exec2pkg:
             # we haven't seen this binary yet
-            pkgname = get_debian_pkgname(executable)
+            pkgname = pkg_mngr.get_pkg_name(executable)
             if not pkgname is None:
-                dpkg_deps = dep_mapper.get('dpkg', set())
-                dpkg_deps.add(pkgname)
-                dep_mapper['dpkg'] = dpkg_deps
+                pkg_deps = dep_mapper.get(pkg_mngr.get_pkg_mngr_type(), set())
+                pkg_deps.add(pkgname)
+                dep_mapper[pkg_mngr.get_pkg_mngr_type()] = pkg_deps
             exec2pkg.add(executable)
     ## 2nd pass -- store inter-process deps using new/simplified PIDs
     for pid, proc in proc_mapper.iteritems():

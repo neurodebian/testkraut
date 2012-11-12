@@ -43,17 +43,6 @@ def test_run_cmd():
     assert(len(res['stdout']) > 0)
     assert_equal(res['merged'][0].split()[0], 'stdout')
 
-def test_debian_stuff():
-    try:
-        import platform
-        dist = platform.linux_distribution()[0]
-        if not dist in ['debian']:
-            raise nose.SkipTest
-    except:
-        raise nose.SkipTest
-    # I hope that most systems have this...
-    assert_equal(utils.get_debian_pkgname('/etc/deluser.conf'), 'adduser')
-
 @with_tempdir()
 def test_minimal_test_run(wdir):
     lr = runner.LocalRunner(testbed_basedir=wdir)
