@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "dpkg": "fsl-5.0"
+    "deb": "fsl-5.0"
   }, 
   "description": "", 
   "environment": {
