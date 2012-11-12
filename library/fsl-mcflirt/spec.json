@@ -9,7 +9,9 @@
   }, 
   "evaluations": {}, 
   "executables": {
-    "$FSLDIR/bin/mcflirt": {}
+    "$FSLDIR/bin/mcflirt": {
+      "version_file": "$FSLDIR/etc/fslversion"
+    }
   }, 
   "id": "fsl-mcflirt", 
   "inputs": {
