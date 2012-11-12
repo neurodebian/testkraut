@@ -73,7 +73,7 @@ helpers.parser_add_common_opt(parser,
                                                           _license_info()))
 if __debug__:
     parser.add_argument(
-        '--dbg', action='append', dest='common_debug',
+        '--dbg', action='store_true', dest='common_debug',
         help="do not catch exceptions and show exception traceback")
 parser.add_argument('--log-level',
                     choices=('critical', 'error', 'warning', 'info', 'debug'),
