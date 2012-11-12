@@ -64,3 +64,16 @@ def test_minimal_test_run(wdir):
     assert_equal(tspec['stdout'].strip(), os.uname()[0])
     assert_true('stderr' in tspec)
     assert_true(os.path.exists(opj(lr.get_testbed_dir(sp_out), 'spec.json')))
+
+@with_tempdir()
+def test_failed_run(wdir):
+    lr = runner.LocalRunner(testbed_basedir=wdir)
+    # pretty minimal test SPEC
+    sp = '{"test":{"command":["stupidddd111"],"type":"shell_command"}}'
+    sp_dict = spec.SPEC(sp)
+    # run it
+    retval, sp_out = lr(sp)
+    assert_false(retval == 0)
+    # but should still come with system info
+    assert_true('system' in sp_out)
+    assert_true('stderr' in sp_out['test'])
