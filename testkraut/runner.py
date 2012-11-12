@@ -39,6 +39,7 @@ class BaseRunner(object):
 
     def __call__(self, spec):
         testlib_filepath = opj(self._testlib, spec, 'spec.json')
+        print testlib_filepath
         if os.path.isfile(testlib_filepath):
             # open spec from test library
             spec = SPEC(open(testlib_filepath))
@@ -76,7 +77,7 @@ class BaseRunner(object):
             test_exec = getattr(self, '_run_%s' % type_)
         except AttributeError:
             raise ValueError("unsupported test type '%s'" % type_)
-        lgr.debug('RUNNER', "run test via %s()" % test_exec.__name__)
+        lgr.debug("run test via %s()" % test_exec.__name__)
         return test_exec(spec)
 
     def _check_output_presence(self, spec):
@@ -103,16 +104,14 @@ def check_file_hash(filepath, inspec):
             hasher = getattr(utils, hashtype)
             observedhash = hasher(filepath)
             if targethash != observedhash:
-                lgr.debug('RUNNER',
-                          "hash for '%s' does not match ('%s' != '%s')"
+                lgr.debug("hash for '%s' does not match ('%s' != '%s')"
                           % (filepath, observedhash, targethash))
                 return False
             else:
-                lgr.debug('RUNNER',
-                          "hash for '%s' matches ('%s')"
+                lgr.debug("hash for '%s' matches ('%s')"
                           % (filepath, observedhash))
                 return True
-    lgr.debug('RUNNER', "no hash for '%s' found" % filepath)
+    lgr.debug("no hash for '%s' found" % filepath)
     return None
 
 def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
@@ -122,8 +121,7 @@ def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
         filename = inspec['value']
     filepath = opj(testlibdir, testid, filename)
     if not os.path.isfile(filepath):
-        lgr.debug('RUNNER', "file '%s' not present at '%s'"
-                            % (filename, filepath))
+        lgr.debug("file '%s' not present at '%s'" % (filename, filepath))
         return None
     return filepath
     return None
@@ -138,8 +136,8 @@ def locate_file_in_cache(cachedir, inspec):
     if os.path.isfile(cand_filename):
         return cand_filename
     else:
-        lgr.debug('RUNNER', "file '%s' not present in cache '%s'"
-                            % (cand_filename, cachedir))
+        lgr.debug("file '%s' not present in cache '%s'"
+                  % (cand_filename, cachedir))
     return None
 
 def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, lazy=False):
@@ -173,8 +171,7 @@ def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, lazy=False):
                     os.makedirs(target_dir)
                 shutil.copy(filepath, dst_path)
             else:
-                lgr.debug('RUNNER',
-                          "skip copying already present file '%s'" % filepath)
+                lgr.debug("skip copying already present file '%s'" % filepath)
         else:
             raise ValueError("unknown input spec type '%s'" % type_)
     # place test code/script itself
@@ -257,8 +254,7 @@ class LocalRunner(BaseRunner):
                 write_prov(exec_graph,
                            filename=opj(workflow.base_dir, 'provenance.json'))
             except ImportError:
-                lgr.debug('RUNNER',
-                          "local nipype version doesn't support provenance capture")
+                lgr.debug("local nipype version doesn't support provenance capture")
             return self._check_output_presence(spec)
         except RuntimeError, e:
             lgr.info("%s: %s" % (e.__class__.__name__, str(e)))
@@ -315,7 +311,7 @@ class LocalRunner(BaseRunner):
         os.chdir(testbedpath)
         try:
             for espec in evalspecs:
-                lgr.debug('RUNNER', "running evaluation '%s'" % espec['id'])
+                lgr.debug("running evaluation '%s'" % espec['id'])
                 res = self._proc_eval_spec(espec, spec)
         finally:
             os.chdir(initial_cwd)
@@ -353,8 +349,7 @@ class LocalRunner(BaseRunner):
         # for all known outputs
         for oname, ospec in spec.get_outputs('file').iteritems():
             filename = ospec['value']
-            lgr.debug('RUNNER',
-                      "generating fingerprints for '%s'" % filename)
+            lgr.debug("generating fingerprints for '%s'" % filename)
             ospec['sha1sum'] = sha1sum(filename)
             # gather fingerprinting callables
             fingerprinters = set()
@@ -369,8 +364,7 @@ class LocalRunner(BaseRunner):
                 if finger_name.startswith('fp_'):
                     # strip common name prefix
                     finger_name = finger_name[3:]
-                lgr.debug('RUNNER',
-                          "generating '%s' fingerprint" % finger_name)
+                lgr.debug("generating '%s' fingerprint" % finger_name)
                 # run it, catch any error
                 try:
                     fprint = {}
@@ -379,8 +373,7 @@ class LocalRunner(BaseRunner):
                     # occurs during a latter stage of the fingerprinting
                     fingerprinter(filename, fprint)
                 except Exception, e:
-                    lgr.debug('RUNNER',
-                              "ignoring exception '%s' while fingerprinting '%s' with '%s'"
+                    lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
                               % (str(e), oname, finger_name))
             ospec['fingerprints'] = fingerprints
         os.chdir(initial_cwd)
@@ -389,18 +382,11 @@ class LocalRunner(BaseRunner):
         entities = {}
         spec['entities'] = entities
         spec['system'] = describe_system()
-        # try using APT to obtain more info on software deps
-        try:
-            import apt
-            pkg_mngr = apt.Cache()
-        except:
-            pkg_mngr = None
         for exec_path, espec in spec.get('executables', {}).iteritems():
             # replace exectutable info with the full picture
             ehash = self._describe_binary(exec_path,
                                           entities,
-                                          type_='binary',
-                                          pkgdb=pkg_mngr)
+                                          type_='binary')
             # link the old info with the new one
             espec['entity'] = ehash
             # check version information
@@ -419,8 +405,7 @@ class LocalRunner(BaseRunner):
                         entities[ehash]['version'] = version
                         have_version = True
                 except:
-                    lgr.debug('RUNNER',
-                              "failed to read version from '%s'"
+                    lgr.debug("failed to read version from '%s'"
                               % verfilename)
             if not have_version and 'version_cmd' in espec:
                 vercmd = espec['version_cmd']
@@ -441,12 +426,11 @@ class LocalRunner(BaseRunner):
                             entities[ehash]['version'] = version
                             have_version = True
                     except:
-                        lgr.debug('RUNNER',
-                                  "failed to read version from '%s'" % vercmd)
+                        lgr.debug("failed to read version from '%s'" % vercmd)
 
         for env in spec.get('environment', {}):
             # grab envvar values
-            spec['environment'][env] = os.environ.get(ename, 'UNDEFINED')
+            spec['environment'][env] = os.environ.get(env, 'UNDEFINED')
         if not len(entities):
             # remove unnecessary dict
             del spec['entities']
@@ -489,8 +473,9 @@ class LocalRunner(BaseRunner):
         # provided by a package?
         pkgname = self._pkg_mngr.get_pkg_name(fpath)
         if not pkgname is None:
-            pkginfo = dict(type=pkg_mngr.get_platform_name(), name=pkgname)
-            pkginfo.update(pkg_mngr.get_pkg_info(pkgname))
+            pkg_pltf = self._pkg_mngr.get_platform_name()
+            pkginfo = dict(type=pkg_pltf, name=pkgname)
+            pkginfo.update(self._pkg_mngr.get_pkg_info(pkgname))
             if 'sha1sum' in pkginfo and len(pkginfo['sha1sum']):
                 pkghash = pkginfo['sha1sum']
             else:

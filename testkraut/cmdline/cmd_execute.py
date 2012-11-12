@@ -24,6 +24,7 @@ __docformat__ = 'restructuredtext'
 
 import argparse
 import os
+import sys
 from os.path import join as opj
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -40,3 +41,6 @@ def run(args):
     runner = tkr.LocalRunner(testlib=args.library)
     retval, spec = runner(args.spec)
     spec.save(opj(runner.get_testbed_dir(spec), 'spec.json'))
+    if not retval:
+        args.logger.critical("test '%s' failed" % args.spec)
+        raise RuntimeError("abort due to test failure")

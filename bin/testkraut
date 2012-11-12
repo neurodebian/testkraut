@@ -11,10 +11,19 @@
 
 __docformat__ = 'restructuredtext'
 
+import logging
+# set up logging
+logging.basicConfig(
+        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+    )
+log_levels = dict(critical=logging.CRITICAL, error=logging.ERROR,
+                  warning=logging.WARNING, info=logging.INFO,
+                  debug=logging.DEBUG)
+lgr = logging.getLogger()
+
 import sys
 import argparse
 import textwrap
-import logging
 import testkraut.cmdline as mvcmd
 from testkraut.cmdline import helpers, common_args
 import testkraut
@@ -44,13 +53,6 @@ THE SOFTWARE.
 Written by Michael Hanke with the help of numerous other contributors.
 """
 
-# set up logging
-logging.basicConfig(
-        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-    )
-log_levels = dict(critical=logging.CRITICAL, error=logging.ERROR,
-                  warning=logging.WARNING, info=logging.INFO,
-                  debug=logging.DEBUG)
 
 # setup cmdline args parser
 # main parser
@@ -142,7 +144,8 @@ available via command-specific help options, i.e.:
 args = parser.parse_args()
 # default log level
 args.common_log_level = log_levels.get(args.common_log_level, logging.WARNING)
-# configure the logger
+# configure the loggers
+lgr.setLevel(args.common_log_level)
 args.logger.setLevel(args.common_log_level)
 # run the function associated with the selected command
 if args.common_debug:
@@ -154,3 +157,4 @@ else:
         args.func(args)
     except Exception as exc:
         logging.error('%s (%s)' % (str(exc), exc.__class__.__name__))
+        sys.exit(1)
