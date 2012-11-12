@@ -43,6 +43,7 @@ def main(**extra_args):
                            'testkraut.cmdline',
                            'testkraut.evaluators',
                            'testkraut.external',
+                           'testkraut.tests',
                            ],
           data_files = [(opj('share', 'testkraut', test), [f for f in glob(opj(test, '*'))
                                     if os.path.isfile(f)])
