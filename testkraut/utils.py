@@ -342,7 +342,10 @@ def get_cmd_prov_strace(cmd, match_argv=None):
     pid_mapper = {}
     for pid, proc in procs.iteritems():
         if proc['started_by'] is None:
-            # nothing to recode
+            # cache pid of the mother
+            if 'argv' in proc:
+                pid_mapper[pid] = pid
+            # nothing else to recode
             continue
         # we have a parent process, but we might have no cmd info
         # -> retrace graph upwards to find a parent with info
