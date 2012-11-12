@@ -19,12 +19,12 @@ class PkgManager(object):
     def __init__(self):
         self._mode = None
         self._native_pkg_cache = None
+        from .utils import run_command
         try:
             import apt
             self._native_pkg_cache = apt.Cache()
             self._mode = 'deb'
         except ImportError:
-            from .utils import run_command
             # it could still be debian, but without python-apt
             ret = run_command('dpkg --version')
             if ret['retval'] == 0:
