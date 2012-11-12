@@ -5,7 +5,7 @@
   "description": "", 
   "environment": {
     "FSLDIR": {}, 
-    "FSLOUTPUTTYPE": {}, 
+    "FSLOUTPUTTYPE": {}
   }, 
   "evaluations": {}, 
   "executables": {
