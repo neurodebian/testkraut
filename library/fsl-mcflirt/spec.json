@@ -1,0 +1,72 @@
+{
+  "dependencies": {
+    "deb": "fsl-5.0"
+  }, 
+  "description": "", 
+  "environment": {
+    "FSLDIR": {}, 
+    "FSLOUTPUTTYPE": {}, 
+  }, 
+  "evaluations": {}, 
+  "executables": {
+    "$FSLDIR/bin/mcflirt": {}
+  }, 
+  "id": "fsl-mcflirt", 
+  "inputs": {
+    "fmri.nii.gz": {
+      "sha1sum": "c015cc61945d86ba3dd49a98df3fc9fc144df3e5", 
+      "tags": [
+        "4D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.nii.gz"
+    }
+  }, 
+  "outputs": {
+    "fmri_mcf.nii.gz": {
+      "tags": [
+        "4D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri_mcf.nii.gz"
+    }, 
+    "fmri_mcf.par": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri_mcf.par"
+    }
+  }, 
+  "processes": {
+    "0": {
+      "argv": [
+        "mcflirt", 
+        "-in", 
+        "fmri.nii.gz", 
+        "-plots"
+      ], 
+      "executable": "$FSLDIR/bin/mcflirt", 
+      "generates": [
+        "fmri_mcf.par", 
+        "fmri_mcf.nii.gz"
+      ], 
+      "uses": [
+        "fmri.nii.gz"
+      ]
+    }
+  }, 
+  "test": {
+    "command": [
+      "mcflirt", 
+      "-in", 
+      "fmri.nii.gz", 
+      "-plots"
+    ], 
+    "type": "shell_command"
+  }, 
+  "version": 0
+}
