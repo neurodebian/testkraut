@@ -26,6 +26,7 @@ import argparse
 import os
 import sys
 from os.path import join as opj
+from ..spec import SPEC
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -39,8 +40,24 @@ def run(args):
     from .. import runner as tkr
     from ..spec import SPECJSONEncoder
     runner = tkr.LocalRunner(testlib=args.library)
-    retval, spec = runner(args.spec)
-    spec.save(opj(runner.get_testbed_dir(spec), 'spec.json'))
+    # where is the test?
+    testlib_filepath = opj(args.library, args.spec, 'spec.json')
+    if os.path.isfile(testlib_filepath):
+        # open spec from test library
+        spec = SPEC(open(testlib_filepath))
+    elif os.path.isfile(args.spec):
+        # open explicit spec file
+        spec = SPEC(open(args.spec))
+    else:
+        # spec is given as a str?
+        spec = SPEC(args.spec)
+    try:
+        retval, spec = runner(spec)
+    finally:
+        spec.save(opj(runner.get_testbed_dir(spec), 'spec.json'))
     if not retval:
         args.logger.critical("test '%s' failed" % args.spec)
+        args.logger.info(spec.get('test', {}).get('stdout', ''))
+        args.logger.info(spec.get('test', {}).get('stderr', ''))
+        
         raise RuntimeError("abort due to test failure")
