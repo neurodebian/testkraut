@@ -51,7 +51,8 @@ class BaseRunner(object):
             spec = SPEC(spec)
 
         lgr.info("processing test SPEC '%s' (%s)" % (spec['id'], spec.get_hash()))
-        lgr.info("check dependencies")
+        lgr.info("check requirements")
+        self._check_requirements(spec)
         lgr.info("prepare testbed")
         self._prepare_testbed(spec)
         lgr.info("run test")
@@ -90,6 +91,9 @@ class BaseRunner(object):
         raise NotImplementedError
 
     def _gather_component_info(self, spec):
+        raise NotImplementedError
+
+    def _check_requirements(self, spec):
         raise NotImplementedError
 
     def get_testbed_dir(self, spec):
@@ -483,6 +487,12 @@ class LocalRunner(BaseRunner):
             entities[pkghash] = pkginfo
             spec['provider'] = pkghash
         return fhash
+
+    def _check_requirements(self, spec):
+        for env in spec.get('environment', {}):
+            if not env in os.environ:
+                raise ValueError("required environment variable '%s' not set"
+                                 % env)
 
 def get_eval_input(inspec, testspec):
     if 'origin' in inspec and inspec['origin'] == 'testoutput':
