@@ -38,8 +38,12 @@ manpages: mkdir-MAN_DIR
 	done
 
 test:
-	PYTHONPATH=$(LPYTHONPATH) $(NOSETESTS) --nocapture .
-
+	PYTHONPATH=$(LPYTHONPATH) $(NOSETESTS) \
+		--nocapture \
+		--with-doctest \
+		--doctest-extension .rst \
+		--doctest-tests doc/source/*.rst \
+		.
 
 #
 # Little helpers
