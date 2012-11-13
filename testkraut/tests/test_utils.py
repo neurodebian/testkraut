@@ -24,11 +24,9 @@ def test_sysinfo():
 def test_pkg_mngr():
     pkg = PkgManager()
     pypkgname = pkg.get_pkg_name('/usr/bin/python')
-    print pkg.get_platform_name(), pypkgname
     if pkg.get_platform_name() in ('deb', 'rpm'):
         assert_false(pypkgname is None)
     pkg_info = pkg.get_pkg_info(pkg.get_pkg_name('/usr/bin/python'))
-    print pkg_info
 
 @with_tempdir()
 def test_strace_wrapper(wdir):
