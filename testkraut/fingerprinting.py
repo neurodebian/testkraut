@@ -11,15 +11,30 @@
 __docformat__ = 'restructuredtext'
 
 import operator
+import logging
+lgr = logging.getLogger(__name__)
 
 _tag2fx = {}
 
 def get_fingerprinters(tag):
     if not len(_tag2fx):
         # charge
-        _tag2fx.update({
-            'volumetric image': [fp_volume_image]
-        })
+        from testkraut import cfg
+        tags = cfg.options('fingerprints')
+        for tag in tags:
+            fp_tag = []
+            for fps_str in cfg.get('fingerprints', tag).split():
+                fps_comp = fps_str.split('.')
+                try:
+                    mod = __import__('.'.join(fps_comp[:-1]), globals(), locals(),
+                                     fps_comp[-1:], -1)
+                    fps = getattr(mod, fps_comp[-1])
+                except:
+                    lgr.warning(
+                        "ignoring invalid fingerprinting function '%s' for tag '%s'"
+                        % (fps_str, tag))
+                fp_tag.append(fps)
+            _tag2fx[tag] = fp_tag
     return _tag2fx.get(tag, [])
 
 def fp_volume_image(fname, fp):
@@ -114,3 +129,6 @@ def fp_volume_image(fname, fp):
                 pos = msr.maximum_position(img_data, labels=clusters, index=cl_label)
                 cli['max_pos'] = pos
                 cli['max'] = img_data[pos]
+
+def fp_nifti(fname, fp):
+    pass
