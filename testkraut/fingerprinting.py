@@ -22,8 +22,9 @@ def get_fingerprinters(tag):
         from testkraut import cfg
         tags = cfg.options('fingerprints')
         for tag in tags:
-            fp_tag = []
-            for fps_str in cfg.get('fingerprints', tag).split():
+            fp_tag = set()
+            for fps_str in cfg.get('system fingerprints', tag, default="").split() \
+                         + cfg.get('fingerprints', tag, default="").split():
                 fps_comp = fps_str.split('.')
                 try:
                     mod = __import__('.'.join(fps_comp[:-1]), globals(), locals(),
@@ -33,9 +34,9 @@ def get_fingerprinters(tag):
                     lgr.warning(
                         "ignoring invalid fingerprinting function '%s' for tag '%s'"
                         % (fps_str, tag))
-                fp_tag.append(fps)
+                fp_tag.add(fps)
             _tag2fx[tag] = fp_tag
-    return _tag2fx.get(tag, [])
+    return _tag2fx.get(tag, set())
 
 def fp_volume_image(fname, fp):
     # this version needs an increment whenever this implementation changes
