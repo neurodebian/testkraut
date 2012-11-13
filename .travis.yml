@@ -18,5 +18,7 @@ install:
     - sudo apt-get install $PYTHON-nose
     - sudo apt-get install $PYTHON-pydot
 script:
+    - ls -l
+    - $PYTHON -c 'from testkraut import cfg; print cfg'
     # Run only nonlabile tests
     - make test
