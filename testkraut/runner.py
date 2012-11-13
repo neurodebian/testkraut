@@ -372,22 +372,7 @@ class LocalRunner(BaseRunner):
             fingerprints = ospec.get('fingerprints', {}) 
             # for the unique set of fingerprinting functions
             for fingerprinter in fingerprinters:
-                # their name will be used as the ID of the fingerprint
-                finger_name = fingerprinter.__name__
-                if finger_name.startswith('fp_'):
-                    # strip common name prefix
-                    finger_name = finger_name[3:]
-                lgr.debug("generating '%s' fingerprint" % finger_name)
-                # run it, catch any error
-                try:
-                    fprint = {}
-                    fingerprints[finger_name] = fprint
-                    # fill in a dict to get whetever info even if an exception
-                    # occurs during a latter stage of the fingerprinting
-                    fingerprinter(filename, fprint)
-                except Exception, e:
-                    lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
-                              % (str(e), oname, finger_name))
+                _proc_fingerprint(fingerprinter, fingerprints, filename)
             ospec['fingerprints'] = fingerprints
         os.chdir(initial_cwd)
 
@@ -515,3 +500,20 @@ def get_eval_input(inspec, testspec):
                 % inspec['value'])
     else:
         raise NotImplementedError("dunno how to handle anything but output references")
+
+def _proc_fingerprint(fingerprinter, fingerprints, filename):
+    finger_name = fingerprinter.__name__
+    if finger_name.startswith('fp_'):
+        # strip common name prefix
+        finger_name = finger_name[3:]
+    lgr.debug("generating '%s' fingerprint" % finger_name)
+    # run it, catch any error
+    try:
+        fprint = {}
+        fingerprints[finger_name] = fprint
+        # fill in a dict to get whetever info even if an exception
+        # occurs during a latter stage of the fingerprinting
+        fingerprinter(filename, fprint)
+    except Exception, e:
+        lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
+                  % (str(e), filename, finger_name))
