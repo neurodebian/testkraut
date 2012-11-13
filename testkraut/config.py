@@ -99,8 +99,7 @@ class ConfigManager(SafeConfigParser):
         # listof filenames to parse (custom plus some standard ones)
         homedir = os.path.expanduser('~')
         user_configfile = os.path.join(homedir, '.testkraut.cfg')
-        filenames = self.__cfg_filenames \
-                    + ['testkraut.cfg', user_configfile]
+        filenames = [user_configfile, 'testkraut.cfg'] + self.__cfg_filenames
 
         # read local and user-specific config
         files = self.read(filenames)
