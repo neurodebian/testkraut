@@ -20,7 +20,7 @@ def get_fingerprinters(tag):
     if not len(_tag2fx):
         # charge
         from testkraut import cfg
-        tags = cfg.options('fingerprints')
+        tags = set(cfg.options('system fingerprints')).union(cfg.options('fingerprints'))
         for tag in tags:
             fp_tag = set()
             for fps_str in cfg.get('system fingerprints', tag, default="").split() \
