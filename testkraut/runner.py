@@ -21,6 +21,7 @@ from .utils import run_command, get_shlibdeps, which, sha1sum, \
         get_script_interpreter, describe_system
 from .pkg_mngr import PkgManager
 from .spec import SPEC
+from testkraut import cfg
 import logging
 lgr = logging.getLogger(__name__)
 
@@ -34,16 +35,23 @@ class BaseRunner(object):
     event of a test failure the input SPEC will contain all information
     collected up to the point of failure.
     """
-    def __init__(self, testlib='library'):
+    def __init__(self, testlib=None):
         """
         Parameters
         ----------
         testlib: path
-          Location of the test library.
+          Location of a test library. The path is added to the configure test
+          library locations (defined via a config file).
         testbed_basedir: path
           Directory where local (non-VM, non-chroot) testbeds will be created.
         """
-        self._testlib = os.path.abspath(testlib)
+        self._testlibdirs = cfg.get('library', 'paths',
+                                    default=opj(os.curdir, 'library')).split(',')
+        if not testlib is None:
+            self._testlibdirs.append(os.path.abspath(testlib))
+        self._testlibdirs = [os.path.abspath(os.path.expanduser(tld))
+                                    for tld in self._testlibdirs]
+        lgr.debug("effective test library paths: '%s'" % self._testlibdirs)
 
     def __call__(self, spec):
         lgr.info("processing test SPEC '%s' (%s)" % (spec['id'], spec.get_hash()))
@@ -112,16 +120,16 @@ def check_file_hash(filepath, inspec):
     lgr.debug("no hash for '%s' found" % filepath)
     return None
 
-def locate_file_in_testlib(testlibdir, testid, inspec=None, filename=None):
+def _locate_file_in_testlib(testlibdirs, testid, inspec=None, filename=None):
     if inspec is None:
         inspec = dict()
     if filename is None:
         filename = inspec['value']
-    filepath = opj(testlibdir, testid, filename)
-    if not os.path.isfile(filepath):
+    for tld in testlibdirs:
+        filepath = opj(tld, testid, filename)
+        if os.path.isfile(filepath):
+            return filepath
         lgr.debug("file '%s' not present at '%s'" % (filename, filepath))
-        return None
-    return filepath
     return None
 
 def locate_file_in_cache(cachedir, inspec):
@@ -138,7 +146,7 @@ def locate_file_in_cache(cachedir, inspec):
                   % (cand_filename, cachedir))
     return None
 
-def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, lazy=False):
+def prepare_local_testbed(spec, dst, testlibdirs, cachedir=None, lazy=False):
     if not os.path.exists(dst):
         os.makedirs(dst)
     inspecs = spec.get('inputs', {})
@@ -149,7 +157,7 @@ def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, lazy=False):
         if type_ == 'file':
             # try finding the file locally
             testbed_filepath = inspec['value']
-            filepath = locate_file_in_testlib(testlibdir, spec['id'], inspec)
+            filepath = _locate_file_in_testlib(testlibdirs, spec['id'], inspec)
             if filepath is None and os.path.isfile(testbed_filepath):
                 # that file actually exists in the current dir
                 filepath = testbed_filepath
@@ -175,7 +183,7 @@ def prepare_local_testbed(spec, dst, testlibdir, cachedir=None, lazy=False):
     # place test code/script itself
     testspec = spec['test']
     if 'file' in testspec:
-        testfilepath = locate_file_in_testlib(testlibdir,
+        testfilepath = _locate_file_in_testlib(testlibdirs,
                                               spec['id'],
                                               filename=testspec['file'])
         if testfilepath is None:
@@ -211,7 +219,7 @@ class LocalRunner(BaseRunner):
     def _prepare_testbed(self, spec):
         prepare_local_testbed(spec,
                               opj(self._testbed_basedir, spec['id']),
-                              self._testlib,
+                              self._testlibdirs,
                               cachedir=self._cachedir)
 
     def _run_nipype_workflow(self, spec):
