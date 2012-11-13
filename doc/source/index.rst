@@ -13,6 +13,7 @@ Contents:
 
    design
    tags
+   fingerprints
 
 Indices and tables
 ==================
