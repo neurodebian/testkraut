@@ -46,7 +46,7 @@ you are to use corresponding parts.
 PyMVPA
 ------
 
-The comnmand line interface has been derived from the one of PyMVPA. The
+The command line interface has been derived from the one of PyMVPA. The
 configuration manager taken almost entirely from PyMVPA.
 
 ::
