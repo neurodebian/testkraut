@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    design
+   tags
 
 Indices and tables
 ==================
