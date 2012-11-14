@@ -18,9 +18,10 @@ from uuid import uuid1 as uuid
 from . import utils
 from . import evaluators
 from .utils import run_command, get_shlibdeps, which, sha1sum, \
-        get_script_interpreter, describe_system
+        get_script_interpreter, describe_system, get_test_library_paths
 from .pkg_mngr import PkgManager
 from .spec import SPEC
+import testkraut
 from testkraut import cfg
 import logging
 lgr = logging.getLogger(__name__)
@@ -35,22 +36,18 @@ class BaseRunner(object):
     event of a test failure the input SPEC will contain all information
     collected up to the point of failure.
     """
-    def __init__(self, testlib=None):
+    def __init__(self, testlibs=None):
         """
         Parameters
         ----------
-        testlib: path
-          Location of a test library. The path is added to the configure test
-          library locations (defined via a config file).
+        testlibs: list
+          sequence of test library locations. The paths are prepended to the
+          configured test library locations (defined via a config file).
         testbed_basedir: path
           Directory where local (non-VM, non-chroot) testbeds will be created.
         """
-        self._testlibdirs = cfg.get('library', 'paths',
-                                    default=opj(os.curdir, 'library')).split(',')
-        if not testlib is None:
-            self._testlibdirs.append(os.path.abspath(testlib))
-        self._testlibdirs = [os.path.abspath(os.path.expanduser(tld))
-                                    for tld in self._testlibdirs]
+        self._testlibdirs = [os.path.abspath(os.path.expandvars(tld))
+                                    for tld in get_test_library_paths(testlibs)]
         lgr.debug("effective test library paths: '%s'" % self._testlibdirs)
 
     def __call__(self, spec):

@@ -29,6 +29,15 @@ if 'setuptools' in sys.modules:
             test='nose>=0.10.1')
     )
 
+test_library_files = []
+for test in glob(opj('testkraut', 'library', '*')):
+    if not os.path.isdir(test):
+        continue
+    for f in glob(opj(test, '*')):
+        if not os.path.isfile(f):
+            continue
+        test_library_files.append(f[10:])
+
 def main(**extra_args):
     setup(name         = 'testkraut',
           version      = testkraut.__version__,
@@ -55,9 +64,9 @@ def main(**extra_args):
                            'testkraut.external',
                            'testkraut.tests',
                            ],
-          data_files = [(opj('share', 'testkraut', test), [f for f in glob(opj(test, '*'))
-                                    if os.path.isfile(f)])
-                            for test in glob(opj('library', '*')) if os.path.isdir(test)],
+          package_data = {
+              'testkraut': test_library_files + ['testkraut.cfg']
+            },
           scripts      = glob(os.path.join('bin', '*'))
           )
 

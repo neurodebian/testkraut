@@ -18,6 +18,11 @@ import datetime
 import hashlib
 import platform
 from .pkg_mngr import PkgManager
+import testkraut
+from os.path import join as opj
+from .spec import SPEC
+import logging
+lgr = logging.getLogger(__name__)
 
 def which(program):
     """
@@ -447,4 +452,53 @@ def _describe_debian_system(sysinfo):
 def _describe_ubuntu_system(sysinfo):
     _describe_debian_system(sysinfo)
 
+def get_test_library_paths(prepend=None):
+    """Returns a sequence with all configured tets library paths.
 
+    Parameters
+    ==========
+    prepend : list
+      sequence with additional paths that are prepended to the output
+    """
+    testlibdirs = [os.path.expandvars(tld) for tld in
+                      testkraut.cfg.get('library', 'paths',
+                              default=opj(os.curdir, 'library')).split(',')]
+    # always add the built-in library as a last resort
+    testlibdirs.append(opj(os.path.dirname(testkraut.__file__), 'library'))
+    if not prepend is None:
+        return prepend + testlibdirs
+    else:
+        return testlibdirs
+
+def get_spec(spec_def, libraries=None):
+    """Return a SPEC object from a number of obscure locations.
+
+    SPEC can be given as a string, a path to a SPEC file, or a SPEC
+    ID that is search for in any configured library location (plus
+    additional libraries passed via ``libraries``).
+    """
+    spec = None
+    # look for the SPEC in any possible library
+    for tld in get_test_library_paths(libraries):
+        testlib_filepath = opj(tld, spec_def, 'spec.json')
+        if os.path.isfile(testlib_filepath):
+            lgr.debug("located SPEC for test '%s' in library at '%s'"
+                      % (spec_def, tld))
+            spec = SPEC(open(testlib_filepath))
+            break
+        else:
+            lgr.debug("did not find SPEC for test '%s' in library at '%s'"
+                      % (spec_def, tld))
+    if spec is None and os.path.isfile(spec_def):
+        # open explicit spec file
+        spec = SPEC(open(spec_def))
+    if spec is None:
+        # spec is given as a str?
+        try:
+            spec = SPEC(spec_def)
+        except ValueError:
+            # not a SPEC
+            raise ValueError("'%s' is neither a SPEC, or a " % spec_def +
+                             "filename of an existing SPEC file, or an ID "
+                             "of a test in any of the configured libraries.")
+    return spec
