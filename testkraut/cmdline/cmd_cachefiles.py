@@ -18,10 +18,12 @@ __docformat__ = 'restructuredtext'
 import argparse
 import os
 import shutil
+import urllib2
 from os.path import join as opj
 from glob import glob
 from ..spec import SPEC
 from ..utils import sha1sum, get_test_library_paths, get_spec
+from testkraut import cfg
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -63,7 +65,7 @@ def run(args):
     # what is missing
     missing_files = wanted_files.difference(have_files)
     search_cache = {}
-    # search in all dirs
+    # search in all locale dirs
     for search_dir in (args.search + args.library):
         for root, dirnames, filenames in os.walk(search_dir):
             for fname in filenames:
@@ -76,6 +78,21 @@ def run(args):
     # ensure the cache is there
     if not os.path.exists(args.cache):
         os.makedirs(args.cache)
+    # try downloading missing files from the web
+    hashpots = cfg.get('hash stores', 'http').split()
+    for sha1 in missing_files.copy():
+        for hp in hashpots:
+            try:
+                urip = urllib2.urlopen('%s%s' % (hp, sha1))
+                dst_path = opj(args.cache, sha1)
+                fp = open(dst_path, 'wb')
+                lgr.debug("download '%s%s'->'%s'" % (hp, sha1, dst_path))
+                fp.write(urip.read())
+                fp.close()
+                missing_files.remove(sha1)
+                break
+            except urllib2.HTTPError:
+                lgr.debug("cannot find '%s' at '%s'" % (sha1, hp))
     # copy/link them into the cache
     for sha1, fpath in search_cache.iteritems():
         dst_path = opj(args.cache, sha1)
