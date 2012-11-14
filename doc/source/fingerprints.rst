@@ -9,11 +9,12 @@
 
 .. _chap_output_tags:
 
+*********************
 Output fingerprinting
-=====================
+*********************
 
 Writing a custom fingerprinting function
-----------------------------------------
+========================================
 
 Writing a custom fingerprint implementation for a particular kind of output
 is pretty straightforward. Start by creating a function with the following

@@ -9,8 +9,9 @@
 
 .. _chap_output_tags:
 
+***********
 Output tags
-===========
+***********
 
 This glossary lists all known tags that can be used to label test outputs.
 According to the assigned tags appropriate fingerprinting or evaluation

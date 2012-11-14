@@ -1,24 +1,56 @@
-.. testkraut documentation master file, created by
-   sphinx-quickstart on Tue Jun 12 17:08:44 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. -*- mode: rst; fill-column: 78; indent-tabs-mode: nil -*-
+.. vi: set ft=rst sts=4 ts=4 sw=4 et tw=79:
+  ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+  #
+  #   See COPYING file distributed along with the testkraut package for the
+  #   copyright and license terms.
+  #
+  ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
-Welcome to testkraut's documentation!
-=====================================
+.. _chap_index:
 
+.. include:: ../../README.rst
+   :end-before: link list
+
+At this point your probably want to :ref:`chap_getting_started`.
+
+.. include:: ../../README.rst
+   :start-after: link list
+
+Wanna help?
+===========
+
+If you think it would be worthwhile to contribute to this project your
+input would be highly appreciated. Please report issues, send feature-requests,
+and pull-request without hesitation!
+
+License
+=======
+
+All code is licensed under the terms of the MIT license, or some equally liberal
+alternative license. Please see the COPYING file in the source distribution for
+more detailed information.
 Contents:
+
+Documentation
+=============
 
 .. toctree::
    :maxdepth: 2
 
-   design
-   tags
+   gettingstarted
+   usecases
    fingerprints
+   tags
+   faq
+
+.. toctree::
+   :hidden:
+
+   design
 
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+:ref:`genindex` | :ref:`modindex` | :ref:`search`
 
