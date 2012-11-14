@@ -28,8 +28,11 @@ and analysis -- opening up the opportunity to "crowd-source" software testing
 efforts, and aggregate results beyond the scope of a single project, lab,
 company, or site.
 
-:More documentation: https://testkraut.readthedocs.org
-:Build status: http://travis-ci.org/neurodebian/testkraut
+More documentation:
+  https://testkraut.readthedocs.org
+
+Build status:
+  http://travis-ci.org/neurodebian/testkraut
 
 
 Prototypes of a testkraut user
@@ -77,3 +80,10 @@ The original aim for this project was to achieve "crowd-sourcing" of software
 testing efforts. "kraut" is obviously almost a semi-homonym of "crowd", while
 at the same time indicating that this software spent its infancy at the
 Institute of Psychology Magdeburg, Germany.
+
+License
+-------
+
+All code is licensed under the terms of the MIT license, or some equally liberal
+alternative license. Please see the COPYING file in the source distribution for
+more detailed information.
