@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext'
 
 from ConfigParser import SafeConfigParser
 import os.path
+from os.path import join as opj
 
 
 class ConfigManager(SafeConfigParser):
@@ -96,13 +97,23 @@ class ConfigManager(SafeConfigParser):
     def reload(self):
         """Re-read settings from all configured locations.
         """
-        # listof filenames to parse (custom plus some standard ones)
+        # listof filenames to parse (custom plus some standard ones), they are
+        # listed in the order they need to be parsed to guarantee a sane
+        # configuration file cascade
         homedir = os.path.expanduser('~')
-        user_configfile = os.path.join(homedir, '.testkraut.cfg')
-        filenames = [user_configfile, 'testkraut.cfg'] + self.__cfg_filenames
+        cfg_file_candidates = [
+                # the base config shipped in the package
+                opj(os.path.dirname(__file__), 'testkraut.cfg'),
+                # systemwide config
+                '/etc/testkraut/testkraut.cfg',
+                # user config
+                opj(homedir, '.testkraut.cfg'),
+                # current dir config
+                'testkraut.cfg'
+            ]
 
         # read local and user-specific config
-        files = self.read(filenames)
+        files = self.read(cfg_file_candidates + self.__cfg_filenames)
 
         # no look for variables in the environment
         for var in [v for v in os.environ.keys() if v.startswith('TESTKRAUT_')]:
