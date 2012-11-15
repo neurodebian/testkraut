@@ -1,0 +1,4 @@
+# Compulsory line, this is a version 3 file
+version=3
+opts="filenamemangle=s/.*\/(.*)/testkraut-$1\.tar\.gz/" \
+  http://github.com/neurodebian/testkraut/tags .*tarball/(\d[\d\.a-z]+)

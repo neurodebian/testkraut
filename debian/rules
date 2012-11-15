@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+# -*- mode: makefile; coding: utf-8 -*-
+
+# one ring to rule them all ...
+%:
+# need to enforce distutils, since we also have a makefile
+	dh $@ --buildsystem=python_distutils --builddirectory=build
+
+override_dh_auto_build:
+	dh_auto_build
+	# and docs
+	$(MAKE) htmldoc
+	# but remove jquery copy (later on link to Debian's version)
+	-rm build/html/_static/jquery.js
+	# objects inventory is of no use for the package
+	-rm build/html/objects.inv
+	# also doc source files only consume space
+	-rm -r build/html/_sources
+
+# enable when we believe that the tests should pass
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	for buildver in $(shell pyversions -vr); do \
+		echo "I: Running unittests using python$$buildver"; \
+		$(MAKE) test PYTHON=python$$buildver || exit 1 ;\
+	done
+endif
+
+## immediately useable documentation
+## and exemplar data (they are small excerpts anyway)
+override_dh_compress:
+	dh_compress -X.py -X.html -X.css -X.jpg -X.txt -X.js -X.json -X.rtc -X.par -X.bin
+
+override_dh_installman:
+	$(MAKE) manpages
+	dh_installman build/man/*
+
+override_dh_clean:
+	$(MAKE) clean
+	dh_clean
