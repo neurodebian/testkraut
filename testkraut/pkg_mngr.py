@@ -32,10 +32,11 @@ class PkgManager(object):
                 lgr.warning("Running on Debian platform but no python-apt "
                             "package found -- only limited information is "
                             "available.")
-        # maybe RPM?
-        ret = run_command('rpm --version')
-        if ret['retval'] == 0:
-            self._mode = 'rpm'
+        if self._mode is None:
+            # maybe RPM?
+            ret = run_command('rpm --version')
+            if ret['retval'] == 0:
+                self._mode = 'rpm'
 
     def get_pkg_name(self, filename):
         """Return the name of a package providing a file (if any).
