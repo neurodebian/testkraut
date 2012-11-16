@@ -40,7 +40,7 @@ manpages: mkdir-MAN_DIR
 test:
 	PYTHONPATH=$(LPYTHONPATH) $(NOSETESTS) \
 		--nocapture \
-		--ignore-files='prov.*\.py' \
+		--exclude='external.*' \
 		--with-doctest \
 		--doctest-extension .rst \
 		--doctest-tests doc/source/*.rst \
