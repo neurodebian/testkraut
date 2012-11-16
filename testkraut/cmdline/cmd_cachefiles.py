@@ -75,6 +75,7 @@ def run(args):
                     # make path relative to cache dir
                     search_cache[sha1] = os.path.relpath(fpath, args.cache)
                     lgr.debug("found missing '%s' at '%s'" % (sha1, fpath))
+                    missing_files.remove(sha1)
     # ensure the cache is there
     if not os.path.exists(args.cache):
         os.makedirs(args.cache)
@@ -93,6 +94,8 @@ def run(args):
                 break
             except urllib2.HTTPError:
                 lgr.debug("cannot find '%s' at '%s'" % (sha1, hp))
+            except urllib2.URLError:
+                lgr.debug("cannot connect to at '%s'" % hp)
     # copy/link them into the cache
     for sha1, fpath in search_cache.iteritems():
         dst_path = opj(args.cache, sha1)
@@ -122,7 +125,6 @@ def run(args):
         else:
             shutil.copy(fpath, dst_path)
             lgr.debug("copylink '%s'->'%s'" % (fpath, dst_path))
-        missing_files.remove(sha1)
     if len(missing_files):
         lgr.warning('cannot find needed file(s):')
         for mf in missing_files:
