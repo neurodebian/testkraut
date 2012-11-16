@@ -1,0 +1,13 @@
+diff --git a/debian/control b/debian/control
+index 302cfd4..2589b7f 100644
+--- a/debian/control
++++ b/debian/control
+@@ -4,7 +4,7 @@ Priority: extra
+ Maintainer: NeuroDebian Team <team@neuro.debian.net>
+ Uploaders: Michael Hanke <mih@debian.org>, Yaroslav Halchenko <debian@onerussian.com>
+ Build-Depends: debhelper (>= 7.2.18), python-all (>= 2.6),
+- python2.6-argparse, python-support (>= 0.6), python-numpy,
++ python-support (>= 0.6), python-numpy,
+  help2man, python-sphinx, python-nose, python-nibabel, python-scipy, strace
+ Standards-Version: 3.9.3
+ Homepage: https://github.com/neurodebian/testkraut
