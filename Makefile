@@ -46,6 +46,20 @@ test:
 		--doctest-tests doc/source/*.rst \
 		.
 
+release-%:
+	@echo "Testing for uncommited changes"
+	@git diff --quiet HEAD
+	sed -i -e 's/^__version__ = .*$$/__version__ = "$(*)"/' testkraut/__init__.py
+	git add testkraut/__init__.py
+	@echo "Create and tag release commit"
+	git commit -m "Release $(*)"
+	git tag -s -a -m "Release $(*)" release/$(*)
+	sed -i -e 's/^__version__ = .*$$/__version__ = "$(*)+dev"/' testkraut/__init__.py
+	git add testkraut/__init__.py
+	git commit -m "Increment version for new development cycle"
+
+
+
 #
 # Little helpers
 #
