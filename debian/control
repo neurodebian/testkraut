@@ -3,7 +3,8 @@ Section: python
 Priority: extra
 Maintainer: NeuroDebian Team <team@neuro.debian.net>
 Uploaders: Michael Hanke <mih@debian.org>, Yaroslav Halchenko <debian@onerussian.com>
-Build-Depends: debhelper (>= 7.2.18), python-all (>= 2.6), python-support (>= 0.6), python-numpy, help2man
+Build-Depends: debhelper (>= 7.2.18), python-all (>= 2.6),
+ python-support (>= 0.6), python-numpy, help2man, python-sphinx, python-nose
 Standards-Version: 3.9.3
 Homepage: https://github.com/neurodebian/testkraut
 Vcs-Browser: http://git.debian.org/?p=pkg-exppsy/testkraut.git
@@ -12,7 +13,8 @@ XS-Python-Version: >= 2.6
 
 Package: testkraut
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-numpy
+Depends: ${misc:Depends}, ${python:Depends}, python-numpy, libjs-underscore,
+ libjs-jquery
 Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}
 Description: test and evaluate heterogeneous data processing pipelines
