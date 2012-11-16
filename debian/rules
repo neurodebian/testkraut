@@ -12,6 +12,7 @@ override_dh_auto_build:
 	$(MAKE) htmldoc
 	# but remove jquery copy (later on link to Debian's version)
 	-rm build/html/_static/jquery.js
+	-rm build/html/_static/underscore.js
 	# objects inventory is of no use for the package
 	-rm build/html/objects.inv
 	# also doc source files only consume space
