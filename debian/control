@@ -14,8 +14,8 @@ XS-Python-Version: >= 2.6
 
 Package: testkraut
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-numpy
- libjs-underscore, libjs-jquery, python (>= 2.7) | python-argparse,
+Depends: ${misc:Depends}, ${python:Depends}, python-numpy,
+ libjs-underscore, libjs-jquery, python (>= 2.7) | python-argparse
 Recommends: strace, python-scipy, python-colorama, python-apt
 Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}
