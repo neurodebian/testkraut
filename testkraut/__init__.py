@@ -10,7 +10,7 @@
 
 __docformat__ = 'restructuredtext'
 
-__version__ = "0.0.1"
+__version__ = "0.0.1+dev"
 
 import os
 from .config import ConfigManager
