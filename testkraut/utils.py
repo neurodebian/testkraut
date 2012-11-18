@@ -453,18 +453,31 @@ def _describe_ubuntu_system(sysinfo):
     _describe_debian_system(sysinfo)
 
 def get_test_library_paths(prepend=None):
-    """Returns a sequence with all configured tets library paths.
+    """Returns a sequence with all configured test library paths.
 
     Parameters
     ==========
     prepend : list
       sequence with additional paths that are prepended to the output
     """
+    # locations from configuration
     testlibdirs = [os.path.expandvars(tld) for tld in
                       testkraut.cfg.get('library', 'paths',
                               default=opj(os.curdir, 'library')).split(',')]
+    # XDG system locations
+    testlibdirs += [opj(b, 'testkraut', 'library') for b in
+                            os.environ.get("XDG_DATA_DIRS",
+                                           "/usr/local/share/:/usr/share/").split(":")
+                                if os.path.isabs(b)]
+    # XDG user location
+    home_testlibdir = opj(os.environ.get("XDG_DATA_HOME",
+                          os.path.expanduser("~/.local/share")))
+    if os.path.isabs(home_testlibdir):
+        testlibdirs.append(opj(home_testlibdir, 'testkraut', 'library'))
     # always add the built-in library as a last resort
     testlibdirs.append(opj(os.path.dirname(testkraut.__file__), 'library'))
+    # filter out non-existing locations
+    testlibdirs = [d for d in testlibdirs if os.path.isdir(d)]
     if not prepend is None:
         return prepend + testlibdirs
     else:
