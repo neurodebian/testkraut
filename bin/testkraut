@@ -11,15 +11,14 @@
 
 __docformat__ = 'restructuredtext'
 
+# set up logging first
 import logging
-# set up logging
-logging.basicConfig(
-        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-    )
 log_levels = dict(critical=logging.CRITICAL, error=logging.ERROR,
                   warning=logging.WARNING, info=logging.INFO,
                   debug=logging.DEBUG)
-lgr = logging.getLogger()
+lgr = logging.getLogger('testkraut')
+# do chatterbox by default (but only for the testkraut.* loggers)
+lgr.setLevel(logging.DEBUG)
 
 import sys
 import argparse
@@ -80,7 +79,14 @@ if __debug__:
 parser.add_argument('--log-level',
                     choices=('critical', 'error', 'warning', 'info', 'debug'),
                     dest='common_log_level',
-                    help='log level')
+                    help="""level of verbosity in log files. By default
+                         everything, including debug messages is logged.""")
+parser.add_argument('--verbose-level',
+                    choices=('critical', 'error', 'warning', 'info', 'debug'),
+                    dest='common_verbose_level',
+                    help="""level of verbosity of console output. By default
+                         only warnings and errors are printed.""")
+
 
 
 # subparsers
@@ -142,16 +148,24 @@ available via command-specific help options, i.e.:
 
 # parse cmd args
 args = parser.parse_args()
-# default log level
-args.common_log_level = log_levels.get(args.common_log_level, logging.WARNING)
+# default log levels
+args.common_log_level = log_levels.get(args.common_log_level, logging.DEBUG)
+args.common_verbose_level = log_levels.get(args.common_verbose_level,
+                                           logging.WARNING)
 # configure the loggers
-lgr.setLevel(args.common_log_level)
-args.logger.setLevel(args.common_log_level)
+# console output
+console = logging.StreamHandler()
+console.setLevel(args.common_verbose_level)
+# TODO: we may want a more fancy custom formatter
+formatter = logging.Formatter(testkraut.cfg.get('logging', 'console format'))
+console.setFormatter(formatter)
+lgr.addHandler(console)
+
 # run the function associated with the selected command
 try:
     args.func(args)
 except Exception as exc:
-    logging.error('%s (%s)' % (str(exc), exc.__class__.__name__))
+    lgr.error('%s (%s)' % (str(exc), exc.__class__.__name__))
     if args.common_debug:
         raise
     sys.exit(1)

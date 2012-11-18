@@ -22,14 +22,12 @@ __docformat__ = 'restructuredtext'
 # magic line for manpage summary
 # man: -*- % generate a test SPEC from an arbitrary command call
 
+import logging
+lgr = logging.getLogger(__name__)
 import argparse
 import os
 import sys
 from os.path import join as opj
-from ..spec import SPEC
-from ..utils import get_spec
-import testkraut
-from testkraut import cfg
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -39,21 +37,38 @@ def setup_parser(parser):
     parser.add_argument('-l', '--library', action='append',
             help="""alternative path to a test library. When given, this setting
                  overwrites any library configuration setting""")
+    parser.add_argument('-t', '--testbeds', default='testbeds',
+            help="""base path of all test beds""")
 
 def run(args):
+    # local logger
     lgr = args.logger
-    from .. import runner as tkr
-    from ..spec import SPECJSONEncoder
-    runner = tkr.LocalRunner(testlibs=args.library)
+    import testkraut
+    from ..spec import SPECJSONEncoder, SPEC
+    from ..utils import get_spec
     # obtain the full SPEC from magic storage
     spec = get_spec(args.spec, args.library)
+    # we need to create the testbed directory here, to be able to place the
+    # logfile
+    testbed_path = opj(args.testbeds, spec['id'])
+    if not os.path.exists(testbed_path):
+        os.makedirs(testbed_path)
+    # configure the logging facility to create a log file in the testbed
+    logfile = logging.FileHandler(opj(testbed_path, 'testkraut.log'))
+    logfile.setLevel(args.common_log_level)
+    log_format = logging.Formatter(testkraut.cfg.get('logging', 'file format'))
+    logfile.setFormatter(log_format)
+    # attach log file to the top-level logger
+    logging.getLogger('testkraut').addHandler(logfile)
+    # and now the runner
+    from .. import runner as tkr
+    runner = tkr.LocalRunner(testlibs=args.library)
     try:
         retval = runner(spec)
     finally:
-        tbd = runner.get_testbed_dir(spec)
-        if os.path.exists(tbd):
+        if os.path.exists(testbed_path):
             # if we got a testbed, be sure to dump all info that we gathered
-            spec.save(opj(tbd, 'spec.json'))
+            spec.save(opj(testbed_path, 'spec.json'))
     if not retval:
         lgr.critical("test '%s' failed" % args.spec)
         lgr.info(spec.get('test', {}).get('stdout', ''))
