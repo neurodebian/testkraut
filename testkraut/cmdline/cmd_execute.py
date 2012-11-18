@@ -28,15 +28,14 @@ import argparse
 import os
 import sys
 from os.path import join as opj
+from .helpers import parser_add_common_args
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
 def setup_parser(parser):
     parser.add_argument('spec', metavar='SPEC',
         help="""SPEC filename or testlibary ID""")
-    parser.add_argument('-l', '--library', action='append',
-            help="""alternative path to a test library. When given, this setting
-                 overwrites any library configuration setting""")
+    parser_add_common_args(parser, opt=('librarypaths',))
     parser.add_argument('-t', '--testbeds', default='testbeds',
             help="""base path of all test beds""")
 

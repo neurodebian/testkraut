@@ -24,16 +24,14 @@ from glob import glob
 from ..spec import SPEC
 from ..utils import sha1sum, get_test_library_paths, get_spec, get_filecache_dir
 from testkraut import cfg
-from .helpers import parser_add_common_opt
+from .helpers import parser_add_common_args
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
 def setup_parser(parser):
     parser.add_argument('ids', nargs='*', metavar='ID',
             help="SPEC name/identifier")
-    parser.add_argument('-l', '--library', action='append', default=[],
-            help="""path to an additional test library""")
-    parser_add_common_opt(parser, 'filecache')
+    parser_add_common_args(parser, opt=('filecache', 'librarypaths'))
     parser.add_argument('-s', '--search', action='append', default=[],
             help="where to search for files")
     parser.add_argument('--copy', action='store_true',
@@ -41,7 +39,7 @@ def setup_parser(parser):
 
 def run(args):
     lgr = args.logger
-    lgr.debug("using file cache at '%s'" % args.cache)
+    lgr.debug("using file cache at '%s'" % args.filecache)
     if not len(args.ids):
         # if none specified go through all the SPECs in the lib
         args.ids = []
@@ -62,7 +60,8 @@ def run(args):
                 lgr.debug("add '%s' (%s) to the list of files to look for"
                           % (input.get('value', ''), input['sha1sum']))
     # what do we have in the cache?
-    have_files = [os.path.basename(f) for f in glob(opj(args.cache, '*')) if os.path.isfile(f)]
+    have_files = [os.path.basename(f) for f in glob(opj(args.filecache, '*'))
+                        if os.path.isfile(f)]
     # what is missing
     missing_files = wanted_files.difference(have_files)
     search_cache = {}
@@ -74,19 +73,19 @@ def run(args):
                 sha1 = sha1sum(fpath)
                 if sha1 in missing_files:
                     # make path relative to cache dir
-                    search_cache[sha1] = os.path.relpath(fpath, args.cache)
+                    search_cache[sha1] = os.path.relpath(fpath, args.filecache)
                     lgr.debug("found missing '%s' at '%s'" % (sha1, fpath))
                     missing_files.remove(sha1)
     # ensure the cache is there
-    if not os.path.exists(args.cache):
-        os.makedirs(args.cache)
+    if not os.path.exists(args.filecache):
+        os.makedirs(args.filecache)
     # try downloading missing files from the web
     hashpots = cfg.get('hash stores', 'http').split()
     for sha1 in missing_files.copy():
         for hp in hashpots:
             try:
                 urip = urllib2.urlopen('%s%s' % (hp, sha1))
-                dst_path = opj(args.cache, sha1)
+                dst_path = opj(args.filecache, sha1)
                 fp = open(dst_path, 'wb')
                 lgr.debug("download '%s%s'->'%s'" % (hp, sha1, dst_path))
                 fp.write(urip.read())

@@ -34,9 +34,16 @@ version = (
 
 
 filecache = (
-    'cache', ('-c', '--cache'),
+    'filecache', ('-c', '--filecache'),
     dict(default=get_filecache_dir(),
          help="""path to the file cache. By default the cache is located
               at ~/.cache/testkraut/files. A XDG_CACHE_HOME variable
               will also be honored when determining the default.""")
+)
+
+librarypaths = (
+    'library', ('-l', '--library'),
+    dict(action='append', default=[],
+         help="""path to an additional test library. This path is added to the
+              configured list of libraries and to the default search paths.""")
 )
