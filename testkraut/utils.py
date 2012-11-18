@@ -509,10 +509,13 @@ def get_filecache_dir():
     Implements XDG Base Directory Specification, hence allows overwriting the
     config setting with $XDG_CACHE_HOME.
     """
-    if 'XDG_CACHE_HOME' in os.environ:
-        cacheroot = os.environ['XDG_CACHE_HOME']
-    else:
+    cacheroot = os.environ.get('XDG_CACHE_HOME',
+                               os.path.expanduser(opj('~', '.cache')))
+    if not os.path.isabs(cacheroot):
+        lgr.debug("freedesktop.org standard dictates to ignore non-absolute "
+                  "XDG_CACHE_HOME setting '%s'" % cacheroot)
         cacheroot = os.path.expanduser(opj('~', '.cache'))
-    return os.path.expandvars(
+    cachepath = os.path.expandvars(
             testkraut.cfg.get('cache', 'files',
                               default=opj(cacheroot, 'testkraut', 'filecache')))
+    return cachepath
