@@ -121,7 +121,6 @@ class ConfigManager(SafeConfigParser):
             )
         # runtime config
         cfg_file_candidates += self.__cfg_filenames
-        print cfg_file_candidates
 
         # read local and user-specific config
         files = self.read(cfg_file_candidates)
