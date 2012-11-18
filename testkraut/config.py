@@ -103,17 +103,28 @@ class ConfigManager(SafeConfigParser):
         homedir = os.path.expanduser('~')
         cfg_file_candidates = [
                 # the base config shipped in the package
-                opj(os.path.dirname(__file__), 'testkraut.cfg'),
-                # systemwide config
-                '/etc/testkraut/testkraut.cfg',
-                # user config
-                opj(homedir, '.testkraut.cfg'),
-                # current dir config
-                'testkraut.cfg'
+                opj(os.path.dirname(__file__), 'testkraut.cfg')
             ]
+        # XDG system config
+        cfg_file_candidates += [opj(b, 'testkraut', 'config') for b in
+                                        os.environ.get("XDG_CONFIG_DIRS",
+                                              "/etc/xdg").split(":")
+                                    if os.path.isabs(b)]
+        # XDG user config
+        home_cfg_base_path = opj(os.environ.get("XDG_CONFIG_HOME",
+                                   os.path.expanduser("~/.config")))
+        if os.path.isabs(home_cfg_base_path):
+            cfg_file_candidates.append(opj(home_cfg_base_path, 'testkraut.cfg'))
+        # current dir config
+        cfg_file_candidates.append(
+                'testkraut.cfg'
+            )
+        # runtime config
+        cfg_file_candidates += self.__cfg_filenames
+        print cfg_file_candidates
 
         # read local and user-specific config
-        files = self.read(cfg_file_candidates + self.__cfg_filenames)
+        files = self.read(cfg_file_candidates)
 
         # no look for variables in the environment
         for var in [v for v in os.environ.keys() if v.startswith('TESTKRAUT_')]:
