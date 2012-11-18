@@ -198,7 +198,7 @@ def prepare_local_testbed(spec, dst, testlibdirs, cachedir=None, lazy=False):
 #class ChrootRunner
 #class VMRunner
 class LocalRunner(BaseRunner):
-    def __init__(self, testbed_basedir='testbeds', cachedir='filecache', **kwargs):
+    def __init__(self, testbed_basedir='testbeds', cachedir=None, **kwargs):
         """
         Parameters
         ----------
@@ -208,6 +208,8 @@ class LocalRunner(BaseRunner):
         BaseRunner.__init__(self, **kwargs)
         self._testbed_basedir = os.path.abspath(testbed_basedir)
         self._cachedir = cachedir
+        if cachedir is None:
+            self._cachedir = utils.get_filecache_dir()
         self._pkg_mngr = PkgManager()
 
     def get_testbed_dir(self, spec):

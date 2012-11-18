@@ -502,3 +502,17 @@ def get_spec(spec_def, libraries=None):
                              "filename of an existing SPEC file, or an ID "
                              "of a test in any of the configured libraries.")
     return spec
+
+def get_filecache_dir():
+    """Return the path to the file cache.
+
+    Implements XDG Base Directory Specification, hence allows overwriting the
+    config setting with $XDG_CACHE_HOME.
+    """
+    if 'XDG_CACHE_HOME' in os.environ:
+        cacheroot = os.environ['XDG_CACHE_HOME']
+    else:
+        cacheroot = os.path.expanduser(opj('~', '.cache'))
+    return os.path.expandvars(
+            testkraut.cfg.get('cache', 'files',
+                              default=opj(cacheroot, 'testkraut', 'filecache')))

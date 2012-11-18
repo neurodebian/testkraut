@@ -16,7 +16,9 @@ __docformat__ = 'restructuredtext'
 #    {<ArgusmentParser.add_arguments_kwargs>}
 #)
 
+from ..utils import get_filecache_dir
 from ..cmdline.helpers import HelpAction
+
 help = (
     'help', ('-h', '--help', '--help-np'),
     dict(nargs=0, action=HelpAction,
@@ -28,4 +30,13 @@ version = (
     'version', ('--version',),
     dict(action='version',
          help="show program's version and license information and exit")
+)
+
+
+filecache = (
+    'cache', ('-c', '--cache'),
+    dict(default=get_filecache_dir(),
+         help="""path to the file cache. By default the cache is located
+              at ~/.cache/testkraut/files. A XDG_CACHE_HOME variable
+              will also be honored when determining the default.""")
 )

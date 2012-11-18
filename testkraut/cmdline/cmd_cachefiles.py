@@ -22,8 +22,9 @@ import urllib2
 from os.path import join as opj
 from glob import glob
 from ..spec import SPEC
-from ..utils import sha1sum, get_test_library_paths, get_spec
+from ..utils import sha1sum, get_test_library_paths, get_spec, get_filecache_dir
 from testkraut import cfg
+from .helpers import parser_add_common_opt
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -32,8 +33,7 @@ def setup_parser(parser):
             help="SPEC name/identifier")
     parser.add_argument('-l', '--library', action='append', default=[],
             help="""path to an additional test library""")
-    parser.add_argument('-c', '--cache', default='filecache',
-            help="path to the file cache")
+    parser_add_common_opt(parser, 'filecache')
     parser.add_argument('-s', '--search', action='append', default=[],
             help="where to search for files")
     parser.add_argument('--copy', action='store_true',
@@ -41,6 +41,7 @@ def setup_parser(parser):
 
 def run(args):
     lgr = args.logger
+    lgr.debug("using file cache at '%s'" % args.cache)
     if not len(args.ids):
         # if none specified go through all the SPECs in the lib
         args.ids = []
