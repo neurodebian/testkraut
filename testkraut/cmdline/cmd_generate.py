@@ -262,5 +262,5 @@ def run(args):
     if not args.dump_env is None:
         for env in os.environ:
             if not re.match(args.dump_env, env) is None:
-                spec['environment'][env] = {}
+                spec['environment'][env] = None
     spec.save(args.ospec_filename)
