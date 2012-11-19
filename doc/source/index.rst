@@ -40,8 +40,10 @@ Documentation
 
    gettingstarted
    usecases
+   spec
    fingerprints
    tags
+   terms
    faq
 
 .. toctree::
