@@ -486,6 +486,10 @@ class LocalRunner(BaseRunner):
             if not env in os.environ:
                 raise ValueError("required environment variable '%s' not set"
                                  % env)
+        for exe in spec.get('executables', {}):
+            if not os.path.isfile(os.path.expandvars(exe)):
+                raise ValueError("required executable '%s' not found" % exe)
+
 
 def get_eval_input(inspec, testspec):
     if 'origin' in inspec and inspec['origin'] == 'testoutput':
