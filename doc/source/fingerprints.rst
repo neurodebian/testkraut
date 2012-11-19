@@ -7,7 +7,7 @@
   #
   ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
-.. _chap_output_tags:
+.. _chap_output_fingerprinting:
 
 *********************
 Output fingerprinting
