@@ -7,7 +7,7 @@
     "FSLDIR": {},
     "FSLOUTPUTTYPE": {}
   }, 
-  "evaluations": {}, 
+  "comparisons": {}, 
   "executables": {
     "$FSLDIR/bin/bet": {
       "version_cmd": [

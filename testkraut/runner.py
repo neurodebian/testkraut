@@ -317,13 +317,13 @@ class LocalRunner(BaseRunner):
         return True
 
     def _evaluate_output(self, spec):
-        evalspecs = spec.get('evaluations',{})
+        evalspecs = spec.get('comparisons',{})
         testbedpath = opj(self._testbed_basedir, spec['id'])
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
         try:
             for eid, espec in evalspecs.iteritems():
-                lgr.debug("running evaluation '%s'" % espec['id'])
+                lgr.debug("running comparison '%s'" % espec['id'])
                 res = self._proc_eval_spec(eid, espec, spec)
         finally:
             os.chdir(initial_cwd)
@@ -345,7 +345,7 @@ class LocalRunner(BaseRunner):
             # This distinction is bullshit and not possible with valid JSON
             if isinstance(ins, basestring):
                 # kwarg
-                raise NotImplementedError('dunno how to handle kwargs in eval input specs')
+                raise NotImplementedError('dunno how to handle kwargs in comparison input specs')
             else:
                 # arg
                 args.append(get_eval_input(ins, spec))

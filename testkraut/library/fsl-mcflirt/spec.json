@@ -7,7 +7,7 @@
     "FSLDIR": {}, 
     "FSLOUTPUTTYPE": {}
   }, 
-  "evaluations": {}, 
+  "comparisons": {}, 
   "executables": {
     "$FSLDIR/bin/mcflirt": {
       "version_file": "$FSLDIR/etc/fslversion"

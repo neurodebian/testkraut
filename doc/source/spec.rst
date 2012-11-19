@@ -142,7 +142,7 @@ environment whose presence is required for a test run. The corresponding values
 are undefined/irrelevant in an input SPEC, but contain the observed variable
 values as strings in an output SPEC.
 
-``evaluations``
+``comparisons``
 ===============
 
 yet to be determined

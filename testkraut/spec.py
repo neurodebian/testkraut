@@ -20,7 +20,7 @@ __allowed_spec_keys__ = [
         'description',
         'entities',
         'environment',
-        'evaluations',
+        'comparisons',
         'executables',
         'id',
         'inputs',
@@ -73,9 +73,9 @@ class SPEC(dict):
 
     def _check(self):
         _verify_tags(self, ('id', 'version', 'test'), 'SPEC')
-        for i, ev in enumerate(self.get('evaluations', {})):
+        for i, ev in enumerate(self.get('comparisons', {})):
             _verify_tags(ev, ('id', 'input spec', 'operator'),
-                         'evaluation %i' % i)
+                         'comparison %i' % i)
         _verify_spec_tags(self.get('outputs', {}), ('type', 'value'),
                           'outputs')
         _verify_spec_tags(self.get('inputs', {}), ('type', 'value'),
