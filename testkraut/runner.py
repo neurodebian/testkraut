@@ -43,8 +43,6 @@ class BaseRunner(object):
         testlibs: list
           sequence of test library locations. The paths are prepended to the
           configured test library locations (defined via a config file).
-        testbed_basedir: path
-          Directory where local (non-VM, non-chroot) testbeds will be created.
         """
         self._testlibdirs = [os.path.abspath(os.path.expandvars(tld))
                                     for tld in get_test_library_paths(testlibs)]
@@ -216,8 +214,10 @@ class LocalRunner(BaseRunner):
         return opj(self._testbed_basedir, spec['id'])
 
     def _prepare_testbed(self, spec):
+        testbed_path = opj(self._testbed_basedir, spec['id'])
+        lgr.debug("prepare testbed at '%s'" % testbed_path)
         prepare_local_testbed(spec,
-                              opj(self._testbed_basedir, spec['id']),
+                              testbed_path,
                               self._testlibdirs,
                               cachedir=self._cachedir)
 

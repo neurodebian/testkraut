@@ -26,6 +26,7 @@ import logging
 lgr = logging.getLogger(__name__)
 import argparse
 import os
+import shutil
 import sys
 from os.path import join as opj
 from .helpers import parser_add_common_args
@@ -35,9 +36,17 @@ parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 def setup_parser(parser):
     parser.add_argument('spec', metavar='SPEC',
         help="""SPEC filename or testlibary ID""")
-    parser_add_common_args(parser, opt=('librarypaths', 'filecache'))
-    parser.add_argument('-t', '--testbeds', default='testbeds',
-            help="""base path of all test beds""")
+    parser_add_common_args(parser, opt=('librarypaths', 'filecache',
+                                        'specoutput'))
+    parser.add_argument('-t', '--testbed',
+            help="""the base directory to run the test in. The actual testbed
+                 will be a sub-directory whose name is equal to the test ID.
+                 Upon completion of the test this testbed will contain all
+                 output data, as well as the test SPEC and logfile(s).""")
+    parser.add_argument('--keep-tmp-testbed', action='store_true',
+            help="""If set, a temporary testbed will not be deleted upon
+                 test completion. Note, custom testbed locations given via
+                 --testbed are never deleted.""")
 
 def run(args):
     # local logger
@@ -49,7 +58,18 @@ def run(args):
     spec = get_spec(args.spec, args.library)
     # we need to create the testbed directory here, to be able to place the
     # logfile
-    testbed_path = opj(args.testbeds, spec['id'])
+    tmp_testbedbase = None
+    if args.testbed is None:
+        import tempfile
+        tmp_testbedbase = tempfile.mkdtemp(suffix='', prefix='testkraut')
+        args.testbed = tmp_testbedbase
+        testbed_path = opj(tmp_testbedbase, spec['id'])
+    else:
+        testbed_path = opj(args.testbed, spec['id'])
+    if args.keep_tmp_testbed or tmp_testbedbase is None:
+        # only provide info on testbed location, if it won't be deleted upon
+        # completion anyway
+        lgr.info('testbed location: %s' % testbed_path)
     if not os.path.exists(testbed_path):
         os.makedirs(testbed_path)
     # configure the logging facility to create a log file in the testbed
@@ -61,13 +81,21 @@ def run(args):
     logging.getLogger('testkraut').addHandler(logfile)
     # and now the runner
     from .. import runner as tkr
-    runner = tkr.LocalRunner(testlibs=args.library)
+    runner = tkr.LocalRunner(testbed_basedir=args.testbed,
+                             testlibs=args.library)
     try:
         retval = runner(spec)
     finally:
         if os.path.exists(testbed_path):
             # if we got a testbed, be sure to dump all info that we gathered
             spec.save(opj(testbed_path, 'spec.json'))
+            if not args.ospec_filename is None:
+                # store a copy to desired custom location
+                spec.save(args.ospec_filename)
+    if not tmp_testbedbase is None and not args.keep_tmp_testbed:
+        # remove temporary testbed location
+        lgr.debug("delete temporary testbed at '%s'" % tmp_testbedbase)
+        shutil.rmtree(tmp_testbedbase)
     if not retval:
         lgr.critical("test '%s' failed" % args.spec)
         lgr.info(spec.get('test', {}).get('stdout', ''))
