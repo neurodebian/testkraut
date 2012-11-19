@@ -47,3 +47,9 @@ librarypaths = (
          help="""path to an additional test library. This path is added to the
               configured list of libraries and to the default search paths.""")
 )
+
+specoutput = (
+    'output-spec', ('-o', '--output-spec'),
+    dict(metavar='FILENAME', dest='ospec_filename',
+         help="""file name of the output SPEC file""")
+)

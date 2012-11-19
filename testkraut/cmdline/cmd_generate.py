@@ -32,13 +32,12 @@ from os.path import join as opj
 from ..spec import SPEC
 from ..utils import sha1sum, get_cmd_prov_strace, guess_file_tags
 from ..pkg_mngr import PkgManager
+from .helpers import parser_add_common_opt
 
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
 def setup_parser(parser):
-    parser.add_argument(
-        '-o', '--spec-file', required=True, metavar='FILENAME', dest='spec_filename',
-        help="name of the output SPEC file")
+    parser_add_common_opt(parser, 'specoutput', required=True)
     parser.add_argument(
         '--id', required=True,
         help="SPEC name/identifier")
@@ -264,4 +263,4 @@ def run(args):
         for env in os.environ:
             if not re.match(args.dump_env, env) is None:
                 spec['environment'][env] = {}
-    spec.save(args.spec_filename)
+    spec.save(args.ospec_filename)
