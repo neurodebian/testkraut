@@ -98,7 +98,7 @@ def run(args):
                 lgr.debug("cannot connect to at '%s'" % hp)
     # copy/link them into the cache
     for sha1, fpath in search_cache.iteritems():
-        dst_path = opj(args.cache, sha1)
+        dst_path = opj(args.filecache, sha1)
         if os.path.lexists(dst_path):
             if os.path.islink(dst_path):
                 # remove existing symlink
