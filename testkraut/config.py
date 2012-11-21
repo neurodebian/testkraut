@@ -21,14 +21,20 @@ class ConfigManager(SafeConfigParser):
     The purpose of this class is to collect all configurable settings used by
     various parts of testkraut. It is fairly simple and does only little more
     than the standard Python ConfigParser. Like ConfigParser it is blind to the
-    data that it stores, i.e. not type checking is performed.
+    data that it stores, i.e. no type checking is performed.
 
-    Configuration files (INI syntax) in multiple location are passed when the
-    class is instantiated or whenever `Config.reload()` is called later on.
-    By default it looks for a config file named `testkraut.cfg` in the current
-    directory and `.testkraut.cfg` in the user's home directory. Moreover, the
-    constructor takes an optional argument with a list of additional file names
-    to parse.
+    Configuration files (INI syntax) in multiple location are parsed when a
+    class instance is created or whenever `Config.reload()` is called later on.
+    Files are read and parsed in the following order:
+
+    1. 'testkraut.cfg' in the same directory as this Python module file
+    2. 'testkraut/config' in all directories defined by $XDG_CONFIG_DIRS
+       (by default: /etc/xdg/)
+    3. 'testkraut.cfg' in $XDG_CONFIG_HOME (by default: ~/.config/)
+    4. 'testkraut.cfg' in the current directory
+
+    Moreover, the constructor takes an optional argument with a list of
+    additional file names to parse afterwards.
 
     In addition to configuration files, this class also looks for special
     environment variables to read settings from. Names of such variables have to
@@ -55,10 +61,11 @@ class ConfigManager(SafeConfigParser):
         long name = 1
 
     Settings from custom configuration files (specified by the constructor
-    argument) have the highest priority and override settings found in the
-    current directory. They in turn override user-specific settings and finally
-    the content of any `TESTKRAUT_*` environment variables overrides all
-    settings read from any file.
+    argument) have the highest priority and override settings found in any of
+    the config files read from default locations (which are themselves read in
+    the order stated above -- overwriting earlier configuration settings
+    accordingly). Finally, the content of any `TESTKRAUT_*` environment variables
+    overrides any settings read from any file.
     """
 
     # things we want to count on to be available
