@@ -14,6 +14,7 @@ import os
 from os.path import join as opj
 import re
 import shutil
+from datetime import datetime
 from uuid import uuid1 as uuid
 from . import utils
 from . import evaluators
@@ -71,12 +72,21 @@ class BaseRunner(object):
 
     def _run_test(self, spec):
         type_ = spec['test']['type']
+        starttime = datetime.utcnow()
+        # year, mon, day, hour, min, sec
+        spec['test']['starttime'] = tuple(starttime.utctimetuple())[:6]
         try:
             test_exec = getattr(self, '_run_%s' % type_)
         except AttributeError:
             raise ValueError("unsupported test type '%s'" % type_)
         lgr.debug("run test via %s()" % test_exec.__name__)
-        return test_exec(spec)
+        ret = test_exec(spec)
+        duration = datetime.utcnow() - starttime
+        # in seconds (XXX could become .total_seconds() in Python 2.7)
+        spec['test']['duration'] = (24 * 60 * 60 * duration.days) \
+                                   + duration.seconds \
+                                   + duration.microseconds / 1000000.
+        return ret
 
     def _check_output_presence(self, spec):
         raise NotImplementedError

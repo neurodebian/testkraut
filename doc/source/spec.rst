@@ -351,12 +351,17 @@ following fields:
 ``exitcode`` (:term:`JSON number`; integer)
   Exit code for the executed command.
 
+``duration`` (:term:`JSON number`; float)
+  Duration of the test run in seconds.
+
 ``stderr`` (:term:`JSON string`)
   Full dump of ``stderr`` output.
 
 ``stdout`` (:term:`JSON string`)
   Full dump of ``stdout`` output.
 
+``starttime`` (:term:`JSON array`)
+  Time of the test run start (year, month, day, hour, minute, second).
 
 ``version``
 ===========
