@@ -257,7 +257,7 @@ def run(args):
         proc['started_by'] = pid_native2new[native_parent_pid]
     if 'deb' in dep_mapper:
         # do a dpkg style dependency statement
-        dep_mapper['deb'] = ' ,'.join(dep_mapper['deb'])
+        dep_mapper['deb'] = ', '.join(dep_mapper['deb'])
     # record full environment (if desired)
     if not args.dump_env is None:
         for env in os.environ:
