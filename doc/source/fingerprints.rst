@@ -44,7 +44,7 @@ an input file could look like this::
   >>> import os
   >>> def fp_file_size(fname, fpinfo):
   ...   fpinfo['version'] = 0
-  ...   fpinfo['size'] = os.stat(fname).st_size
+  ...   fpinfo['size'] = os.path.getsize(fname)
   >>> #
   >>> # test it
   >>> #
