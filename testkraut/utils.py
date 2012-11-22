@@ -391,6 +391,8 @@ def guess_file_tags(fname):
         img = nb.load(fname)
         tags.add('volumetric image')
         tags.add('%iD image' % len(img.get_shape()))
+        if 'nifti1' in img.__class__.__name__.lower():
+            tags.add('nifti1 format')
     except:
         pass
     try:

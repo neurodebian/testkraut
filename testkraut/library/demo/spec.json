@@ -35,6 +35,7 @@
     "brain.nii.gz": {
       "tags": [
         "3D image", 
+        "nifti1 format", 
         "volumetric image"
       ], 
       "type": "file", 
@@ -43,6 +44,7 @@
     "brain_mask.nii.gz": {
       "tags": [
         "3D image", 
+        "nifti1 format", 
         "volumetric image"
       ], 
       "type": "file", 

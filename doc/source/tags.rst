@@ -22,6 +22,9 @@ methods are automatically applied to the output data.
  3D image, 4D image
    a sub-category of :term:`volumetric image` with a particular number of axes
 
+ nifti1 format
+   a file in any variant of the NIfTI1 format
+
  space-separated values
    data in text format where individual numeric values are separated by any
    white-space character(s)

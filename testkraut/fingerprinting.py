@@ -143,5 +143,21 @@ def fp_volume_image(fname, fp, tags):
                 cli['max_pos'] = pos
                 cli['max'] = img_data[pos]
 
-def fp_nifti(fname, fp, tags):
-    pass
+def fp_nifti1_header(fname, fp, tags):
+    import nibabel as nb
+    import numpy as np
+    img = nb.load(fname)
+    fp['version'] = 0
+    hdr = img.get_header()
+    for k, v in hdr.items():
+        if not len(v.shape):
+            # 0d fellas
+            fp[k] = v.item()
+        elif np.issubdtype(v.dtype, float):
+            fp[k] = [float(i) for i in v]
+        elif np.issubdtype(v.dtype, int):
+            fp[k] = [int(i) for i in v]
+        else:
+            fp[k] = unicode(v)
+    fp['extension_codes'] = hdr.extensions.get_codes()
+    fp['extension_sizes'] = [e.get_sizeondisk() for e in hdr.extensions]
