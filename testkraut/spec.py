@@ -12,7 +12,6 @@ __docformat__ = 'restructuredtext'
 
 import json
 import difflib
-import numpy as np
 from uuid import uuid1 as uuid
 
 __allowed_spec_keys__ = [
@@ -51,8 +50,13 @@ def _verify_spec_tags(specs, tags, name):
 
 class SPECJSONEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, np.ndarray):
-            return list(o)
+        try:
+            import numpy as np
+            if isinstance(o, np.ndarray):
+                return list(o)
+        except ImportError:
+            # let is fail elsewhere if numpy is not available
+            pass
         return super(SPECJSONEncoder, self).default(o)
 
 class SPEC(dict):
