@@ -73,7 +73,8 @@ def run(args):
     if not os.path.exists(testbed_path):
         os.makedirs(testbed_path)
     # configure the logging facility to create a log file in the testbed
-    logfile = logging.FileHandler(opj(testbed_path, 'testkraut.log'))
+    logfile_path = opj(testbed_path, 'testkraut.log')
+    logfile = logging.FileHandler(logfile_path)
     logfile.setLevel(args.common_log_level)
     log_format = logging.Formatter(testkraut.cfg.get('logging', 'file format'))
     logfile.setFormatter(log_format)
@@ -87,6 +88,9 @@ def run(args):
         retval = runner(spec)
     finally:
         if os.path.exists(testbed_path):
+            if os.path.exists(logfile_path):
+                # suck in the log file if there is any
+                spec['test']['log'] = open(logfile_path, 'r').readlines()
             # if we got a testbed, be sure to dump all info that we gathered
             spec.save(opj(testbed_path, 'spec.json'))
             if not args.ospec_filename is None:
