@@ -381,7 +381,8 @@ class LocalRunner(BaseRunner):
             fingerprints = ospec.get('fingerprints', {}) 
             # for the unique set of fingerprinting functions
             for fingerprinter in fingerprinters:
-                _proc_fingerprint(fingerprinter, fingerprints, filename)
+                _proc_fingerprint(fingerprinter, fingerprints, filename,
+                                  ospec.get('tags', []))
             ospec['fingerprints'] = fingerprints
         os.chdir(initial_cwd)
 
@@ -514,7 +515,9 @@ def get_eval_input(inspec, testspec):
     else:
         raise NotImplementedError("dunno how to handle anything but output references")
 
-def _proc_fingerprint(fingerprinter, fingerprints, filename):
+def _proc_fingerprint(fingerprinter, fingerprints, filename, tags=None):
+    if tags is None:
+        tags = []
     finger_name = fingerprinter.__name__
     if finger_name.startswith('fp_'):
         # strip common name prefix
@@ -526,7 +529,7 @@ def _proc_fingerprint(fingerprinter, fingerprints, filename):
         fingerprints[finger_name] = fprint
         # fill in a dict to get whetever info even if an exception
         # occurs during a latter stage of the fingerprinting
-        fingerprinter(filename, fprint)
+        fingerprinter(filename, fprint, tags)
     except Exception, e:
         lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
                   % (str(e), filename, finger_name))

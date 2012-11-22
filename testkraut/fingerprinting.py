@@ -41,11 +41,11 @@ def get_fingerprinters(tag):
     fprinters.add(fp_file)
     return fprinters
 
-def fp_file(fname, fp, tags=None):
+def fp_file(fname, fp, tags):
     fp['version'] = 0
     fp['size'] = os.path.getsize(fname)
 
-def fp_volume_image(fname, fp):
+def fp_volume_image(fname, fp, tags):
     # this version needs an increment whenever this implementation changes
     fp['version'] = 0
     import nibabel as nb
@@ -138,5 +138,5 @@ def fp_volume_image(fname, fp):
                 cli['max_pos'] = pos
                 cli['max'] = img_data[pos]
 
-def fp_nifti(fname, fp):
+def fp_nifti(fname, fp, tags):
     pass

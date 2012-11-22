@@ -20,7 +20,7 @@ Writing a custom fingerprint implementation for a particular kind of output
 is pretty straightforward. Start by creating a function with the following
 interface::
 
-  def fp_my_fingerprint(fname, fpinfo):
+  def fp_my_fingerprint(fname, fpinfo, tags):
     pass
 
 The variable ``fname`` will contain the filename/path of the output for which a
@@ -29,7 +29,9 @@ content of the fingerprint needs to be added. A test runner will add this
 dictionary to the ``fingerprints`` section of the respective output file in the
 SPEC. The name of the fingerprinting function itself will be used as key for
 this fingerprint element in that section. Any ``fp_``-prefix, as in the example
-above, will be stripped from the name.
+above, will be stripped from the name. Finally, ``tags`` is a sequence of
+:ref:`chap_output_tags` that categorize a file and can be used to adjust the
+content of a fingerprint accordingly.
 
 Any fingerprinting function must add a ``version`` tag to the fingerprint. The
 version must be incremented whenever the fingerprint implementation changes, to
@@ -42,7 +44,7 @@ A complete implementation of a fingerprinting function that stores the size of
 an input file could look like this::
 
   >>> import os
-  >>> def fp_file_size(fname, fpinfo):
+  >>> def fp_file_size(fname, fpinfo, tags):
   ...   fpinfo['version'] = 0
   ...   fpinfo['size'] = os.path.getsize(fname)
   >>> #
