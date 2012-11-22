@@ -60,6 +60,10 @@ def test_minimal_test_run(wdir):
     assert_equal(tspec['exitcode'], 0)
     assert_equal(tspec['stdout'].strip(), os.uname()[0])
     assert_true('stderr' in tspec)
+    assert_true('duration' in tspec)
+    assert_equal(type(tspec['duration']), float)
+    assert_true('starttime' in tspec)
+    assert_equal(len(tspec['starttime']), 6)
 
 @with_tempdir()
 def test_failed_run(wdir):
