@@ -15,11 +15,30 @@ Get started (quickly)
 
 This should not take much time. testkraut contains no compiled code. It should
 run with Python 2.6 (or later) -- although Python 3x hasn't been tested (yet).
-If you are running Python 2.6 you should install the ``argparse`` package,
-otherwise you won't have much fun. The ``numpy`` package is not strictly
-required, but very useful to have. Same goes for ``scipy`` -- any reasonably
-recent version should do. For more beautiful console output go and get the
-``colorama`` package -- but again, for purists there is no real requirement.
+If you are running Python 2.6 you should install the argparse_ package,
+otherwise you won't have much fun. Here is a list of things the make life
+more interesting:
+
+NumPy_
+   not strictly required, but strongly recommended. There should be no need
+   to have a particular version.
+
+SciPy_
+   will improve the test result reporting -- any reasonably recent version
+   should do
+
+libmagic_
+   helps to provide more meaningful information on file types
+
+python-colorama_
+   for more beautiful console output -- but monochrome beings don't need it
+
+.. _argparse: http://pypi.python.org/pypi/argparse
+.. _NumPy: http://numpy.scipy.org
+.. _SciPy: http://www.scipy.org
+.. _libmagic: http://www.darwinsys.com/file
+.. _python-colorama: http://pypi.python.org/pypi/colorama
+
 
 Download ...
 ============
@@ -37,8 +56,12 @@ installing you might want to call ``sudo`` for additional force.
 Depending on your setup you may want to add this location to your ``PATH``
 environment variable.
 
+.. _PyPi: http://pypi.python.org
+
 ... and run
 ===========
+
+.. _FSL: http://www.fmrib.ox.ac.uk/fsl
 
 Now we're ready to run our first test. The ``demo`` test requires FSL_ to be
 installed and configured to run (properly set ``FSLDIR`` variable and so on...).

@@ -30,7 +30,6 @@ License
 All code is licensed under the terms of the MIT license, or some equally liberal
 alternative license. Please see the COPYING file in the source distribution for
 more detailed information.
-Contents:
 
 Documentation
 =============

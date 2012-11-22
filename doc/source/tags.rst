@@ -23,11 +23,19 @@ methods are automatically applied to the output data.
    a sub-category of :term:`volumetric image` with a particular number of axes
 
  space-separated values
-   a :term:`text file` were individual numeric values are separated by any
+   data in text format where individual numeric values are separated by any
    white-space character(s)
 
  text file
    a file with text-only, i.e. non-binary content
 
+ tscores
+   values from a `Student’s t-distribution
+   <http://en.wikipedia.org/wiki/Student%E2%80%99s_t-distribution>`_
+
  volumetric image
    a multi-dimensional (three or more) image
+
+ zscores
+   standardized values indicating how many standard deviations an original
+   value is above or below the mean
