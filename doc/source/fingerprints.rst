@@ -33,9 +33,9 @@ above, will be stripped from the name. Finally, ``tags`` is a sequence of
 :ref:`chap_output_tags` that categorize a file and can be used to adjust the
 content of a fingerprint accordingly.
 
-Any fingerprinting function must add a ``version`` tag to the fingerprint. The
-version must be incremented whenever the fingerprint implementation changes, to
-make longitudinal comparisons of test results more accurate.
+Any fingerprinting function must add a ``__version__`` tag to the fingerprint.
+The version must be incremented whenever the fingerprint implementation
+changes, to make longitudinal comparisons of test results more accurate.
 
 There is no need to return any value -- all content needs to be added to the
 ``fpinfo`` dictionary.
@@ -45,7 +45,7 @@ an input file could look like this::
 
   >>> import os
   >>> def fp_file_size(fname, fpinfo, tags):
-  ...   fpinfo['version'] = 0
+  ...   fpinfo['__version__'] = 0
   ...   fpinfo['size'] = os.path.getsize(fname)
   >>> #
   >>> # test it

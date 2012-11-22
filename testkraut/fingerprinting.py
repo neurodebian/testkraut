@@ -42,7 +42,7 @@ def get_fingerprinters(tag):
     return fprinters
 
 def fp_file(fname, fp, tags):
-    fp['version'] = 0
+    fp['__version__'] = 0
     fp['size'] = os.path.getsize(fname)
     try:
         from .external import magic
@@ -52,7 +52,7 @@ def fp_file(fname, fp, tags):
 
 def fp_volume_image(fname, fp, tags):
     # this version needs an increment whenever this implementation changes
-    fp['version'] = 0
+    fp['__version__'] = 0
     import nibabel as nb
     import numpy as np
     from scipy.ndimage import measurements as msr
@@ -147,7 +147,7 @@ def fp_nifti1_header(fname, fp, tags):
     import nibabel as nb
     import numpy as np
     img = nb.load(fname)
-    fp['version'] = 0
+    fp['__version__'] = 0
     hdr = img.get_header()
     for k, v in hdr.items():
         if not len(v.shape):
@@ -161,3 +161,4 @@ def fp_nifti1_header(fname, fp, tags):
             fp[k] = unicode(v)
     fp['extension_codes'] = hdr.extensions.get_codes()
     fp['extension_sizes'] = [e.get_sizeondisk() for e in hdr.extensions]
+
