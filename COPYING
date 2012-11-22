@@ -67,3 +67,14 @@ Python implementation of the W3C's PROV-DM
   License: MIT
   Copyright: 2012 University of Southampton
 
+python-magic
+------------
+
+Python interface to the libmagic file type identification library.
+
+::
+
+  Author: Adam Hupp <adam@hupp.org>
+  Files: testkraut/external/magic.py
+  License: PSF
+  Copyright: 2001-2012 Adam Hupp
