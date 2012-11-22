@@ -10,6 +10,7 @@
 
 __docformat__ = 'restructuredtext'
 
+import os
 import operator
 import logging
 lgr = logging.getLogger(__name__)
@@ -36,7 +37,13 @@ def get_fingerprinters(tag):
                         % (fps_str, tag))
                 fp_tag.add(fps)
             _tag2fx[tag] = fp_tag
-    return _tag2fx.get(tag, set())
+    fprinters = _tag2fx.get(tag, set())
+    fprinters.add(fp_file)
+    return fprinters
+
+def fp_file(fname, fp, tags=None):
+    fp['version'] = 0
+    fp['size'] = os.path.getsize(fname)
 
 def fp_volume_image(fname, fp):
     # this version needs an increment whenever this implementation changes
