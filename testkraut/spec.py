@@ -53,7 +53,11 @@ class SPECJSONEncoder(json.JSONEncoder):
         try:
             import numpy as np
             if isinstance(o, np.ndarray):
-                return list(o)
+                if len(o.shape):
+                    return list(o)
+                else:
+                    # 0d-arrays
+                    return o.item()
         except ImportError:
             # let is fail elsewhere if numpy is not available
             pass
