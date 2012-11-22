@@ -44,6 +44,11 @@ def get_fingerprinters(tag):
 def fp_file(fname, fp, tags):
     fp['version'] = 0
     fp['size'] = os.path.getsize(fname)
+    try:
+        from .external import magic
+        fp['magic'] = magic.from_file(fname)
+    except ImportError:
+        lgr.debug("no 'magic' package found -- cannot determine filemagic")
 
 def fp_volume_image(fname, fp, tags):
     # this version needs an increment whenever this implementation changes
