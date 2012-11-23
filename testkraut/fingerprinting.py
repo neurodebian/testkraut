@@ -169,3 +169,38 @@ def fp_nifti1_header(fname, fp, tags):
     fp['extension_codes'] = hdr.extensions.get_codes()
     fp['extension_sizes'] = [e.get_sizeondisk() for e in hdr.extensions]
 
+def fp_text_table(fname, fp, tags):
+    """Read entire text-based tables instead of computing a actual fingerprint
+
+    Any table format dialect that is understood but the 'csv' module can be
+    read in full. Tables have to have a header with column names. These names
+    are used as fieldnames in the fingerprint structure. The actual coulmn data
+    is stored in full. However, an attempt is made to determine the dtype of
+    each column individually and convert the data accordingly. Only integer
+    values, floating point numbers and strings are distinguished.
+    """
+    fp['__version__'] = 0
+    import csv
+    f = open(fname, 'r')
+    sniffer = csv.Sniffer()
+    dialect = sniffer.sniff(f.read(1024))
+    f.seek(0)
+    reader = csv.DictReader(f, dialect=dialect)
+    fp.update(dict(zip(reader.fieldnames,
+                       [list() for i in xrange(len(reader.fieldnames))])))
+    for row in reader:
+        for k, v in row.iteritems():
+            fp[k].append(v)
+    # improve dtypes -- do last do keep data when no numpy is around
+    import numpy as np
+    for k, v in fp.iteritems():
+        if k.startswith('__') and k.endswith('__'):
+            continue
+        try:
+            fp[k] = np.array(v, dtype=int)
+        except ValueError:
+            try:
+                fp[k] = np.array(v, dtype=float)
+            except ValueError:
+                # we tried ...
+                pass

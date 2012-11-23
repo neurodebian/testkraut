@@ -32,6 +32,10 @@ methods are automatically applied to the output data.
  text file
    a file with text-only, i.e. non-binary content
 
+ text table
+   a file with data in an text-based table layout (column names in first line;
+   uniform but arbitrary delimiter)
+
  tscores
    values from a `Student’s t-distribution
    <http://en.wikipedia.org/wiki/Student%E2%80%99s_t-distribution>`_
