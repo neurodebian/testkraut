@@ -531,5 +531,6 @@ def _proc_fingerprint(fingerprinter, fingerprints, filename, tags=None):
         # occurs during a latter stage of the fingerprinting
         fingerprinter(filename, fprint, tags)
     except Exception, e:
+        fprint['__exception__'] = str(e)
         lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
                   % (str(e), filename, finger_name))
