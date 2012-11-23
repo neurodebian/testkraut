@@ -10,8 +10,6 @@
 
 __docformat__ = 'restructuredtext'
 
-import tempfile
-import shutil
 import os
 from os.path import join as opj
 from testkraut import spec
@@ -19,20 +17,7 @@ from testkraut import runner
 from testkraut import utils
 from nose.tools import *
 import nose
-
-def with_tempdir(*targs, **tkwargs):
-    def decorate(func):
-        def newfunc(*arg, **kwargs):
-            import tempfile
-            wdir = tempfile.mkdtemp(*targs, **tkwargs)
-            try:
-                func(*((wdir,) + arg), **kwargs)
-            finally:
-                import shutil
-                shutil.rmtree(wdir)
-        newfunc = make_decorator(func)(newfunc)
-        return newfunc
-    return decorate
+from .utils import with_tempdir
 
 def test_run_cmd():
     # just very simple
