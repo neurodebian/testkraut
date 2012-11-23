@@ -13,6 +13,16 @@
 Output fingerprinting
 *********************
 
+.. currentmodule:: testkraut
+
+Modules with fingerprint generators:
+
+.. autosummary::
+   :toctree: generated
+
+   fingerprinting
+
+
 Writing a custom fingerprinting function
 ========================================
 
@@ -61,7 +71,7 @@ an input file could look like this::
 There is no need to catch exceptions inside fingerprinting functions. The test
 runner will catch any exception and everything that has been stored in the
 fingerprint content dictionary up to when the exception occurred will be
-preserved.
+preserved. The exception itself will be logged in a ``__exception__`` field.
 
 To enable the new fingerprinting function, add it to any appropriate tag in the
 ``fingerprints`` section of the configuration file::

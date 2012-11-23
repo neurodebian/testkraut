@@ -29,3 +29,4 @@ pip-log.txt
 # things that will show up during development
 filecache
 testbeds
+doc/source/generated

@@ -19,11 +19,15 @@ else
 endif
 
 htmldoc:
-	$(MAKE) -C doc html BUILDDIR=$(BUILDDIR)
+	PYTHONPATH=..:$(LPYTHONPATH) sphinx-autogen \
+			   -t doc/templates \
+			   -o doc/source/generated doc/source/*.rst
+	PYTHONPATH=..:$(LPYTHONPATH) $(MAKE) -C doc html BUILDDIR=$(BUILDDIR)
 
 clean:
 	rm -rf build
 	rm -f MANIFEST
+	rm -rf doc/source/generated
 
 manpages: mkdir-MAN_DIR
 	@echo "I: Creating manpages"

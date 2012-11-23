@@ -6,7 +6,7 @@
 #   copyright and license terms.
 #
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-""""""
+"""Fingerprint generators for various file types"""
 
 __docformat__ = 'restructuredtext'
 
@@ -42,6 +42,13 @@ def get_fingerprinters(tag):
     return fprinters
 
 def fp_file(fname, fp, tags):
+    """Basic fingerprint for any file
+
+    The fingerprint contains the size of the file on disk, as reported by
+    os.stat (field ``size``). If ``libmagic`` is installed, the fingerprint
+    will also contain a label for the file type as guessed by libmagic
+    (identical to what would have been returned by the ``file`` command).
+    """
     fp['__version__'] = 0
     fp['size'] = os.path.getsize(fname)
     try:
