@@ -22,10 +22,10 @@ def get_fingerprinters(tag):
         # charge
         from testkraut import cfg
         tags = set(cfg.options('system fingerprints')).union(cfg.options('fingerprints'))
-        for tag in tags:
+        for tag_ in tags:
             fp_tag = set()
-            for fps_str in cfg.get('system fingerprints', tag, default="").split() \
-                         + cfg.get('fingerprints', tag, default="").split():
+            for fps_str in cfg.get('system fingerprints', tag_, default="").split() \
+                         + cfg.get('fingerprints', tag_, default="").split():
                 fps_comp = fps_str.split('.')
                 try:
                     mod = __import__('.'.join(fps_comp[:-1]), globals(), locals(),
@@ -34,9 +34,9 @@ def get_fingerprinters(tag):
                 except:
                     lgr.warning(
                         "ignoring invalid fingerprinting function '%s' for tag '%s'"
-                        % (fps_str, tag))
+                        % (fps_str, tag_))
                 fp_tag.add(fps)
-            _tag2fx[tag] = fp_tag
+            _tag2fx[tag_] = fp_tag
     fprinters = _tag2fx.get(tag, set())
     fprinters.add(fp_file)
     return fprinters
