@@ -78,18 +78,22 @@ def fp_volume_image(fname, fp, tags):
     fp['max'] = img_minmax[1]
     fp['skewness'] = img_skew
     fp['kurtosis'] = img_kurt
-    # global zscore 
-    img_data -= img_mean
-    img_data /= img_std
+    if not 'zscores' in tags and not 'tscores' in tags:
+        # unknown distribution of values -> global zscore to normalize
+        img_data -= img_mean
+        img_data /= img_std
     zmin = img_data.min()
     zmax = img_data.max()
-    # normalized luminance histogram (needs zscores)
-    luminance_hist_params = (-3, 3, 7)
-    fp['luminance_histogram_[%i,%i,%i]' % luminance_hist_params] = \
+    # normalized luminance histogram
+    luminance_hist_params = (-10, 10, 21)
+    fp['histogram_[%i,%i,%i]' % luminance_hist_params] = \
             np.histogram(img_data, normed=True,
                          bins=np.linspace(*luminance_hist_params))[0]
     if not img_std:
         # no variance, nothing to do
+        return
+    if not '3D image' in tags:
+        # the following clustering can become insane for 4D and higher images
         return
     # perform thresholding at various levels and compute descriptive
     # stats of the resulting clusters
