@@ -362,7 +362,7 @@ class LocalRunner(BaseRunner):
         return operator(*args, **kwargs)
 
     def _fingerprint_output(self, spec):
-        from .fingerprinting import get_fingerprinters
+        from .fingerprints import get_fingerprinters
         from .utils import sha1sum
         # all local to the testbed
         testbedpath = opj(self._testbed_basedir, spec['id'])

@@ -10,7 +10,8 @@
 
 __docformat__ = 'restructuredtext'
 
-from testkraut.fingerprinting import *
+from testkraut.fingerprints import *
+from testkraut.fingerprints.base import *
 from nose.tools import *
 from .utils import with_tempdir
 from os.path import join as opj

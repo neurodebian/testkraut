@@ -20,7 +20,8 @@ Modules with fingerprint generators:
 .. autosummary::
    :toctree: generated
 
-   fingerprinting
+   fingerprints
+   fingerprints.base
 
 
 Writing a custom fingerprinting function
