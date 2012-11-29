@@ -22,19 +22,24 @@ methods are automatically applied to the output data.
  3D image, 4D image
    a sub-category of :term:`volumetric image` with a particular number of axes
 
+ columns
+   columns of a matrix or an array should be described individually
+
  nifti1 format
    a file in any variant of the NIfTI1 format
 
- space-separated values
-   data in text format where individual numeric values are separated by any
-   white-space character(s)
+ numeric values
+   a file containing an array/matrix of numeric values
+
+ rows
+   rows of a matrix or an array should be described individually
 
  text file
    a file with text-only, i.e. non-binary content
 
- text table
-   a file with data in an text-based table layout (column names in first line;
-   uniform but arbitrary delimiter)
+ table
+   a file with data table layout (if a text format, column names are in first
+   line; uniform but arbitrary delimiter)
 
  tscores
    values from a `Student’s t-distribution
@@ -42,6 +47,10 @@ methods are automatically applied to the output data.
 
  volumetric image
    a multi-dimensional (three or more) image
+
+ whitespace-separated fields
+   data in a structured text format where individual fields are separated by any
+   white-space character(s)
 
  zscores
    standardized values indicating how many standard deviations an original
