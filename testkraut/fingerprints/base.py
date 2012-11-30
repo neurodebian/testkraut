@@ -43,6 +43,8 @@ def fp_volume_image(fname, fp, tags):
     from scipy.stats import describe
     img = nb.load(fname)
     img_data = img.get_data().astype('float') # float for z-score
+    # cleanup the original image to get a leaner footprint
+    del img
     # keep a map where the original data is larger than zero
     zero_thresh = img_data > 0
     # basic descriptive stats
