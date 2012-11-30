@@ -26,6 +26,12 @@ can be used to reference the directory in which a test is executed.
 
 The following sections provide a summary of all SPEC components.
 
+``authors``
+===========
+
+A :term:`JSON object`, where keys email addresses of authors of a SPEC and
+corresponding values are the authors' names.
+
 ``dependencies``
 ================
 

@@ -1,4 +1,7 @@
 {
+  "authors" : {
+    "michael.hanke@gmail.com": "Michael Hanke"
+  },
   "dependencies": {
     "deb": "fsl-5.0"
   }, 
