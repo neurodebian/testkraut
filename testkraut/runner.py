@@ -472,7 +472,8 @@ class LocalRunner(BaseRunner):
         try:
             interpreter_path = get_script_interpreter(fpath)
             spec['type'] = 'script'
-            spec['interpreter'] = self._describe_binary(interpreter_path,
+            spec['shebang'] = interpreter_path
+            spec['interpreter'] = self._describe_binary(interpreter_path.split()[0],
                                                         entities,
                                                         pkgdb=pkgdb)
         except ValueError:
@@ -535,6 +536,6 @@ def _proc_fingerprint(fingerprinter, fingerprints, filename, tags=None):
         # occurs during a latter stage of the fingerprinting
         fingerprinter(filename, fprint, tags)
     except Exception, e:
-        fprint['__exception__'] = str(e)
+        fprint['__exception__'] = '%s: %s' % (type(e), e.message)
         lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
                   % (str(e), filename, finger_name))
