@@ -20,6 +20,10 @@ test output, a SPEC is an annotated version of the input SPEC, with a detailed
 descriptions of various properties of observed test components and results.
 A SPEC is text file in :term:`JSON` format.
 
+Path specifications for files can make use of environment variables which get
+expanded appropriately. The special variable :envvar:`TESTKRAUT_TESTBED_PATH`
+can be used to reference the directory in which a test is executed.
+
 The following sections provide a summary of all SPEC components.
 
 ``dependencies``

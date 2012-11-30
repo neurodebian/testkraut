@@ -65,6 +65,9 @@ class BaseRunner(object):
         self._fingerprint_output(spec)
         lgr.info("evaluate test results")
         self._evaluate_output(spec)
+        # cleanup
+        if 'TESTKRAUT_TESTBED_PATH' in os.environ:
+            del os.environ['TESTKRAUT_TESTBED_PATH']
         return True
 
     def _prepare_testbed(self, spec):
@@ -225,6 +228,7 @@ class LocalRunner(BaseRunner):
 
     def _prepare_testbed(self, spec):
         testbed_path = opj(self._testbed_basedir, spec['id'])
+        os.environ['TESTKRAUT_TESTBED_PATH'] = testbed_path
         lgr.debug("prepare testbed at '%s'" % testbed_path)
         prepare_local_testbed(spec,
                               testbed_path,
