@@ -157,6 +157,26 @@ def fp_nifti1_header(fname, fp, tags):
     fp['extension_codes'] = hdr.extensions.get_codes()
     fp['extension_sizes'] = [e.get_sizeondisk() for e in hdr.extensions]
 
+
+def _loadtxt_guess_comment(fname, delimiter=None):
+    # load an array with np.loadtxt, but parse file upfront to guess comment
+    # character
+    import numpy as np
+    first_chars = set()
+    fi = fileinput.FileInput(fname, openhook=fileinput.hook_compressed)
+    for line in fi:
+        first_chars.add(line[0])
+    comment_char = first_chars.difference(
+            [str(i) for i in range(10)] + ['\n', '\t', ' ', '.', '-'])
+    if len(comment_char) > 1:
+        raise ValueError("Cannot determine the comment character")
+    if len(comment_char):
+        comment_char = comment_char.pop()
+    else:
+        comment_char = None
+    data = np.loadtxt(fname, comments=comment_char, delimiter=delimiter)
+    return data
+
 def fp_numeric_values(fname, fp, tags):
     """Basic fingerprint for matrices are arrays of numeric values.
 
@@ -172,23 +192,11 @@ def fp_numeric_values(fname, fp, tags):
     fp['__version__'] = 0
     import numpy as np
     if 'text file' in tags:
-        first_chars = set()
-        fi = fileinput.FileInput(fname, openhook=fileinput.hook_compressed)
-        for line in fi:
-            first_chars.add(line[0])
-        comment_char = first_chars.difference(
-                [str(i) for i in range(10)] + ['\n', '\t', ' ', '.', '-'])
-        if len(comment_char) > 1:
-            raise ValueError("Cannot determine the comment character")
-        if len(comment_char):
-            comment_char = comment_char.pop()
-        else:
-            comment_char = None
         if 'whitespace-separated fields' in tags:
             delimiter=None
         else:
             delimiter=None
-        data = np.loadtxt(fname, comments=comment_char)
+        data = _loadtxt_guess_comment(fname, delimiter)
     else:
         # TODO load binary data
         return
