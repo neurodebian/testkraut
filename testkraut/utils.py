@@ -396,9 +396,24 @@ def guess_file_tags(fname):
     except:
         pass
     try:
+        from .fingerprints.base import _loadtxt_guess_comment
         import numpy as np
-        mat = np.loadtxt(fname)
-        tags.add('space-separated values')
+        mat = _loadtxt_guess_comment(fname)
+        tags.add('whitespace-separated fields')
+        tags.add('text file')
+        tags.add('numeric values')
+        if len(mat.shape) == 2:
+            if mat.shape[0] > mat.shape[1]:
+                tags.add('columns')
+            elif mat.shape[0] < mat.shape[1]:
+                tags.add('row')
+    except:
+        pass
+    try:
+        from .fingerprints.base import _fp_text_table
+        fp = {}
+        _fp_text_table(fname, fp, [])
+        tags.add('table')
         tags.add('text file')
     except:
         pass
