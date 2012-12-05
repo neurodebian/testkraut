@@ -78,3 +78,15 @@ Python interface to the libmagic file type identification library.
   Files: testkraut/external/magic.py
   License: PSF
   Copyright: 2001-2012 Adam Hupp
+
+AFNI
+----
+
+IO code for AFNI's 1D files.
+
+::
+
+  Author: Rick Reynolds <reynoldr@mail.nih.gov> and other AFNI authors
+  Files: testkraut/external/afni/*
+  License: GPL
+  Copyright: 2006-2012 AFNI authors
