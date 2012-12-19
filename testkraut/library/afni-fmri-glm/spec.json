@@ -1,0 +1,237 @@
+{
+  "authors" : {
+    "nikolaas.oosterhof@unitn.it": "Nick Oosterhof", 
+    "michael.hanke@gmail.com": "Michael Hanke"
+  },
+  "comparisons": {}, 
+  "dependencies": {
+    "deb": "python, afni, tcsh"
+  }, 
+  "description": "", 
+  "environment": {}, 
+  "executables": {
+    "python": {}, 
+    "3dAllineate": {}, 
+    "3dAutomask": {}, 
+    "3dDeconvolve": {}, 
+    "3dDespike": {}, 
+    "3dNotes": {}, 
+    "3dTstat": {}, 
+    "3dWarp": {}, 
+    "3dbucket": {}, 
+    "3dcalc": {}, 
+    "3dcopy": {}, 
+    "3dmerge": {}, 
+    "3drefit": {}, 
+    "3dvolreg": {}, 
+    "align_epi_anat.py": {}, 
+    "cat_matvec": {}
+  }, 
+  "id": "afni-fmri-glm", 
+  "inputs": {
+    "MNI152_T1_2mm_brain.nii.gz": {
+      "sha1sum": "4d88292c85256c8a2a9f2a2bc19dfc2b7b52bb95", 
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "MNI152_T1_2mm_brain.nii.gz"
+    }, 
+    "afni.sh": {
+      "sha1sum": "5df1ae10c7efb2f7079d6b669b987601745d6a24", 
+      "tags": [], 
+      "type": "file", 
+      "value": "afni.sh"
+    }, 
+    "fmri.nii.gz": {
+      "sha1sum": "c015cc61945d86ba3dd49a98df3fc9fc144df3e5", 
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.nii.gz"
+    }, 
+    "structural_brain.nii.gz": {
+      "sha1sum": "71b11330d5e888fdfceafb0f6955f5e189cb2642", 
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "structural_brain.nii.gz"
+    }
+  }, 
+  "outputs": {
+    "fmri.afni/clustsim.log": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/clustsim.log"
+    }, 
+    "fmri.afni/epi_mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/epi_mask.nii.gz"
+    }, 
+    "fmri.afni/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/example_func.nii.gz"
+    }, 
+    "fmri.afni/example_func.nii.gz_al.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/example_func.nii.gz_al.nii.gz"
+    }, 
+    "fmri.afni/example_func.nii.gz_al_mat.aff12.1D": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/example_func.nii.gz_al_mat.aff12.1D"
+    }, 
+    "fmri.afni/example_func.nii.gz_al_reg_mat.aff12.1D": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/example_func.nii.gz_al_reg_mat.aff12.1D"
+    }, 
+    "fmri.afni/full_f_as_z.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/full_f_as_z.nii.gz"
+    }, 
+    "fmri.afni/full_f_as_z_clusters.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/full_f_as_z_clusters.nii.gz"
+    }, 
+    "fmri.afni/full_f_as_z_clustertable.txt": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/full_f_as_z_clustertable.txt"
+    }, 
+    "fmri.afni/func2mni.aff12.1D": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/func2mni.aff12.1D"
+    }, 
+    "fmri.afni/glm.REML_cmd": {
+      "tags": [], 
+      "type": "file", 
+      "value": "fmri.afni/glm.REML_cmd"
+    }, 
+    "fmri.afni/glm.nii.gz": {
+      "tags": [
+        "5D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/glm.nii.gz"
+    }, 
+    "fmri.afni/glm.xmat.1D": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/glm.xmat.1D"
+    }, 
+    "fmri.afni/glm_errts.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/glm_errts.nii.gz"
+    }, 
+    "fmri.afni/mcparam.1D": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/mcparam.1D"
+    }, 
+    "fmri.afni/preproc.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/preproc.nii.gz"
+    }, 
+    "fmri.afni/smoothness.1D": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/smoothness.1D"
+    }, 
+    "fmri.afni/structural_brain.nii.gz_al.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/structural_brain.nii.gz_al.nii.gz"
+    }, 
+    "fmri.afni/structural_brain.nii.gz_al_mat.aff12.1D": {
+      "tags": [
+        "text file", 
+        "space-separated values"
+      ], 
+      "type": "file", 
+      "value": "fmri.afni/structural_brain.nii.gz_al_mat.aff12.1D"
+    }
+  }, 
+  "test": {
+    "command": [
+      "/bin/sh", 
+      "afni.sh"
+    ], 
+    "type": "shell_command"
+  }, 
+  "version": 0
+}
