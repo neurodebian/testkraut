@@ -381,6 +381,9 @@ def get_cmd_prov_strace(cmd, match_argv=None):
     return procs, cmd_exec.returncode
 
 def guess_file_tags(fname):
+    """Try to guess file type tags from an existing file.
+    """
+    # go through all known types from special to basic.
     tags = set()
     if not os.path.getsize(fname):
         # no futher tags for empty files
@@ -395,6 +398,24 @@ def guess_file_tags(fname):
             tags.add('nifti1 format')
     except:
         pass
+    if fname.endswith('.1D'):
+        try:
+            from .external.afni import lib_afni1D
+            ts = lib_afni1D.Afni1D(fname, verb=0)
+            tags.add('afni 1d')
+            tags.add('columns')
+            if len(ts.labels):
+                tags.add('table')
+        except ValueError:
+            pass
+    try:
+        from .fingerprints.base import _fp_text_table
+        fp = {}
+        _fp_text_table(fname, fp, [])
+        tags.add('table')
+        tags.add('text file')
+    except:
+        pass
     try:
         from .fingerprints.base import _loadtxt_guess_comment
         import numpy as np
@@ -406,15 +427,7 @@ def guess_file_tags(fname):
             if mat.shape[0] > mat.shape[1]:
                 tags.add('columns')
             elif mat.shape[0] < mat.shape[1]:
-                tags.add('row')
-    except:
-        pass
-    try:
-        from .fingerprints.base import _fp_text_table
-        fp = {}
-        _fp_text_table(fname, fp, [])
-        tags.add('table')
-        tags.add('text file')
+                tags.add('rows')
     except:
         pass
     return tags
