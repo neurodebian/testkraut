@@ -21,7 +21,7 @@ more interesting:
 
 NumPy_
    not strictly required, but strongly recommended. There should be no need
-   to have a particular version.
+   to have any particular version.
 
 SciPy_
    will improve the test result reporting -- any reasonably recent version
@@ -70,7 +70,7 @@ and run tests. A comprehensive listing is available form the help output::
 
   % testkraut --help
 
-The run the ``demo`` test, we need to obtain the required test data first. This
+To run the ``demo`` test, we need to obtain the required test data first. This
 is done by telling testkraut to cache all required files locally::
 
   % testkraut cachefiles demo
