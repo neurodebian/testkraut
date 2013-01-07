@@ -54,6 +54,7 @@ def setup_parser(parser):
         '--env', '--dump-environment', metavar='REGEX', dest='dump_env',
         help="""dump all environment variables into the SPEC whose names match
              the regular expression""")
+    # XXX make use of this one
     parser.add_argument(
         '--no-strace', action='store_true',
         help="do not use strace to analyze software and data dependencies.")
@@ -67,6 +68,7 @@ def setup_parser(parser):
     parser.add_argument(
         '--match-cmds', default=r'.*', metavar='REGEX',
         help="regular expression matching commands to capture as test components.")
+    # XXX make use of this one
     parser.add_argument(
         '--nomin', '--no-minimize-inputs', action='store_true', dest='no_minimize_inputs',
         help="""always include all files present in the test directory as input
@@ -180,15 +182,14 @@ def run(args):
         args.ignore_outputs = re.compile(args.ignore_outputs)
     if not args.match_outputs is None:
         args.match_outputs = re.compile(args.match_outputs)
-    # record al input files
+    # record all input files
     for ipf in prior_test_hashes:
         relname = os.path.relpath(ipf)
         if not relname in used_files:
             # skip
             continue
         s = dict(type='file', value=relname,
-                 sha1sum=prior_test_hashes[ipf],
-                 tags=list(guess_file_tags(relname)))
+                 sha1sum=prior_test_hashes[ipf])
         spec['inputs'][relname] = s
     # record all output files
     for opf in new_files:

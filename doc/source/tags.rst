@@ -34,6 +34,9 @@ methods are automatically applied to the output data.
  rows
    rows of a matrix or an array should be described individually
 
+ store
+   as much of the file content should be keep verbatim in a fingerprint
+
  text file
    a file with text-only, i.e. non-binary content
 
