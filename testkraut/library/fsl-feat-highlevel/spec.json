@@ -27,7 +27,7 @@
     "$FSLDIR/bin/film_gls": {
       "version_file": "$FSLDIR/etc/fslversion"
     },
-    "FSLDIR/bin/flameo": {
+    "$FSLDIR/bin/flameo": {
       "version_file": "$FSLDIR/etc/fslversion"
     }, 
     "$FSLDIR/bin/fsl_sub": {
