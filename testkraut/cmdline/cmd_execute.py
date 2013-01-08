@@ -10,6 +10,8 @@
 
 some more bits...
 
+If no ouput filename is provided (-o) the test result SPEC is written to stdout.
+
 Examples:
 
 $ testkraut execute demo.json
@@ -27,7 +29,9 @@ lgr = logging.getLogger(__name__)
 import argparse
 import os
 import shutil
+import json
 import sys
+from ..spec import SPECJSONEncoder
 from os.path import join as opj
 from .helpers import parser_add_common_args
 
@@ -96,6 +100,9 @@ def run(args):
             if not args.ospec_filename is None:
                 # store a copy to desired custom location
                 spec.save(args.ospec_filename)
+            else:
+                print json.dumps(spec, indent=2, sort_keys=True, cls=SPECJSONEncoder)
+
     if not tmp_testbedbase is None and not args.keep_tmp_testbed:
         # remove temporary testbed location
         lgr.debug("delete temporary testbed at '%s'" % tmp_testbedbase)
