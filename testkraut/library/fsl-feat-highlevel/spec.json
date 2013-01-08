@@ -1,20 +1,44 @@
 {
+  "authors" : {
+    "michael.hanke@gmail.com": "Michael Hanke"
+  },
   "comparisons": {}, 
   "dependencies": {
-    "deb": "dash, fsl-5.0"
+    "deb": "fsl-5.0"
   }, 
   "description": "", 
-  "environment": {}, 
+  "environment": {
+    "FSLDIR": {},
+    "FSLOUTPUTTYPE": {}
+  }, 
   "executables": {
-    "/bin/dash": {}, 
-    "/usr/lib/fsl/5.0/feat": {}, 
-    "/usr/lib/fsl/5.0/feat_model": {}, 
-    "/usr/lib/fsl/5.0/featregapply": {}, 
-    "/usr/lib/fsl/5.0/film_gls": {}, 
-    "/usr/lib/fsl/5.0/flameo": {}, 
-    "/usr/lib/fsl/5.0/fsl_sub": {}, 
-    "/usr/lib/fsl/5.0/imcp": {}, 
-    "/usr/lib/fsl/5.0/mainfeatreg": {}
+    "$FSLDIR/bin/feat": {
+      "version_file": [
+            "$TESTKRAUT_TESTBED_PATH/fmri.feat/report_prestats.html",
+            "Version (\\S+), part of FSL"
+      ]
+    }, 
+    "$FSLDIR/bin/feat_model": {
+      "version_file": [
+            "$TESTKRAUT_TESTBED_PATH/fmri.feat/report_prestats.html",
+            "Version (\\S+), part of FSL"
+      ]
+    }, 
+    "$FSLDIR/bin/film_gls": {
+      "version_file": "$FSLDIR/etc/fslversion"
+    },
+    "FSLDIR/bin/flameo": {
+      "version_file": "$FSLDIR/etc/fslversion"
+    }, 
+    "$FSLDIR/bin/fsl_sub": {
+      "version_file": "$FSLDIR/etc/fslversion"
+    },
+    "$FSLDIR/bin/mainfeatreg": {
+      "version_file": [
+            "$TESTKRAUT_TESTBED_PATH/fmri.feat/report_prestats.html",
+            "Version (\\S+), part of FSL"
+      ]
+    }
   }, 
   "id": "fsl-feat-highlevel", 
   "inputs": {
