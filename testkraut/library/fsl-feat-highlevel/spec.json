@@ -1,0 +1,2473 @@
+{
+  "comparisons": {}, 
+  "dependencies": {
+    "deb": "dash, fsl-5.0"
+  }, 
+  "description": "", 
+  "environment": {}, 
+  "executables": {
+    "/bin/dash": {}, 
+    "/usr/lib/fsl/5.0/feat": {}, 
+    "/usr/lib/fsl/5.0/feat_model": {}, 
+    "/usr/lib/fsl/5.0/featregapply": {}, 
+    "/usr/lib/fsl/5.0/film_gls": {}, 
+    "/usr/lib/fsl/5.0/flameo": {}, 
+    "/usr/lib/fsl/5.0/fsl_sub": {}, 
+    "/usr/lib/fsl/5.0/imcp": {}, 
+    "/usr/lib/fsl/5.0/mainfeatreg": {}
+  }, 
+  "id": "fsl-feat-highlevel", 
+  "inputs": {
+    "1stlevel.fsf": {
+      "sha1sum": "7bc905d06a5fcd376417972ceaa63f8ef217c3ab", 
+      "type": "file", 
+      "value": "1stlevel.fsf"
+    }, 
+    "MNI152_T1_2mm_brain.nii.gz": {
+      "sha1sum": "4d88292c85256c8a2a9f2a2bc19dfc2b7b52bb95", 
+      "type": "file", 
+      "value": "MNI152_T1_2mm_brain.nii.gz"
+    }, 
+    "fmri.nii.gz": {
+      "sha1sum": "c015cc61945d86ba3dd49a98df3fc9fc144df3e5", 
+      "type": "file", 
+      "value": "fmri.nii.gz"
+    }, 
+    "highlevel.fsf": {
+      "sha1sum": "392a680aa41e632583a48be91ab1097d1481dfe0", 
+      "type": "file", 
+      "value": "highlevel.fsf"
+    }, 
+    "structural_brain.nii.gz": {
+      "sha1sum": "71b11330d5e888fdfceafb0f6955f5e189cb2642", 
+      "type": "file", 
+      "value": "structural_brain.nii.gz"
+    }, 
+    "testfeat.sh": {
+      "sha1sum": "481a758acfc31ee1737cb0877fab81d780569372", 
+      "type": "file", 
+      "value": "testfeat.sh"
+    }
+  }, 
+  "outputs": {
+    "1stlevel_a.feat/absbrainthresh.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/absbrainthresh.txt"
+    }, 
+    "1stlevel_a.feat/cluster_mask_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_mask_zfstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/cluster_mask_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_mask_zstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/cluster_mask_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_mask_zstat2.nii.gz"
+    }, 
+    "1stlevel_a.feat/cluster_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_zfstat1.txt"
+    }, 
+    "1stlevel_a.feat/cluster_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_zfstat1_std.txt"
+    }, 
+    "1stlevel_a.feat/cluster_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_zstat1.txt"
+    }, 
+    "1stlevel_a.feat/cluster_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_zstat1_std.txt"
+    }, 
+    "1stlevel_a.feat/cluster_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_zstat2.txt"
+    }, 
+    "1stlevel_a.feat/cluster_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/cluster_zstat2_std.txt"
+    }, 
+    "1stlevel_a.feat/design.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/design.mat"
+    }, 
+    "1stlevel_a.feat/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/example_func.nii.gz"
+    }, 
+    "1stlevel_a.feat/filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/filtered_func_data.nii.gz"
+    }, 
+    "1stlevel_a.feat/lmax_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/lmax_zfstat1.txt"
+    }, 
+    "1stlevel_a.feat/lmax_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/lmax_zfstat1_std.txt"
+    }, 
+    "1stlevel_a.feat/lmax_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/lmax_zstat1.txt"
+    }, 
+    "1stlevel_a.feat/lmax_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/lmax_zstat1_std.txt"
+    }, 
+    "1stlevel_a.feat/lmax_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/lmax_zstat2.txt"
+    }, 
+    "1stlevel_a.feat/lmax_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/lmax_zstat2_std.txt"
+    }, 
+    "1stlevel_a.feat/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/mask.nii.gz"
+    }, 
+    "1stlevel_a.feat/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/mean_func.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/example_func.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg/example_func2highres.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/example_func2highres.mat"
+    }, 
+    "1stlevel_a.feat/reg/example_func2highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/example_func2highres.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg/example_func2standard.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/example_func2standard.mat"
+    }, 
+    "1stlevel_a.feat/reg/example_func2standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/example_func2standard.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg/highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/highres.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg/highres2example_func.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/highres2example_func.mat"
+    }, 
+    "1stlevel_a.feat/reg/highres2standard.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/highres2standard.mat"
+    }, 
+    "1stlevel_a.feat/reg/highres2standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/highres2standard.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg/standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/standard.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg/standard2example_func.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/standard2example_func.mat"
+    }, 
+    "1stlevel_a.feat/reg/standard2highres.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg/standard2highres.mat"
+    }, 
+    "1stlevel_a.feat/reg_standard/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/example_func.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg_standard/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/mask.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg_standard/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/mean_func.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg_standard/reg/highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/reg/highres.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg_standard/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/stats/cope1.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg_standard/stats/cope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/stats/cope2.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg_standard/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/stats/varcope1.nii.gz"
+    }, 
+    "1stlevel_a.feat/reg_standard/stats/varcope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/reg_standard/stats/varcope2.nii.gz"
+    }, 
+    "1stlevel_a.feat/rendered_thresh_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/rendered_thresh_zfstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/rendered_thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/rendered_thresh_zstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/rendered_thresh_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/rendered_thresh_zstat2.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/cope1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/cope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/cope2.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/corrections.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/corrections.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/fstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/fstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/neff1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/neff1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/neff2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/neff2.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/pe1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/pe1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/pe2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/pe2.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/pe3.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/pe3.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/pe4.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/pe4.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/res4d.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/res4d.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/sigmasquareds.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/sigmasquareds.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/threshac1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/threshac1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/tstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/tstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/tstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/tstat2.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/varcope1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/varcope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/varcope2.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/zfstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/zstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/stats/zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/stats/zstat2.nii.gz"
+    }, 
+    "1stlevel_a.feat/thresh_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/thresh_zfstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/thresh_zstat1.nii.gz"
+    }, 
+    "1stlevel_a.feat/thresh_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_a.feat/thresh_zstat2.nii.gz"
+    }, 
+    "1stlevel_b.feat/absbrainthresh.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/absbrainthresh.txt"
+    }, 
+    "1stlevel_b.feat/cluster_mask_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_mask_zfstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/cluster_mask_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_mask_zstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/cluster_mask_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_mask_zstat2.nii.gz"
+    }, 
+    "1stlevel_b.feat/cluster_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_zfstat1.txt"
+    }, 
+    "1stlevel_b.feat/cluster_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_zfstat1_std.txt"
+    }, 
+    "1stlevel_b.feat/cluster_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_zstat1.txt"
+    }, 
+    "1stlevel_b.feat/cluster_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_zstat1_std.txt"
+    }, 
+    "1stlevel_b.feat/cluster_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_zstat2.txt"
+    }, 
+    "1stlevel_b.feat/cluster_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/cluster_zstat2_std.txt"
+    }, 
+    "1stlevel_b.feat/design.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/design.mat"
+    }, 
+    "1stlevel_b.feat/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/example_func.nii.gz"
+    }, 
+    "1stlevel_b.feat/filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/filtered_func_data.nii.gz"
+    }, 
+    "1stlevel_b.feat/lmax_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/lmax_zfstat1.txt"
+    }, 
+    "1stlevel_b.feat/lmax_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/lmax_zfstat1_std.txt"
+    }, 
+    "1stlevel_b.feat/lmax_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/lmax_zstat1.txt"
+    }, 
+    "1stlevel_b.feat/lmax_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/lmax_zstat1_std.txt"
+    }, 
+    "1stlevel_b.feat/lmax_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/lmax_zstat2.txt"
+    }, 
+    "1stlevel_b.feat/lmax_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/lmax_zstat2_std.txt"
+    }, 
+    "1stlevel_b.feat/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/mask.nii.gz"
+    }, 
+    "1stlevel_b.feat/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/mean_func.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/example_func.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg/example_func2highres.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/example_func2highres.mat"
+    }, 
+    "1stlevel_b.feat/reg/example_func2highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/example_func2highres.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg/example_func2standard.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/example_func2standard.mat"
+    }, 
+    "1stlevel_b.feat/reg/example_func2standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/example_func2standard.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg/highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/highres.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg/highres2example_func.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/highres2example_func.mat"
+    }, 
+    "1stlevel_b.feat/reg/highres2standard.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/highres2standard.mat"
+    }, 
+    "1stlevel_b.feat/reg/highres2standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/highres2standard.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg/standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/standard.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg/standard2example_func.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/standard2example_func.mat"
+    }, 
+    "1stlevel_b.feat/reg/standard2highres.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg/standard2highres.mat"
+    }, 
+    "1stlevel_b.feat/reg_standard/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/example_func.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg_standard/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/mask.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg_standard/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/mean_func.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg_standard/reg/highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/reg/highres.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg_standard/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/stats/cope1.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg_standard/stats/cope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/stats/cope2.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg_standard/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/stats/varcope1.nii.gz"
+    }, 
+    "1stlevel_b.feat/reg_standard/stats/varcope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/reg_standard/stats/varcope2.nii.gz"
+    }, 
+    "1stlevel_b.feat/rendered_thresh_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/rendered_thresh_zfstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/rendered_thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/rendered_thresh_zstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/rendered_thresh_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/rendered_thresh_zstat2.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/cope1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/cope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/cope2.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/corrections.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/corrections.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/fstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/fstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/neff1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/neff1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/neff2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/neff2.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/pe1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/pe1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/pe2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/pe2.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/pe3.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/pe3.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/pe4.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/pe4.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/res4d.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/res4d.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/sigmasquareds.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/sigmasquareds.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/threshac1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/threshac1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/tstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/tstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/tstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/tstat2.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/varcope1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/varcope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/varcope2.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/zfstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/zstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/stats/zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/stats/zstat2.nii.gz"
+    }, 
+    "1stlevel_b.feat/thresh_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/thresh_zfstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/thresh_zstat1.nii.gz"
+    }, 
+    "1stlevel_b.feat/thresh_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_b.feat/thresh_zstat2.nii.gz"
+    }, 
+    "1stlevel_c.feat/absbrainthresh.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/absbrainthresh.txt"
+    }, 
+    "1stlevel_c.feat/cluster_mask_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_mask_zfstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/cluster_mask_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_mask_zstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/cluster_mask_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_mask_zstat2.nii.gz"
+    }, 
+    "1stlevel_c.feat/cluster_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_zfstat1.txt"
+    }, 
+    "1stlevel_c.feat/cluster_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_zfstat1_std.txt"
+    }, 
+    "1stlevel_c.feat/cluster_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_zstat1.txt"
+    }, 
+    "1stlevel_c.feat/cluster_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_zstat1_std.txt"
+    }, 
+    "1stlevel_c.feat/cluster_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_zstat2.txt"
+    }, 
+    "1stlevel_c.feat/cluster_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/cluster_zstat2_std.txt"
+    }, 
+    "1stlevel_c.feat/design.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/design.mat"
+    }, 
+    "1stlevel_c.feat/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/example_func.nii.gz"
+    }, 
+    "1stlevel_c.feat/filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/filtered_func_data.nii.gz"
+    }, 
+    "1stlevel_c.feat/lmax_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/lmax_zfstat1.txt"
+    }, 
+    "1stlevel_c.feat/lmax_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/lmax_zfstat1_std.txt"
+    }, 
+    "1stlevel_c.feat/lmax_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/lmax_zstat1.txt"
+    }, 
+    "1stlevel_c.feat/lmax_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/lmax_zstat1_std.txt"
+    }, 
+    "1stlevel_c.feat/lmax_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/lmax_zstat2.txt"
+    }, 
+    "1stlevel_c.feat/lmax_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/lmax_zstat2_std.txt"
+    }, 
+    "1stlevel_c.feat/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/mask.nii.gz"
+    }, 
+    "1stlevel_c.feat/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/mean_func.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/example_func.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg/example_func2highres.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/example_func2highres.mat"
+    }, 
+    "1stlevel_c.feat/reg/example_func2highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/example_func2highres.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg/example_func2standard.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/example_func2standard.mat"
+    }, 
+    "1stlevel_c.feat/reg/example_func2standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/example_func2standard.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg/highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/highres.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg/highres2example_func.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/highres2example_func.mat"
+    }, 
+    "1stlevel_c.feat/reg/highres2standard.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/highres2standard.mat"
+    }, 
+    "1stlevel_c.feat/reg/highres2standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/highres2standard.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg/standard.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/standard.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg/standard2example_func.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/standard2example_func.mat"
+    }, 
+    "1stlevel_c.feat/reg/standard2highres.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg/standard2highres.mat"
+    }, 
+    "1stlevel_c.feat/reg_standard/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/example_func.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg_standard/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/mask.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg_standard/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/mean_func.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg_standard/reg/highres.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/reg/highres.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg_standard/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/stats/cope1.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg_standard/stats/cope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/stats/cope2.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg_standard/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/stats/varcope1.nii.gz"
+    }, 
+    "1stlevel_c.feat/reg_standard/stats/varcope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/reg_standard/stats/varcope2.nii.gz"
+    }, 
+    "1stlevel_c.feat/rendered_thresh_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/rendered_thresh_zfstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/rendered_thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/rendered_thresh_zstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/rendered_thresh_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/rendered_thresh_zstat2.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/cope1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/cope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/cope2.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/corrections.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/corrections.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/fstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/fstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/neff1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/neff1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/neff2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/neff2.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/pe1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/pe1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/pe2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/pe2.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/pe3.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/pe3.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/pe4.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/pe4.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/res4d.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/res4d.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/sigmasquareds.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/sigmasquareds.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/threshac1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/threshac1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/tstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/tstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/tstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/tstat2.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/varcope1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/varcope2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/varcope2.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/zfstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/zstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/stats/zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/stats/zstat2.nii.gz"
+    }, 
+    "1stlevel_c.feat/thresh_zfstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/thresh_zfstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/thresh_zstat1.nii.gz"
+    }, 
+    "1stlevel_c.feat/thresh_zstat2.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "1stlevel_c.feat/thresh_zstat2.nii.gz"
+    }, 
+    "fmri_a.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri_a.nii.gz"
+    }, 
+    "fmri_b.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri_b.nii.gz"
+    }, 
+    "fmri_c.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri_c.nii.gz"
+    }, 
+    "highlevel.gfeat/bg_image.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/bg_image.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/cluster_mask_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/cluster_mask_zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/cluster_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/cluster_zstat1_std.txt"
+    }, 
+    "highlevel.gfeat/cope1.feat/design.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/design.mat"
+    }, 
+    "highlevel.gfeat/cope1.feat/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/example_func.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/filtered_func_data.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/lmax_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/lmax_zstat1_std.txt"
+    }, 
+    "highlevel.gfeat/cope1.feat/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/mask.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/mean_func.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/rendered_thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/rendered_thresh_zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/cope1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/mean_random_effects_var1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/mean_random_effects_var1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/pe1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/pe1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/res4d.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/res4d.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/tdof_t1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/tdof_t1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/tstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/tstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/varcope1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/weights1.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/weights1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/zflame1lowertstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/zflame1lowertstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/zflame1uppertstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/zflame1uppertstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/stats/zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/stats/zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/thresh_zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope1.feat/var_filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope1.feat/var_filtered_func_data.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/cluster_mask_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/cluster_mask_zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/cluster_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "rows", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/cluster_zstat1_std.txt"
+    }, 
+    "highlevel.gfeat/cope2.feat/design.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/design.mat"
+    }, 
+    "highlevel.gfeat/cope2.feat/example_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/example_func.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/filtered_func_data.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/lmax_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "columns", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/lmax_zstat1_std.txt"
+    }, 
+    "highlevel.gfeat/cope2.feat/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/mask.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/mean_func.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/rendered_thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/rendered_thresh_zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/cope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/cope1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/mean_random_effects_var1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/mean_random_effects_var1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/pe1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/pe1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/res4d.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/res4d.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/tdof_t1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/tdof_t1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/tstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/tstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/varcope1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/varcope1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/weights1.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/weights1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/zflame1lowertstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/zflame1lowertstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/zflame1uppertstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/zflame1uppertstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/stats/zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/stats/zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/thresh_zstat1.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/thresh_zstat1.nii.gz"
+    }, 
+    "highlevel.gfeat/cope2.feat/var_filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/cope2.feat/var_filtered_func_data.nii.gz"
+    }, 
+    "highlevel.gfeat/design.mat": {
+      "tags": [
+        "text file", 
+        "table", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/design.mat"
+    }, 
+    "highlevel.gfeat/inputreg/masksum.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/inputreg/masksum.nii.gz"
+    }, 
+    "highlevel.gfeat/inputreg/masksum_overlay.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/inputreg/masksum_overlay.nii.gz"
+    }, 
+    "highlevel.gfeat/inputreg/maskunique.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/inputreg/maskunique.nii.gz"
+    }, 
+    "highlevel.gfeat/inputreg/maskunique_overlay.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/inputreg/maskunique_overlay.nii.gz"
+    }, 
+    "highlevel.gfeat/mask.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/mask.nii.gz"
+    }, 
+    "highlevel.gfeat/mean_func.nii.gz": {
+      "tags": [
+        "nifti1 format", 
+        "3D image", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "highlevel.gfeat/mean_func.nii.gz"
+    }
+  }, 
+  "processes": {}, 
+  "test": {
+    "command": [
+      "sh", 
+      "testfeat.sh"
+    ], 
+    "type": "shell_command"
+  }, 
+  "version": 0
+}
