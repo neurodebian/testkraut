@@ -395,6 +395,12 @@ class LocalRunner(BaseRunner):
         spec['entities'] = entities
         spec['system'] = describe_system()
         for exec_path, espec in spec.get('executables', {}).iteritems():
+            if not os.path.exists(exec_path):
+                # no executable? is it optional?
+                if not espec.get('optional', False):
+                    lgr.warning("failed to find required executable '%s'"
+                                % exec_path)
+                continue
             # replace exectutable info with the full picture
             ehash = self._describe_binary(exec_path,
                                           entities,
@@ -502,8 +508,10 @@ class LocalRunner(BaseRunner):
             if not env in os.environ:
                 raise ValueError("required environment variable '%s' not set"
                                  % env)
-        for exe in spec.get('executables', {}):
-            if not os.path.isfile(os.path.expandvars(exe)):
+        exes = spec.get('executables', {})
+        for exe in exes:
+            optional = exes[exe].get('optional', False)
+            if not optional and not os.path.isfile(os.path.expandvars(exe)):
                 raise ValueError("required executable '%s' not found" % exe)
 
 

@@ -21,6 +21,10 @@ Terminology
    (for more information see the `"JSON" Wikipedia entry section on data
    types`_)
 
+ JSON boolean
+   Boolean value: ``true`` or ``false`` (for more information see the `"JSON"
+   Wikipedia entry section on data types`_)
+
  JSON number
    Double precision floating-point format in JavaScript
    (for more information see the `"JSON" Wikipedia entry section on data

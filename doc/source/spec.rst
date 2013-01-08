@@ -160,7 +160,7 @@ yet to be determined
 ``executables``
 ===============
 
-A :term:`JSON object` where keys are required executables for a test case. Keys
+A :term:`JSON object` where keys are executable components for a test case. Keys
 may contain absolute paths and/or environment variables which will be expanded
 to their actual values during processing. Such variables should be listed in
 the ``environment`` section. Values are :term:`JSON object`\ s with fields
@@ -168,6 +168,14 @@ described in the following subsections. The ``executables`` section is altered
 in an output SPEC by adding an ``entity`` key to each executable's  :term:`JSON
 object`, with a :term:`JSON string` value, cross-referencing that executable
 with a corresponding entry in the ``entities`` section.
+
+``optional``
+------------
+
+A :term:`JSON boolean` indicating whether an executable is optional (``true``),
+or required (``false``; default). Optional executables are useful for writing
+tests that need to accommodate changes in the implementation of the to-be-tested
+software.
 
 ``version_cmd``
 ---------------

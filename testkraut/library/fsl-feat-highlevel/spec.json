@@ -34,6 +34,7 @@
       "version_file": "$FSLDIR/etc/fslversion"
     },
     "$FSLDIR/bin/mainfeatreg": {
+      "optional": true,
       "version_file": [
             "$TESTKRAUT_TESTBED_PATH/fmri.feat/report_prestats.html",
             "Version (\\S+), part of FSL"
