@@ -57,7 +57,19 @@ def test_failed_run(wdir):
     sp = spec.SPEC('{"test":{"command":["stupidddd111"],"type":"shell_command"}}')
     # run it
     retval = lr(sp)
-    assert_false(retval == 0)
+    assert_false(retval)
     # but should still come with system info
     assert_true('system' in sp)
     assert_true('stderr' in sp['test'])
+
+@with_tempdir()
+def test_optional_executable(wdir):
+    lr = runner.LocalRunner(testbed_basedir=wdir)
+    # pretty minimal test SPEC
+    sp = spec.SPEC('{"executables":{"idonotexist":{"optional":true}},"test":{"command":["true"],"type":"shell_command"}}')
+    # run it
+    retval = lr(sp)
+    assert_true(retval)
+    # but should still come with system info
+    assert_true('idonotexist' in sp['executables'])
+    assert_false('entity' in sp['executables']['idonotexist'])

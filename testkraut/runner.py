@@ -57,10 +57,10 @@ class BaseRunner(object):
         self._prepare_testbed(spec)
         lgr.info("run test")
         test_success = self._run_test(spec)
-        if not test_success:
-            return False
         lgr.info("gather component information")
         self._gather_component_info(spec)
+        if not test_success:
+            return False
         lgr.info("fingerprinting results")
         self._fingerprint_output(spec)
         lgr.info("evaluate test results")
@@ -307,7 +307,8 @@ class LocalRunner(BaseRunner):
             for chan in ('stderr', 'stdout'):
                 testspec[chan] = getattr(texec, chan).read()
                 lgr.debug('%s: %s' % (chan, testspec[chan]))
-            return self._check_output_presence(spec)
+            opresence = self._check_output_presence(spec)
+            return texec.returncode == 0 and opresence
         except OSError, e:
             lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
             return False
