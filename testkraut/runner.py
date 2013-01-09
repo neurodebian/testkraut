@@ -374,10 +374,20 @@ class LocalRunner(BaseRunner):
         initial_cwd = os.getcwdu()
         os.chdir(testbedpath)
         # for all known outputs
-        for oname, ospec in spec.get_outputs('file').iteritems():
+        ofilespecs = spec.get_outputs('file')
+        # cache fingerprinted files tp avoid duplication for identical files
+        fp_cache = {}
+        # deterministic order to help stabilize reference filename for duplicates
+        for oname in sorted(ofilespecs.keys()):
+            ospec = ofilespecs[oname]
             filename = ospec['value']
+            sha1 = sha1sum(filename)
+            ospec['sha1sum'] = sha1
+            if sha1 in fp_cache:
+                ospec['identical_with'] = fp_cache[sha1]
+                lgr.debug("'%s' is a duplicate of '%s'" % (oname, fp_cache[sha1]))
+                continue
             lgr.debug("generating fingerprints for '%s'" % filename)
-            ospec['sha1sum'] = sha1sum(filename)
             # gather fingerprinting callables
             fingerprinters = set()
             for tag in ospec.get('tags', []):
@@ -546,5 +556,6 @@ def _proc_fingerprint(fingerprinter, fingerprints, filename, tags=None):
         fingerprinter(filename, fprint, tags)
     except Exception, e:
         fprint['__exception__'] = '%s: %s' % (type(e), e.message)
+        # XXX maybe better a warning?
         lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
                   % (str(e), filename, finger_name))
