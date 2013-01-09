@@ -238,6 +238,7 @@ def diff(fr, to, recursive_list=False, min_abs_numdiff=None,
                         not min_rel_numdiff is None and
                             (fr_base == 0 or absmaxdiff / fr_base) >= min_rel_numdiff)):
                     return {'numdiff': numdiff, '%%magic%%': 'diff'}
+                return None
             except ImportError:
                 # silently fail and do a non-array diff
                 pass
