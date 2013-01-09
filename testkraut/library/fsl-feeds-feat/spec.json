@@ -1,0 +1,1005 @@
+{
+  "authors" : {
+    "michael.hanke@gmail.com": "Michael Hanke"
+  },
+  "comparisons": {}, 
+  "dependencies": {
+    "deb": "fsl-5.0"
+  }, 
+  "description": "", 
+  "environment": {
+    "FSLDIR": {},
+    "FSLOUTPUTTYPE": {}
+  }, 
+  "executables": {
+    "$FSLDIR/bin/feat": {
+      "version_file": [
+            "$TESTKRAUT_TESTBED_PATH/fmri.feat/report_prestats.html",
+            "Version (\\S+), part of FSL"
+      ]
+    }, 
+    "$FSLDIR/bin/feat_model": {
+      "version_file": [
+            "$TESTKRAUT_TESTBED_PATH/fmri.feat/report_prestats.html",
+            "Version (\\S+), part of FSL"
+      ]
+    }, 
+    "$FSLDIR/bin/film_gls": {
+      "version_file": "$FSLDIR/etc/fslversion"
+    },
+    "$FSLDIR/bin/fsl_sub": {
+      "version_file": "$FSLDIR/etc/fslversion"
+    },
+    "$FSLDIR/bin/mainfeatreg": {
+      "version_file": [
+            "$TESTKRAUT_TESTBED_PATH/fmri.feat/report_prestats.html",
+            "Version (\\S+), part of FSL"
+      ]
+    }
+  }, 
+  "id": "fsl-feeds-feat", 
+  "inputs": {
+    "MNI152_T1_2mm_brain.nii.gz": {
+      "sha1sum": "4d88292c85256c8a2a9f2a2bc19dfc2b7b52bb95", 
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "MNI152_T1_2mm_brain.nii.gz"
+    }, 
+    "design.fsf": {
+      "sha1sum": "9c58db9f0c8fee963a43fbcb00999429119d91b1", 
+      "tags": [], 
+      "type": "file", 
+      "value": "design.fsf"
+    }, 
+    "fmri.nii.gz": {
+      "sha1sum": "c015cc61945d86ba3dd49a98df3fc9fc144df3e5", 
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.nii.gz"
+    }, 
+    "structural_brain.nii.gz": {
+      "sha1sum": "71b11330d5e888fdfceafb0f6955f5e189cb2642", 
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "structural_brain.nii.gz"
+    }, 
+    "testfeat.sh": {
+      "sha1sum": "e3e1925a3f3ac09cbae544d697e213ddf60ccd21", 
+      "tags": [], 
+      "type": "file", 
+      "value": "testfeat.sh"
+    }
+  }, 
+  "outputs": {
+    "fmri.feat/absbrainthresh.txt": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/absbrainthresh.txt"
+    }, 
+    "fmri.feat/cluster_mask_zfstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image", 
+        "zscores"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_mask_zfstat1.nii.gz"
+    }, 
+    "fmri.feat/cluster_mask_zstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image", 
+        "zscores"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_mask_zstat1.nii.gz"
+    }, 
+    "fmri.feat/cluster_mask_zstat2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image", 
+        "zscores"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_mask_zstat2.nii.gz"
+    }, 
+    "fmri.feat/cluster_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_zfstat1.txt"
+    }, 
+    "fmri.feat/cluster_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_zfstat1_std.txt"
+    }, 
+    "fmri.feat/cluster_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_zstat1.txt"
+    }, 
+    "fmri.feat/cluster_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_zstat1_std.txt"
+    }, 
+    "fmri.feat/cluster_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_zstat2.txt"
+    }, 
+    "fmri.feat/cluster_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/cluster_zstat2_std.txt"
+    }, 
+    "fmri.feat/design.mat": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values", 
+        "columns"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/design.mat"
+    }, 
+    "fmri.feat/example_func.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/example_func.nii.gz"
+    }, 
+    "fmri.feat/filtered_func_data.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/filtered_func_data.nii.gz"
+    }, 
+    "fmri.feat/lmax_zfstat1.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/lmax_zfstat1.txt"
+    }, 
+    "fmri.feat/lmax_zfstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/lmax_zfstat1_std.txt"
+    }, 
+    "fmri.feat/lmax_zstat1.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/lmax_zstat1.txt"
+    }, 
+    "fmri.feat/lmax_zstat1_std.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/lmax_zstat1_std.txt"
+    }, 
+    "fmri.feat/lmax_zstat2.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/lmax_zstat2.txt"
+    }, 
+    "fmri.feat/lmax_zstat2_std.txt": {
+      "tags": [
+        "text file", 
+        "table"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/lmax_zstat2_std.txt"
+    }, 
+    "fmri.feat/mask.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/mask.nii.gz"
+    }, 
+    "fmri.feat/mc/prefiltered_func_data_mcf.par": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values", 
+        "columns"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/mc/prefiltered_func_data_mcf.par"
+    }, 
+    "fmri.feat/mean_func.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/mean_func.nii.gz"
+    }, 
+    "fmri.feat/reg/example_func.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/example_func.nii.gz"
+    }, 
+    "fmri.feat/reg/example_func2highres.mat": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/example_func2highres.mat"
+    }, 
+    "fmri.feat/reg/example_func2highres.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/example_func2highres.nii.gz"
+    }, 
+    "fmri.feat/reg/example_func2standard.mat": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/example_func2standard.mat"
+    }, 
+    "fmri.feat/reg/example_func2standard.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/example_func2standard.nii.gz"
+    }, 
+    "fmri.feat/reg/highres.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/highres.nii.gz"
+    }, 
+    "fmri.feat/reg/highres2example_func.mat": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/highres2example_func.mat"
+    }, 
+    "fmri.feat/reg/highres2standard.mat": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/highres2standard.mat"
+    }, 
+    "fmri.feat/reg/highres2standard.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/highres2standard.nii.gz"
+    }, 
+    "fmri.feat/reg/standard.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/standard.nii.gz"
+    }, 
+    "fmri.feat/reg/standard2example_func.mat": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/standard2example_func.mat"
+    }, 
+    "fmri.feat/reg/standard2highres.mat": {
+      "tags": [
+        "text file", 
+        "whitespace-separated fields", 
+        "numeric values"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/reg/standard2highres.mat"
+    }, 
+    "fmri.feat/stats/cope1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/cope1.nii.gz"
+    }, 
+    "fmri.feat/stats/cope2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/cope2.nii.gz"
+    }, 
+    "fmri.feat/stats/corrections.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/corrections.nii.gz"
+    }, 
+    "fmri.feat/stats/fstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/fstat1.nii.gz"
+    }, 
+    "fmri.feat/stats/neff1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/neff1.nii.gz"
+    }, 
+    "fmri.feat/stats/neff2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/neff2.nii.gz"
+    }, 
+    "fmri.feat/stats/pe1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/pe1.nii.gz"
+    }, 
+    "fmri.feat/stats/pe2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/pe2.nii.gz"
+    }, 
+    "fmri.feat/stats/pe3.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/pe3.nii.gz"
+    }, 
+    "fmri.feat/stats/pe4.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/pe4.nii.gz"
+    }, 
+    "fmri.feat/stats/res4d.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/res4d.nii.gz"
+    }, 
+    "fmri.feat/stats/sigmasquareds.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/sigmasquareds.nii.gz"
+    }, 
+    "fmri.feat/stats/threshac1.nii.gz": {
+      "tags": [
+        "4D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/threshac1.nii.gz"
+    }, 
+    "fmri.feat/stats/tstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image", 
+        "tscores"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/tstat1.nii.gz"
+    }, 
+    "fmri.feat/stats/tstat2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image", 
+        "tscores"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/tstat2.nii.gz"
+    }, 
+    "fmri.feat/stats/varcope1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/varcope1.nii.gz"
+    }, 
+    "fmri.feat/stats/varcope2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/varcope2.nii.gz"
+    }, 
+    "fmri.feat/stats/zfstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/zfstat1.nii.gz"
+    }, 
+    "fmri.feat/stats/zstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/zstat1.nii.gz"
+    }, 
+    "fmri.feat/stats/zstat2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/stats/zstat2.nii.gz"
+    }, 
+    "fmri.feat/thresh_zfstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/thresh_zfstat1.nii.gz"
+    }, 
+    "fmri.feat/thresh_zstat1.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/thresh_zstat1.nii.gz"
+    }, 
+    "fmri.feat/thresh_zstat2.nii.gz": {
+      "tags": [
+        "3D image", 
+        "nifti1 format", 
+        "volumetric image"
+      ], 
+      "type": "file", 
+      "value": "fmri.feat/thresh_zstat2.nii.gz"
+    }
+  }, 
+  "processes": {
+    "0": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/fsl_sub", 
+        "-T", 
+        "2", 
+        "-l", 
+        "logs", 
+        "-N", 
+        "feat3_film", 
+        "-j", 
+        "16555", 
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-film"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/fsl_sub", 
+      "generates": [], 
+      "started_by": 14, 
+      "uses": [
+        "fmri.feat/design.fsf"
+      ]
+    }, 
+    "1": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/fsl_sub", 
+        "-T", 
+        "2", 
+        "-l", 
+        "logs", 
+        "-N", 
+        "feat4_post", 
+        "-j", 
+        "17023", 
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-poststats", 
+        "0", 
+        "0"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/fsl_sub", 
+      "generates": [
+        "fmri.feat/logs/feat4_post"
+      ], 
+      "started_by": 14, 
+      "uses": [
+        "fmri.feat/design.fsf", 
+        "fmri.feat/logs/feat4_post"
+      ]
+    }, 
+    "2": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-poststats", 
+        "1", 
+        "0"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/feat", 
+      "generates": [
+        "fmri.feat/logs/feat4_post"
+      ], 
+      "started_by": 4, 
+      "uses": [
+        "fmri.feat/design.fsf", 
+        "fmri.feat/logs/feat4_post"
+      ]
+    }, 
+    "3": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/feat_model", 
+        "design"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/feat_model", 
+      "generates": [], 
+      "started_by": 14, 
+      "uses": [
+        "design.fsf"
+      ]
+    }, 
+    "4": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/fsl_sub", 
+        "-T", 
+        "119", 
+        "-l", 
+        "logs", 
+        "-N", 
+        "feat4_post", 
+        "-j", 
+        "17203,15798", 
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-poststats", 
+        "1", 
+        "0"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/fsl_sub", 
+      "generates": [
+        "fmri.feat/logs/feat4_post"
+      ], 
+      "started_by": 14, 
+      "uses": [
+        "fmri.feat/design.fsf", 
+        "fmri.feat/logs/feat4_post"
+      ]
+    }, 
+    "5": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/mainfeatreg", 
+        "-d", 
+        "/tmp/fmri/fmri.feat", 
+        "-l", 
+        "/tmp/fmri/fmri.feat/logs/feat5_reg", 
+        "-R", 
+        "/tmp/fmri/fmri.feat/report_unwarp.html", 
+        "-r", 
+        "/tmp/fmri/fmri.feat/report_reg.html", 
+        "-i", 
+        "/tmp/fmri/fmri.feat/example_func.nii.gz", 
+        "-h", 
+        "/tmp/fmri/structural_brain", 
+        "-w", 
+        "6", 
+        "-x", 
+        "90", 
+        "-s", 
+        "/tmp/fmri/MNI152_T1_2mm_brain", 
+        "-y", 
+        "12", 
+        "-z", 
+        "90"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/mainfeatreg", 
+      "generates": [
+        "fmri.feat/report_reg.html", 
+        "fmri.feat/report_unwarp.html", 
+        "fmri.feat/logs/feat5_reg"
+      ], 
+      "started_by": 15, 
+      "uses": [
+        "structural_brain.nii.gz", 
+        "MNI152_T1_2mm_brain.nii.gz"
+      ]
+    }, 
+    "6": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-film"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/feat", 
+      "generates": [], 
+      "started_by": 0, 
+      "uses": [
+        "fmri.feat/design.fsf"
+      ]
+    }, 
+    "7": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/fsl_sub", 
+        "-T", 
+        "10", 
+        "-l", 
+        "logs", 
+        "-N", 
+        "feat0_init", 
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-init"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/fsl_sub", 
+      "generates": [
+        "fmri.feat/logs/feat1a_init"
+      ], 
+      "started_by": 14, 
+      "uses": [
+        "fmri.nii.gz", 
+        "fmri.feat/logs/feat1a_init"
+      ]
+    }, 
+    "8": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/fsl_sub", 
+        "-T", 
+        "18", 
+        "-l", 
+        "logs", 
+        "-N", 
+        "feat2_pre", 
+        "-j", 
+        "15798,15716", 
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-prestats"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/fsl_sub", 
+      "generates": [
+        "fmri.feat/logs/feat2_pre"
+      ], 
+      "started_by": 14, 
+      "uses": [
+        "fmri.feat/logs/feat2_pre", 
+        "fmri.feat/design.fsf"
+      ]
+    }, 
+    "9": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/imcp", 
+        "/tmp/fmri/fmri.feat/example_func.nii.gz", 
+        "example_func"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/imcp", 
+      "generates": [], 
+      "started_by": 5, 
+      "uses": [
+        "fmri.feat/example_func.nii.gz"
+      ]
+    }, 
+    "10": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-prestats"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/feat", 
+      "generates": [
+        "fmri.feat/logs/feat2_pre"
+      ], 
+      "started_by": 8, 
+      "uses": [
+        "fmri.feat/logs/feat2_pre", 
+        "fmri.feat/design.fsf"
+      ]
+    }, 
+    "11": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-init"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/feat", 
+      "generates": [
+        "fmri.feat/logs/feat1a_init"
+      ], 
+      "started_by": 7, 
+      "uses": [
+        "fmri.nii.gz", 
+        "fmri.feat/design.fsf", 
+        "fmri.feat/logs/feat1a_init"
+      ]
+    }, 
+    "12": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/fsl_sub", 
+        "-T", 
+        "30", 
+        "-l", 
+        "logs", 
+        "-N", 
+        "feat1b_reg", 
+        "-j", 
+        "15716", 
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-reg"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/fsl_sub", 
+      "generates": [
+        "fmri.feat/logs/feat1_reg", 
+        "fmri.feat/logs/feat5_reg", 
+        "fmri.feat/report_reg.html", 
+        "fmri.feat/report_unwarp.html"
+      ], 
+      "started_by": 14, 
+      "uses": [
+        "MNI152_T1_2mm_brain.nii.gz"
+      ]
+    }, 
+    "13": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-poststats", 
+        "0", 
+        "0"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/feat", 
+      "generates": [
+        "fmri.feat/logs/feat4_post"
+      ], 
+      "started_by": 1, 
+      "uses": [
+        "fmri.feat/design.fsf", 
+        "fmri.feat/logs/feat4_post"
+      ]
+    }, 
+    "14": {
+      "argv": [
+        "/bin/sh", 
+        "testfeat.sh"
+      ], 
+      "executable": "/bin/dash", 
+      "generates": [
+        "fmri.feat/logs/feat1", 
+        "fmri.feat/report_unwarp.html", 
+        "fmri.feat/logs/feat2_pre", 
+        "fmri.feat/logs/feat5_reg", 
+        "design.fsf", 
+        "fmri.feat/logs/feat4_post", 
+        "fmri.feat/logs/feat1_reg", 
+        "fmri.feat/report_reg.html"
+      ], 
+      "started_by": null, 
+      "uses": [
+        "testfeat.sh", 
+        "fmri.feat/logs/feat2_pre", 
+        "fmri.feat/logs/feat1", 
+        "design.fsf", 
+        "fmri.feat/design.fsf", 
+        "fmri.feat/logs/feat4_post", 
+        "MNI152_T1_2mm_brain.nii.gz"
+      ]
+    }, 
+    "15": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/feat", 
+        "/tmp/fmri/fmri.feat/design.fsf", 
+        "-D", 
+        "/tmp/fmri/fmri.feat", 
+        "-I", 
+        "1", 
+        "-reg"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/feat", 
+      "generates": [
+        "fmri.feat/logs/feat1_reg", 
+        "fmri.feat/report_reg.html", 
+        "fmri.feat/logs/feat5_reg", 
+        "fmri.feat/report_unwarp.html"
+      ], 
+      "started_by": 12, 
+      "uses": [
+        "fmri.feat/design.fsf", 
+        "MNI152_T1_2mm_brain.nii.gz", 
+        "fmri.feat/logs/feat1_reg"
+      ]
+    }, 
+    "16": {
+      "argv": [
+        "/usr/share/fsl/5.0/bin/film_gls", 
+        "-rn", 
+        "stats", 
+        "-sa", 
+        "-ms", 
+        "5", 
+        "filtered_func_data", 
+        "design.mat", 
+        "1000.0"
+      ], 
+      "executable": "/usr/lib/fsl/5.0/film_gls", 
+      "generates": [], 
+      "started_by": 6, 
+      "uses": []
+    }
+  }, 
+  "test": {
+    "command": [
+      "/bin/sh", 
+      "testfeat.sh"
+    ], 
+    "type": "shell_command"
+  }, 
+  "version": 0
+}
