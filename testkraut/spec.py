@@ -204,8 +204,7 @@ def diff(fr, to, recursive_list=False, min_abs_numdiff=None,
         if numdiff and \
            (
                (    min_abs_numdiff is None and
-                    min_rel_numdiff is None and
-                not numdiff == 0) \
+                    min_rel_numdiff is None) \
             or (not min_abs_numdiff is None and
                     min_rel_numdiff is None and
                     abs(numdiff) >= min_abs_numdiff) \
@@ -216,6 +215,35 @@ def diff(fr, to, recursive_list=False, min_abs_numdiff=None,
         else:
             return None
     elif isinstance(fr, list):
+        if isinstance(to, list) and len(fr) == len(to) and len(fr) > 0:
+            # two sequences of the same length: maybe two numerical arrays?
+            try:
+                # if we have numpy, try converting it into an array and attempt 
+                # to compute an element-wise difference
+                import numpy as np
+                arr_fr = np.array(fr)
+                arr_to = np.array(to)
+                numdiff = arr_to - arr_fr
+                absnumdiff = np.abs(numdiff)
+                absmaxdiff = float(absnumdiff.max())
+                fr_base = arr_fr.ravel()[absnumdiff.argmax()]
+                if absmaxdiff > 0 and \
+                   (
+                       (min_abs_numdiff is None and
+                        min_rel_numdiff is None) \
+                    or (not min_abs_numdiff is None and
+                            min_rel_numdiff is None and
+                            absmaxdiff >= min_abs_numdiff) \
+                    or (    min_abs_numdiff is None and
+                        not min_rel_numdiff is None and
+                            (fr_base == 0 or absmaxdiff / fr_base) >= min_rel_numdiff)):
+                    return {'numdiff': numdiff, '%%magic%%': 'diff'}
+            except ImportError:
+                # silently fail and do a non-array diff
+                pass
+            except TypeError:
+                # probably not an array with numeric values
+                pass
         try:
             seqmatch = difflib.SequenceMatcher(None, fr, to).get_opcodes()
         except TypeError:

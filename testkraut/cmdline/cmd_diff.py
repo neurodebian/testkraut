@@ -17,6 +17,7 @@ __docformat__ = 'restructuredtext'
 
 import sys
 import argparse
+import re
 from ..spec import SPEC
 
 try:
@@ -43,16 +44,38 @@ def setup_parser(parser):
             help="""minimum relative numerical difference to be considered an
                  actual difference. Differences are evaluated relative to the
                  first input (``from``).""")
+    parser.add_argument('--exclude-types', nargs='+',
+            choices=('num', 'str', 'seq', 'mis'), default=tuple(),
+            help="""exclude one or more types of differences from the output.
+                 Possible choices are ``num`` for numerical differences, ``str``
+                 for string differences, ``seq`` for sequence diffrences, and
+                 ``mis`` for missing or new elements.
+                 """)
+    parser.add_argument('-i', '--include-elements', action='append',
+                        help="""if provided, only differences of elements whos
+                        location matching any of the given regular expressions
+                        regular expressions are reported. The option can be
+                        given multiple times. Include expressions are applied
+                        before any potential exclude expressions
+                        (see --exclude_elements).""")
+    parser.add_argument('-e', '--exclude-elements', action='append',
+                        help="""if provided, differences of elements whos
+                        location matching any of the given regular expressions
+                        regular expressions are NOT reported. The option can be
+                        given multiple times. Exclude expressions are applied
+                        after any potential include expressions
+                        (see --include_elements).""")
     parser.add_argument('specs', nargs=2, metavar='SPEC',
             help="SPEC name/identifier")
 
 def print_diff_hdr(fr, to, mode):
     print '%sdiff --%s\n--- %s\n+++ %s' % (style.BRIGHT, mode, fr, to)
 
-def print_diff(breadcrumbs, diffspec, fr, to):
-    bc_str = '->'.join(breadcrumbs)
+def print_diff(breadcrumbs, diffspec, fr, to, exclude_types):
     if 'ndiff' in diffspec:
-        print_diff_hdr(bc_str, bc_str, 'ndiff')
+        if 'str' in exclude_types:
+            return
+        print_diff_hdr(breadcrumbs, breadcrumbs, 'ndiff')
         for ds in diffspec['ndiff']:
             if ds.startswith('-'):
                 print colors.RED + ds,
@@ -61,10 +84,14 @@ def print_diff(breadcrumbs, diffspec, fr, to):
             else:
                 print colors.CYAN + ds,
     elif 'numdiff' in diffspec:
-        print_diff_hdr(bc_str, bc_str, 'num')
+        if 'num' in exclude_types:
+            return
+        print_diff_hdr(breadcrumbs, breadcrumbs, 'num')
         print '$ %s' % diffspec['numdiff']
     elif 'seqmatch' in diffspec:
-        print_diff_hdr(bc_str, bc_str, 'seq')
+        if 'seq' in exclude_types:
+            return
+        print_diff_hdr(breadcrumbs, breadcrumbs, 'seq')
         for oc in diffspec['seqmatch']:
             if oc[0] == 'equal':
                 continue
@@ -77,7 +104,9 @@ def print_diff(breadcrumbs, diffspec, fr, to):
                 for el in to[oc[3]:oc[4]]:
                     print colors.GREEN + '+ %s' % el
     else:
-        frs = tos = bc_str
+        if 'mis' in exclude_types:
+            return
+        frs = tos = breadcrumbs
         if fr is None:
             frs = '(none)'
         if to is None:
@@ -88,7 +117,10 @@ def print_diff(breadcrumbs, diffspec, fr, to):
         if not to is None:
             print colors.GREEN + '+ %s' % to
 
-def walk_difftree(dt, fr, to, render, breadcrumbs=None):
+def walk_difftree(dt, fr, to, render, breadcrumbs=None, exclude_types=None,
+                  exclude_elements=None, include_elements=None):
+    if exclude_types is None:
+        exclude_types = tuple()
     if breadcrumbs is None:
         breadcrumbs = []
     for i, k in enumerate(dt):
@@ -107,17 +139,47 @@ def walk_difftree(dt, fr, to, render, breadcrumbs=None):
             continue
         if isinstance(v, dict) and '%%magic%%' in v and v['%%magic%%'] == 'diff':
             # we found a diff -- render it
-            render(breadcrumbs + [breadcrumb], v, f, t)
+            bc_str = '->'.join(breadcrumbs + [breadcrumb])
+            if not include_elements is None:
+                # how often does this location string match any given include
+                # expression
+                incmatches = sum([not exp.match(bc_str) is None for exp
+                                    in include_elements])
+                if not incmatches > 0:
+                    # if not at least one matches, skip this one
+                    continue
+            if not exclude_elements is None:
+                # how often does this location string match any given exclude
+                # expression
+                excmatches = sum([not exp.match(bc_str) is None for exp
+                                    in exclude_elements])
+                if excmatches > 0:
+                    # if at least one matches, skip this one too
+                    continue
+            render(bc_str, v, f, t, exclude_types=exclude_types)
         else:
             # walk further
-            walk_difftree(v, f, t, render, breadcrumbs + [breadcrumb])
-
-
+            walk_difftree(v, f, t, render, breadcrumbs + [breadcrumb],
+                          exclude_types=exclude_types,
+                          include_elements=include_elements,
+                          exclude_elements=exclude_elements,
+                          )
 
 def run(args):
+    for argname in ('include_elements', 'exclude_elements'):
+        arg = getattr(args, argname)
+        if not arg is None:
+            try:
+                setattr(args, argname, [re.compile(e) for e in arg])
+            except re.error:
+                raise ValueError("malformed regular expression in %s" % arg)
     fspec = SPEC(open(args.specs[0]))
     tspec = SPEC(open(args.specs[1]))
     difftree = fspec.diff(tspec,
                           min_abs_numdiff=args.min_abs_numdiff,
                           min_rel_numdiff=args.min_abs_numdiff)
-    walk_difftree(difftree, fspec, tspec, print_diff)
+    walk_difftree(difftree, fspec, tspec, print_diff,
+                  exclude_types=args.exclude_types,
+                  include_elements=args.include_elements,
+                  exclude_elements=args.exclude_elements,
+                  )

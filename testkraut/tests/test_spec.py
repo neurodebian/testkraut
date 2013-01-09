@@ -35,3 +35,8 @@ def test_numdiff():
     assert_false('test' in sp.diff(spec.SPEC('{"test": 1}'), min_abs_numdiff=2))
     assert_true('test' in sp.diff(spec.SPEC('{"test": 1}'), min_rel_numdiff=1.0))
     assert_true('test' in sp.diff(spec.SPEC('{"test": 1}'), min_rel_numdiff=0.00001))
+    # arrays
+    sp = spec.SPEC('{"test": [1,2,3,4]}')
+    assert_true('numdiff' in sp.diff(spec.SPEC('{"test": [1,2,2,4]}'))['test'])
+    assert_false('numdiff' in sp.diff(spec.SPEC('{"test": [1,2,3]}'))['test'])
+    assert_false('numdiff' in sp.diff(spec.SPEC('{"test": [1,2,2,"hello"]}'))['test'])
