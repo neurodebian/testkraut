@@ -53,3 +53,27 @@ specoutput = (
     dict(metavar='FILENAME', dest='ospec_filename',
          help="""file name of the output SPEC file""")
 )
+
+include_spec_elements = (
+    'include-elements', ('-i', '--include-elements'),
+    dict(action='append',
+         help="""if provided, only differences of elements whos
+              location matching any of the given regular expressions
+              regular expressions are reported. The option can be
+              given multiple times. Include expressions are applied
+              before any potential exclude expressions
+              (see --exclude_elements)."""),
+)
+
+exclude_spec_elements = (
+    'exclude-elements', ('-e', '--exclude-elements'),
+    dict(action='append',
+         help="""if provided, differences of elements whos
+              location matching any of the given regular expressions
+              regular expressions are NOT reported. The option can be
+              given multiple times. Exclude expressions are applied
+              after any potential include expressions
+              (see --include_elements)."""),
+)
+
+

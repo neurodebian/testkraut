@@ -19,6 +19,7 @@ import sys
 import argparse
 import re
 from ..spec import SPEC
+from .helpers import parser_add_common_args
 
 try:
     if not sys.stdout.isatty():
@@ -51,20 +52,8 @@ def setup_parser(parser):
                  for string differences, ``seq`` for sequence diffrences, and
                  ``mis`` for missing or new elements.
                  """)
-    parser.add_argument('-i', '--include-elements', action='append',
-                        help="""if provided, only differences of elements whos
-                        location matching any of the given regular expressions
-                        regular expressions are reported. The option can be
-                        given multiple times. Include expressions are applied
-                        before any potential exclude expressions
-                        (see --exclude_elements).""")
-    parser.add_argument('-e', '--exclude-elements', action='append',
-                        help="""if provided, differences of elements whos
-                        location matching any of the given regular expressions
-                        regular expressions are NOT reported. The option can be
-                        given multiple times. Exclude expressions are applied
-                        after any potential include expressions
-                        (see --include_elements).""")
+    parser_add_common_args(parser, opt=('include_spec_elements',
+                                        'exclude_spec_elements'))
     parser.add_argument('specs', nargs=2, metavar='SPEC',
             help="SPEC name/identifier")
 
