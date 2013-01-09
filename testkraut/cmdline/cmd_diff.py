@@ -36,6 +36,13 @@ except:
 parser_args = dict(formatter_class=argparse.RawDescriptionHelpFormatter)
 
 def setup_parser(parser):
+    parser.add_argument('--min-abs-numdiff', type=float,
+            help="""minimum absolute numerical difference to be considered an
+                 actual difference""")
+    parser.add_argument('--min-rel-numdiff', type=float,
+            help="""minimum relative numerical difference to be considered an
+                 actual difference. Differences are evaluated relative to the
+                 first input (``from``).""")
     parser.add_argument('specs', nargs=2, metavar='SPEC',
             help="SPEC name/identifier")
 
@@ -110,5 +117,7 @@ def walk_difftree(dt, fr, to, render, breadcrumbs=None):
 def run(args):
     fspec = SPEC(open(args.specs[0]))
     tspec = SPEC(open(args.specs[1]))
-    difftree = fspec.diff(tspec)
+    difftree = fspec.diff(tspec,
+                          min_abs_numdiff=args.min_abs_numdiff,
+                          min_rel_numdiff=args.min_abs_numdiff)
     walk_difftree(difftree, fspec, tspec, print_diff)

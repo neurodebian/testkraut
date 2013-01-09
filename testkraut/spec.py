@@ -140,7 +140,29 @@ class SPEC(dict):
 def spec_testoutput_ids(spec):
         return spec.get('outputs', {}).keys()
 
-def diff(fr, to, recursiv_list=False):
+def diff(fr, to, recursive_list=False, min_abs_numdiff=None,
+         min_rel_numdiff=None):
+    """Build a difference tree from two container objects
+
+    Most commonly such objects will be SPECs or components thereof.
+
+    Parameters
+    ----------
+    fr: dict or list or tuple or float or int or str or None
+      "from" input into the diff algorithm.
+    to: dict or list or tuple or float or int or str or None
+      "to" input into the diff algorithm.
+    recursive_list: bool
+    min_abs_numdiff: float or None
+      If not None, this is te minimum absolute numerical difference that shall
+      be regarded as an actual difference. All smaller values will be considered
+      zero.
+    min_rel_numdiff: float or None
+      Analog to ``min_abs_numdiff``, but differences will evaluated relative to
+      the corresponding ``fr`` value. Specifying 0.1 here, would cause any
+      numerical difference to be ignored that is not at least 10% of the
+      corresponding numerical value in the first SPEC.
+    """
     if not type(fr) == type(to):
         # different type
         return {'from': fr, 'to': to, '%%magic%%': 'diff'}
@@ -159,7 +181,10 @@ def diff(fr, to, recursiv_list=False):
             dtree[missing] = {'to': to, '%%magic%%': 'diff'}
         # compare intersecting keys
         for key in fr_keys.intersection(to_keys):
-            value_diff = diff(fr[key], to[key], recursiv_list)
+            value_diff = diff(fr[key], to[key],
+                              recursive_list=recursive_list,
+                              min_abs_numdiff=min_abs_numdiff,
+                              min_rel_numdiff=min_rel_numdiff)
             if not value_diff is None:
                 dtree[key] = value_diff
         if len(dtree):
@@ -175,8 +200,19 @@ def diff(fr, to, recursiv_list=False):
         else:
             return None
     elif isinstance(fr, float) or isinstance(fr, int):
-        if not fr == to:
-            return {'numdiff': to - fr, '%%magic%%': 'diff'}
+        numdiff = to - fr
+        if numdiff and \
+           (
+               (    min_abs_numdiff is None and
+                    min_rel_numdiff is None and
+                not numdiff == 0) \
+            or (not min_abs_numdiff is None and
+                    min_rel_numdiff is None and
+                    abs(numdiff) >= min_abs_numdiff) \
+            or (    min_abs_numdiff is None and
+                not min_rel_numdiff is None and
+                    (fr == 0 or abs(float(numdiff)/fr) >= min_rel_numdiff))):
+            return {'numdiff': numdiff, '%%magic%%': 'diff'}
         else:
             return None
     elif isinstance(fr, list):
@@ -192,14 +228,14 @@ def diff(fr, to, recursiv_list=False):
             if seqmatch[0][0] == 'equal':
                 # all the same
                 return None
-            if recursiv_list:
+            if recursive_list:
                 if seqmatch[0][0] == 'replace':
                     # all different
                     return {'from': fr, 'to': to, '%%magic%%': 'diff'}
                 else:
                     # either 'from' or 'to' were empty
                     return {'from': fr, 'to': to, '%%magic%%': 'diff'}
-        if recursiv_list and \
+        if recursive_list and \
             len([None for s in seqmatch
                  if s[0] == 'equal'
                     or (s[0] == 'replace' 
@@ -212,7 +248,10 @@ def diff(fr, to, recursiv_list=False):
                     out.extend(fr[s[1]:s[2]])
                 elif s[0] == 'replace':
                     for i in xrange(s[1], s[2]):
-                        out.append(diff(fr[i], to[i], recursiv_list))
+                        out.append(diff(fr[i], to[i],
+                                        recursive_list=recursive_list,
+                                        min_abs_numdiff=min_abs_numdiff,
+                                        min_rel_numdiff=min_rel_numdiff))
                 else:
                     # all other conditions should be caught by top-level IF
                     raise RuntimeError('impossible opcode in sequence match')
