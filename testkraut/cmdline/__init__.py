@@ -15,3 +15,4 @@ import cmd_execute
 import cmd_cachefiles
 import cmd_diff
 import cmd_export2table
+import cmd_compare
