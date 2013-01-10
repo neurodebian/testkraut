@@ -406,7 +406,7 @@ class LocalRunner(BaseRunner):
         spec['entities'] = entities
         spec['system'] = describe_system()
         for exec_path, espec in spec.get('executables', {}).iteritems():
-            if not os.path.exists(exec_path):
+            if not os.path.exists(os.path.expandvars(exec_path)):
                 # no executable? is it optional?
                 if not espec.get('optional', False):
                     lgr.warning("failed to find required executable '%s'"
