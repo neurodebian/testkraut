@@ -145,10 +145,17 @@ def run(args):
     prior_test_hashes = get_dir_hashes(testbed_dir)
     # run through strace
     if args.no_strace:
-        retval = subprocess.call(args.arg)
+        testcmd = subprocess.Popen(args.arg,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        testcmd.wait()
+        stderr = testcmd.stderr
+        stdout = testcmd.stdout
+        retval = testcmd.returncode
         proc_info = {}
     else:
-        proc_info, retval = get_cmd_prov_strace(args.arg, args.match_cmds)
+        proc_info, retval, stdout, stderr = \
+                get_cmd_prov_strace(args.arg, args.match_cmds)
     if not retval == 0:
         raise RuntimeError('command returned with non-zero exit code %s'
                            % args.arg)
@@ -179,6 +186,12 @@ def run(args):
                 outputs={},
                 comparisons={}))
 
+    stdout = stdout.read()
+    if len(stdout):
+        spec['outputs']['stdout'] = {'type': 'string', 'value': stdout}
+    stderr = stderr.read()
+    if len(stderr):
+        spec['outputs']['stderr'] = {'type': 'string', 'value': stderr}
     # in case of a shell command
     spec['test'] = dict(type='shell_command', command=args.arg)
     # filter files
@@ -194,7 +207,7 @@ def run(args):
             continue
         s = dict(type='file', value=relname,
                  sha1sum=prior_test_hashes[ipf])
-        spec['inputs'][relname] = s
+        spec['inputs']['file:%s' % relname] = s
     # record all output files
     for opf in new_files:
         relname = os.path.relpath(opf)
@@ -204,7 +217,7 @@ def run(args):
             continue
         s = dict(type='file', value=relname,
                  tags=list(guess_file_tags(relname)))
-        spec['outputs'][relname] = s
+        spec['outputs']['file:%s' % relname] = s
 
     # and now get all info into the SPEC
     dep_mapper = {}
