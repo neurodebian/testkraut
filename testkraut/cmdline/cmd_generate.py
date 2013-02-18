@@ -268,4 +268,4 @@ def run(args):
         for env in os.environ:
             if not re.match(args.dump_env, env) is None:
                 spec['environment'][env] = None
-    spec.save(args.ospec_filename)
+    spec.save(args.ospec_filename, minimize=True)

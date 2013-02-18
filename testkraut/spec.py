@@ -111,9 +111,17 @@ class SPEC(dict):
         str_repr = json.dumps(self, separators=(',',':'), sort_keys=True)
         return sha1(str_repr).hexdigest()
 
-    def save(self, filename):
+    def save(self, filename, minimize=False):
+        from operator import isSequenceType, isMappingType
         spec_file = open(filename, 'w')
-        spec_file.write(json.dumps(self, indent=2, sort_keys=True,
+        if minimize:
+            # don't write empty containers
+            towrite = dict([(k, v) for k, v in self.iteritems()
+                                if not (isSequenceType(v) or isMappingType(v)) \
+                                   or len(v)])
+        else:
+            towrite = self
+        spec_file.write(json.dumps(towrite, indent=2, sort_keys=True,
                                    cls=SPECJSONEncoder))
         spec_file.write('\n')
         spec_file.close()
