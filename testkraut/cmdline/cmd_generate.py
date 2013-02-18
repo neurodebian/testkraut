@@ -144,7 +144,11 @@ def run(args):
     # get the state of the union
     prior_test_hashes = get_dir_hashes(testbed_dir)
     # run through strace
-    proc_info, retval = get_cmd_prov_strace(args.arg, args.match_cmds)
+    if args.no_strace:
+        retval = subprocess.call(args.arg)
+        proc_info = {}
+    else:
+        proc_info, retval = get_cmd_prov_strace(args.arg, args.match_cmds)
     if not retval == 0:
         raise RuntimeError('command returned with non-zero exit code %s'
                            % args.arg)
