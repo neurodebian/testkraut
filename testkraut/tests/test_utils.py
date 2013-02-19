@@ -40,7 +40,7 @@ def test_strace_wrapper(wdir):
         inf.close()
         cmd = ['python', '-c', 'open(\"%s\",\"w\").write(open(\"%s\").read())'
                                % (outf_path, inf_path)]
-        procs, retval = utils.get_cmd_prov_strace(cmd)
+        procs, retval, stdout, stderr = utils.get_cmd_prov_strace(cmd)
         assert_equal(retval, 0)
         assert_equal(len(procs), 1)
         assert_equal(procs.keys(), ['mother'])
