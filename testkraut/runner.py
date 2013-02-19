@@ -319,16 +319,25 @@ class LocalRunner(BaseRunner):
     def _check_output_presence(self, spec):
         testbedpath = opj(self._testbed_basedir, spec['id'])
         outspec = spec.get('outputs', {})
-        missing = []
+        unmatched_output = []
         for ospec_id in outspec:
             ospec = outspec[ospec_id]
-            if not ospec['type'] == 'file':
-                raise NotImplementedError("dunno how to handle non-file output yet")
-            if not os.path.isfile(ospec['value']):
-                missing.append(ospec_id)
+            ospectype = ospec['type']
+            if ospectype == 'file':
+                if not os.path.isfile(ospec['value']):
+                    unmatched_output.append(ospec_id)
+            elif ospectype == 'string':
+                sec, field = ospec_id.split('::')
+                if not spec[sec][field] == ospec['value']:
+                    unmatched_output.append(ospec_id)
+            else:
+                raise NotImplementedError(
+                        "dunno how to handle output type '%s' yet"
+                        % ospectype)
             # TODO check for file type
-        if len(missing):
-            raise RuntimeError("expected output(s) %s not found" % missing)
+        if len(unmatched_output):
+            raise RuntimeError("mismatch in expected output(s): %s"
+                    % ', '.join(unmatched_output))
         return True
 
     def _evaluate_output(self, spec):

@@ -188,10 +188,10 @@ def run(args):
 
     stdout = stdout.read()
     if len(stdout):
-        spec['outputs']['stdout'] = {'type': 'string', 'value': stdout}
+        spec['outputs']['test::stdout'] = {'type': 'string', 'value': stdout}
     stderr = stderr.read()
     if len(stderr):
-        spec['outputs']['stderr'] = {'type': 'string', 'value': stderr}
+        spec['outputs']['test::stderr'] = {'type': 'string', 'value': stderr}
     # in case of a shell command
     spec['test'] = dict(type='shell_command', command=args.arg)
     # filter files
