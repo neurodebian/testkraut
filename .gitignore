@@ -30,3 +30,7 @@ pip-log.txt
 filecache
 testbeds
 doc/source/generated
+
+# remove later
+hbm
+afni_run

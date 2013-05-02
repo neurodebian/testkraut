@@ -1,0 +1,19 @@
+{
+  "id": "minimal", 
+  "environment": {"HOME": ""},
+  "outputs": {
+    "test::stdout": {
+      "type": "string", 
+      "value": "mike\n"
+    }
+  }, 
+  "test": {
+    "command": [
+      "bash", 
+      "-c", 
+      "echo \"mike\""
+    ], 
+    "type": "shell_command"
+  }, 
+  "version": 0
+}
