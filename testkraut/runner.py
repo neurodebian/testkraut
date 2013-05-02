@@ -201,8 +201,11 @@ def prepare_local_testbed(spec, dst, testlibdirs, cachedir=None, lazy=False):
     elif 'command' in testspec:
         # nothing to move
         pass
+    elif 'code' in testspec:
+        # nothing to move
+        pass
     else:
-        raise NotImplementedError("can't deal with anything but test scripts for now")
+        raise NotImplementedError("unsupported field '%s' in test SPEC" % testspec)
 
 
 

@@ -1,12 +1,8 @@
 {
   "id": "check_testbed_env", 
   "test": {
-    "command": [
-      "python",
-      "-c",
-      "import os; assert('TESTKRAUT_TESTBED_PATH' in os.environ)"
-    ], 
-    "type": "shell_command"
+    "code": "import os; assert('TESTKRAUT_TESTBED_PATH' in os.environ)",
+    "type": "python_script"
   }, 
   "version": 0
 }

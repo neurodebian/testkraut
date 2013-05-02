@@ -101,13 +101,9 @@ def discover_specs(paths=None):
                 lgr.debug("ignoring '%s' directory in library path '%s': contains no SPEC file"
                           % (subdir, tld))
                 continue
-            try:
-                spec = SPEC(open(spec_fname))
-                spec_id = spec['id'].replace('-', '_')
-            except:
-                # not a valid SPEC
-                lgr.warning("ignoring '%s': no a valid SPEC file"
-                          % spec_fname)
+            #try:
+            spec = SPEC(open(spec_fname))
+            spec_id = spec['id'].replace('-', '_')
             if spec_id in discovered:
                 lgr.warning("found duplicate test ID '%s' in %s: ignoring the latter test"
                             % (spec_id, (discovered[spec_id], spec_fname)))
@@ -115,6 +111,10 @@ def discover_specs(paths=None):
             # we actually found a new one
             lgr.debug("discovered test SPEC '%s'" % spec_id)
             discovered[spec_id] = spec_fname
+            #except:
+            #    # not a valid SPEC
+            #    lgr.warning("ignoring '%s': no a valid SPEC file"
+            #              % spec_fname)
     # wrap spec file locations in TestArgs
     return dict([(k, TestArgs(v)) for k, v in discovered.iteritems()])
 
@@ -180,8 +180,30 @@ class TestFromSPEC(TestCase):
         except AttributeError:
             raise ValueError("unsupported test type '%s'" % type_)
         lgr.debug("run test via %s()" % test_exec.__name__)
-        ret = test_exec(spec)
+        # move into testbed
+        initial_cwd = os.getcwdu()
+        os.chdir(self._workdir)
+        # run the test
+        try:
+            ret = test_exec(spec)
+        finally:
+            os.chdir(initial_cwd)
         return ret
+
+    def _execute_python_script(self, spec):
+        testspec = spec['test']
+        try:
+            if 'code' in testspec:
+                exec testspec['code'] in {}, {}
+            elif 'file' in testspec:
+                execfile(testspec['file'], {}, {})
+            else:
+                raise ValueError("no test code found")
+        except Exception, e:
+            lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+            self.assertThat(e,
+                Annotate("exception occured while executing Python test code: %s (%s)"
+                         % (e.__class__.__name__, str(e)), Equals(None)))
 
     def _execute_shell_command(self, spec):
         import subprocess
@@ -192,8 +214,6 @@ class TestFromSPEC(TestCase):
             # to get all envvar expansion ...
             cmd = subprocess.list2cmdline(cmd)
         # for the rest we need to execute stuff in the root of the testbed
-        initial_cwd = os.getcwdu()
-        os.chdir(self._workdir)
         try:
             lgr.debug("attempting to execute command '%s'" % cmd)
             texec = subprocess.Popen(cmd,
@@ -214,9 +234,7 @@ class TestFromSPEC(TestCase):
         except OSError, e:
             lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
             return False
-        finally:
-            os.chdir(initial_cwd)
-        return False
+        return True
 
     def _check_output_presence(self, spec):
         outspec = spec.get('outputs', {})
