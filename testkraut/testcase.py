@@ -188,7 +188,6 @@ class TestFromSPEC(TestCase):
             ret = test_exec(spec)
         finally:
             os.chdir(initial_cwd)
-        return ret
 
     def _execute_python_script(self, spec):
         testspec = spec['test']
@@ -233,8 +232,9 @@ class TestFromSPEC(TestCase):
                          Equals(0)))
         except OSError, e:
             lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
-            return False
-        return True
+            self.assertThat(e,
+                Annotate("test command execution failed: %s (%s)"
+                         % (e.__class__.__name__, str(e)), Equals(None)))
 
     def _check_output_presence(self, spec):
         outspec = spec.get('outputs', {})
