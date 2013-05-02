@@ -141,14 +141,17 @@ class TestFromSPEC(TestCase):
         # all, all details become identical
         details['sys'] = Content(ct, lambda: [jds(self._get_system_info())])
         details['env'] = Content(ct, lambda: [jds(self._get_environment(spec))])
-        #os.environ['TESTKRAUT_TESTBED_PATH'] = testbed_path
 
         # prepare the testbed, place test input into testbed
         from .runner import prepare_local_testbed
         prepare_local_testbed(spec, wdir, get_test_library_paths(),
                               cachedir=None, lazy=False)
+        # post testbed path into the environment
+        os.environ['TESTKRAUT_TESTBED_PATH'] = wdir
         # execute the actual test implementation
         self._execute_any_test_implementation(spec)
+        # remove status var again
+        del os.environ['TESTKRAUT_TESTBED_PATH']
         # check for expected output
         self._check_output_presence(spec)
 
