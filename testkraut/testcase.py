@@ -117,10 +117,10 @@ def discover_specs(paths=None):
             # we actually found a new one
             lgr.debug("discovered test SPEC '%s'" % spec_id)
             discovered[spec_id] = spec_fname
-        except:
+        except Exception, e:
             # not a valid SPEC
-            lgr.warning("ignoring '%s': no a valid SPEC file"
-                      % spec_fname)
+            lgr.warning("ignoring '%s': no a valid SPEC file: %s (%s)"
+                      % (spec_fname, str(e), e.__class__.__name__))
     # wrap spec file locations in TestArgs
     return dict([(k, TestArgs(v)) for k, v in discovered.iteritems()])
 
