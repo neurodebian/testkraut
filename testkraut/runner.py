@@ -189,23 +189,23 @@ def prepare_local_testbed(spec, dst, testlibdirs, cachedir=None, lazy=False):
         else:
             raise ValueError("unknown input spec type '%s'" % type_)
     # place test code/script itself
-    testspec = spec['test']
-    if 'file' in testspec:
-        testfilepath = _locate_file_in_testlib(testlibdirs,
-                                              spec['id'],
-                                              filename=testspec['file'])
-        if testfilepath is None:
-            raise ValueError("file '%s' referenced in test '%s' not found"
-                             % (testspec['file'], spec['id']))
-        shutil.copy(testfilepath, dst)
-    elif 'command' in testspec:
-        # nothing to move
-        pass
-    elif 'code' in testspec:
-        # nothing to move
-        pass
-    else:
-        raise NotImplementedError("unsupported field '%s' in test SPEC" % testspec)
+    for testspec in spec['tests']:
+        if 'file' in testspec:
+            testfilepath = _locate_file_in_testlib(testlibdirs,
+                                                  spec['id'],
+                                                  filename=testspec['file'])
+            if testfilepath is None:
+                raise ValueError("file '%s' referenced in test '%s' not found"
+                                 % (testspec['file'], spec['id']))
+            shutil.copy(testfilepath, dst)
+        elif 'command' in testspec:
+            # nothing to move
+            pass
+        elif 'code' in testspec:
+            # nothing to move
+            pass
+        else:
+            raise NotImplementedError("unsupported field '%s' in test SPEC" % testspec)
 
 
 

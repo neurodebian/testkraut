@@ -22,6 +22,8 @@ if 'TESTKRAUT_LOGGER_VERBOSE' in os.environ:
     cfg = os.environ['TESTKRAUT_LOGGER_VERBOSE']
     if cfg == 'debug':
         lgr.setLevel(logging.DEBUG)
+    else:
+        lgr.setLevel(logging.INFO)
 
 from testkraut.testcase import TestFromSPEC, discover_specs, template_case, TemplateTestCase
 

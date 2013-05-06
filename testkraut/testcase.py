@@ -154,8 +154,12 @@ class TestFromSPEC(TestCase):
                               cachedir=None, lazy=False)
         # post testbed path into the environment
         os.environ['TESTKRAUT_TESTBED_PATH'] = wdir
-        # execute the actual test implementation
-        self._execute_any_test_implementation(spec)
+        for idx, testspec in enumerate(spec['tests']):
+            os.environ['TESTKRAUT_SUBTEST_IDX'] = str(idx)
+            subtestid = '%s~%s' % (spec_id, idx)
+            # execute the actual test implementation
+            self._execute_any_test_implementation(subtestid, testspec)
+            del os.environ['TESTKRAUT_SUBTEST_IDX']
         # remove status var again
         del os.environ['TESTKRAUT_TESTBED_PATH']
         # check for expected output
@@ -179,24 +183,24 @@ class TestFromSPEC(TestCase):
             shutil.rmtree(self._workdir)
             self._workdir = None
 
-    def _execute_any_test_implementation(self, spec):
-        type_ = spec['test']['type']
+    def _execute_any_test_implementation(self, testid, testspec):
+        type_ = testspec['type']
         try:
             test_exec = getattr(self, '_execute_%s' % type_)
         except AttributeError:
             raise ValueError("unsupported test type '%s'" % type_)
-        lgr.debug("run test via %s()" % test_exec.__name__)
+        lgr.info("run test '%s' via %s()"
+                 % (testid, test_exec.__name__))
         # move into testbed
         initial_cwd = os.getcwdu()
         os.chdir(self._workdir)
         # run the test
         try:
-            ret = test_exec(spec)
+            ret = test_exec(testid, testspec)
         finally:
             os.chdir(initial_cwd)
 
-    def _execute_python_script(self, spec):
-        testspec = spec['test']
+    def _execute_python_script(self, testid, testspec):
         try:
             if 'code' in testspec:
                 exec testspec['code'] in {}, {}
@@ -207,12 +211,11 @@ class TestFromSPEC(TestCase):
         except Exception, e:
             lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
             self.assertThat(e,
-                Annotate("exception occured while executing Python test code: %s (%s)"
-                         % (e.__class__.__name__, str(e)), Equals(None)))
+                Annotate("exception occured while executing Python test code in test '%s': %s (%s)"
+                         % (testid, str(e), e.__class__.__name__), Equals(None)))
 
-    def _execute_shell_command(self, spec):
+    def _execute_shell_command(self, testid, testspec):
         import subprocess
-        testspec = spec['test']
         cmd = testspec['command']
         if isinstance(cmd, list):
             # convert into a cmd string to execute via shell

@@ -346,10 +346,17 @@ A :term:`JSON object` listing various properties of the computational
 environment a test was ran in. This section is added by the test runner and
 only exists in output SPECs.
 
-``test``
+``tests``
 ========
 
-A :term:`JSON object` describing the actual test case. The mandatory ``type``
+A :term:`JSON array` of :term:`JSON object`\ s describing the actual test cases.
+All (sub-)test cases are executed in order of appearance in the array, in the
+same test bed, using the same environment. Multiple sub-tests can be used to
+split tests into sub parts to improve error reporting, while minimizing test
+SPEC overhead. However, output fingerprinting is only done once *after* all
+subtests have completed successfully.
+
+For each :term:`JSON object` describing a sub-test, the mandatory ``type``
 field identifies the kind of test case and the possible content of this section
 changes accordingly. Supported scenarios are described in the following
 subsections.

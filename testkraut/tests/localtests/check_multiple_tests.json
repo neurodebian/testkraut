@@ -1,0 +1,14 @@
+{
+  "id": "check_multiple_tests", 
+  "tests": [
+    {
+      "code": "import os; assert(os.environ['TESTKRAUT_SUBTEST_IDX'] == '0')",
+      "type": "python_script"
+    }, 
+    {
+      "code": "import os; assert(os.environ['TESTKRAUT_SUBTEST_IDX'] == '1')",
+      "type": "python_script"
+    } 
+  ],
+  "version": 0
+}
