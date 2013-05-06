@@ -91,17 +91,23 @@ def discover_specs(paths=None):
     # for all configured test library locations
     if paths is None:
         paths = get_test_library_paths()
+    cands = []
     for tld in paths:
-        # for all subdirs
-        for subdir in [d for d in os.listdir(tld)
-                            if os.path.isdir(opj(tld, d))]:
-            spec_fname = opj(tld, subdir, 'spec.json')
-            if not os.path.isfile(spec_fname):
-                # not a test spec
-                lgr.debug("ignoring '%s' directory in library path '%s': contains no SPEC file"
-                          % (subdir, tld))
-                continue
-            #try:
+        # look for 'spec.json' in all subdirs
+        cands.extend([opj(tld, d, 'spec.json')
+                        for d in os.listdir(tld)
+                            if os.path.isdir(opj(tld, d))])
+        # and all plain JSON files
+        cands.extend([opj(tld, d)
+                        for d in os.listdir(tld)
+                            if d.endswith('.json')])
+    for spec_fname in cands:
+        if not os.path.isfile(spec_fname):
+            # not a test spec
+            lgr.debug("ignoring '%s' directory in library path '%s': contains no SPEC file"
+                      % (subdir, tld))
+            continue
+        try:
             spec = SPEC(open(spec_fname))
             spec_id = spec['id'].replace('-', '_')
             if spec_id in discovered:
@@ -111,10 +117,10 @@ def discover_specs(paths=None):
             # we actually found a new one
             lgr.debug("discovered test SPEC '%s'" % spec_id)
             discovered[spec_id] = spec_fname
-            #except:
-            #    # not a valid SPEC
-            #    lgr.warning("ignoring '%s': no a valid SPEC file"
-            #              % spec_fname)
+        except:
+            # not a valid SPEC
+            lgr.warning("ignoring '%s': no a valid SPEC file"
+                      % spec_fname)
     # wrap spec file locations in TestArgs
     return dict([(k, TestArgs(v)) for k, v in discovered.iteritems()])
 
