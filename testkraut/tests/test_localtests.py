@@ -11,13 +11,17 @@
 This is Testkraut's own unit test interface to serve the local SPECs within
 the unit tests battery as actual test cases.
 """
+import os
 import logging
 import os.path as op
 
-#lgr = logging.getLogger('testkraut')
-#console = logging.StreamHandler()
-#lgr.addHandler(console)
-#lgr.setLevel(logging.DEBUG)
+if 'TESTKRAUT_LOGGER_VERBOSE' in os.environ:
+    lgr = logging.getLogger('testkraut')
+    console = logging.StreamHandler()
+    lgr.addHandler(console)
+    cfg = os.environ['TESTKRAUT_LOGGER_VERBOSE']
+    if cfg == 'debug':
+        lgr.setLevel(logging.DEBUG)
 
 from testkraut.testcase import TestFromSPEC, discover_specs, template_case, TemplateTestCase
 
