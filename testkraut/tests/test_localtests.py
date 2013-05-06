@@ -14,10 +14,10 @@ the unit tests battery as actual test cases.
 import logging
 import os.path as op
 
-lgr = logging.getLogger('testkraut')
-console = logging.StreamHandler()
-lgr.addHandler(console)
-lgr.setLevel(logging.DEBUG)
+#lgr = logging.getLogger('testkraut')
+#console = logging.StreamHandler()
+#lgr.addHandler(console)
+#lgr.setLevel(logging.DEBUG)
 
 from testkraut.testcase import TestFromSPEC, discover_specs, template_case, TemplateTestCase
 
