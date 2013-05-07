@@ -3,11 +3,11 @@
   "tests": [
     {
       "code": "import os; assert(os.environ['TESTKRAUT_SUBTEST_IDX'] == '0')",
-      "type": "python_script"
+      "type": "python"
     }, 
     {
       "code": "import os; assert(os.environ['TESTKRAUT_SUBTEST_IDX'] == '1')",
-      "type": "python_script"
+      "type": "python"
     } 
   ],
   "version": 0

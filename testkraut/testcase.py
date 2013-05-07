@@ -197,7 +197,7 @@ class TestFromSPEC(TestCase):
     def _execute_any_test_implementation(self, testid, testspec):
         type_ = testspec['type']
         try:
-            test_exec = getattr(self, '_execute_%s' % type_)
+            test_exec = getattr(self, '_execute_%s_test' % type_)
         except AttributeError:
             raise ValueError("unsupported test type '%s'" % type_)
         lgr.info("run test '%s' via %s()"
@@ -211,7 +211,7 @@ class TestFromSPEC(TestCase):
         finally:
             os.chdir(initial_cwd)
 
-    def _execute_python_script(self, testid, testspec):
+    def _execute_python_test(self, testid, testspec):
         try:
             if 'code' in testspec:
                 exec testspec['code'] in {}, {}
@@ -225,7 +225,7 @@ class TestFromSPEC(TestCase):
                 Annotate("exception occured while executing Python test code in test '%s': %s (%s)"
                          % (testid, str(e), e.__class__.__name__), Equals(None)))
 
-    def _execute_shell_command(self, testid, testspec):
+    def _execute_shell_test(self, testid, testspec):
         import subprocess
         cmd = testspec['command']
         if isinstance(cmd, list):

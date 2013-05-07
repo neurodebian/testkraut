@@ -2,7 +2,7 @@
   "id": "check_testbed_env", 
   "tests": [{
     "code": "import os; assert('TESTKRAUT_TESTBED_PATH' in os.environ)",
-    "type": "python_script"
+    "type": "python"
   }], 
   "version": 0
 }
