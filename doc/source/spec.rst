@@ -148,9 +148,12 @@ is no ``shlibdeps`` field, but instead:
 ===============
 
 A :term:`JSON object`, where keys represent names of variables in the system
-environment whose presence is required for a test run. The corresponding values
-are undefined/irrelevant in an input SPEC, but contain the observed variable
-values as strings in an output SPEC.
+environment. If the corresponding value is a string the respective variable
+will be set to this value prior test execution. If the value is ``null`` any
+existing variable of such name will be unset. If the value is ``true`` the
+presence of this variable is required and its value is recorded in the protocol.
+If the value is ``false``, the variable is not required and its (optional)
+value is recorded.
 
 ``comparisons``
 ===============

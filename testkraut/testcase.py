@@ -22,7 +22,7 @@ from testtools import TestCase, RunTest
 from testtools.content import Content, text_content
 from testtools.content_type import ContentType, UTF8_TEXT
 from testtools import matchers as tm
-from testtools.matchers import Equals, Annotate, FileExists
+from testtools.matchers import Equals, Annotate, FileExists, Contains
 
 from .utils import get_test_library_paths, describe_system
 #from .utils import run_command, get_shlibdeps, which, sha1sum, \
@@ -133,6 +133,7 @@ class TestFromSPEC(TestCase):
     def __init__(self, *args, **kwargs):
         TestCase.__init__(self, *args, **kwargs)
         self._workdir = None
+        self._environ_restore = None
 
 # derived classes should have this
 #    @template_case(discover_specs())
@@ -141,17 +142,25 @@ class TestFromSPEC(TestCase):
         # get the SPEC
         spec = SPEC(open(spec_filename))
         spec_id = spec['id']
+        env_info = {}
         details = self.getDetails()
         ct = ContentType('application', 'json')
         # for some strange reason doing the following in a loop doesn't work at
         # all, all details become identical
-        details['sys'] = Content(ct, lambda: [jds(self._get_system_info())])
-        details['env'] = Content(ct, lambda: [jds(self._get_environment(spec))])
-
+        # my current understanding is that these callable will get called when
+        # the details are fed into the test protocol, hence LATER
+        details['sysinfo'] = \
+                Content(ct, lambda: [jds(self._get_system_info())])
+        details['environment'] = \
+                Content(ct, lambda: [jds(env_info)])
+        details['componentinfo'] = \
+                Content(ct, lambda: [jds(self._gather_component_info(spec))])
         # prepare the testbed, place test input into testbed
         from .runner import prepare_local_testbed
         prepare_local_testbed(spec, wdir, get_test_library_paths(),
                               cachedir=None, lazy=False)
+        # get the environment in shape, accoridng to SPEC
+        env_info.update(self._prepare_environment(spec))
         # post testbed path into the environment
         os.environ['TESTKRAUT_TESTBED_PATH'] = wdir
         for idx, testspec in enumerate(spec['tests']):
@@ -162,6 +171,8 @@ class TestFromSPEC(TestCase):
             del os.environ['TESTKRAUT_SUBTEST_IDX']
         # remove status var again
         del os.environ['TESTKRAUT_TESTBED_PATH']
+        # restore environment to its previous state
+        self._restore_environment()
         # check for expected output
         self._check_output_presence(spec)
 
@@ -272,17 +283,47 @@ class TestFromSPEC(TestCase):
             TestFromSPEC._system_info = describe_system()
         return TestFromSPEC._system_info
 
-    def _get_environment(self, spec):
+    def _prepare_environment(self, spec):
+        # returns the relevant bits of the environment
         info = {}
-        for env in spec.get('environment', {}):
-            # grab envvar values
-            info[env] = os.environ.get(env, 'UNDEFINED')
+        env_restore = {}
+        env_spec = spec.get('environment', {})
+        for env in env_spec:
+            # store the current value
+            env_restore[env] = os.environ.get(env, None)
+            if env_spec[env] is None:
+                # unset if null
+                if env in os.environ:
+                    del os.environ[env]
+            elif isinstance(env_spec[env], basestring):
+                # set if string
+                # set the new one
+                os.environ[env] = str(env_spec[env])
+            elif env_spec[env] is True:
+                # this variable is required to be present
+                self.assertThat(os.environ, Contains(env))
+            # grab envvar values if anyhow listed
+            info[env] = os.environ.get(env, None)
+        if len(env_restore):
+            self._environ_restore = env_restore
         return info
+
+    def _restore_environment(self):
+        if self._environ_restore is None:
+            return
+        for env, val in self._environ_restore.iteritems():
+            if val is None:
+                if env in os.environ:
+                    del os.environ[env]
+            else:
+                os.environ[env] = str(val)
+        self._environ_restore = None
 
     def _gather_component_info(self, spec):
         info = {}
         entities = {}
         info['entities'] = entities
+        # TODO support more than just executables...python modules...
         for exec_path, espec in spec.get('executables', {}).iteritems():
             if not os.path.exists(os.path.expandvars(exec_path)):
                 # no executable? is it optional?
