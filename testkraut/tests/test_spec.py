@@ -21,22 +21,22 @@ def test_spec_io():
     # no unknown keys
     assert_raises(ValueError, sp.__setitem__, 'mike', 0)
     # from a str
-    sp = spec.SPEC('{"test":{"command":["uname"],"type":"shell_command"}}')
+    sp = spec.SPEC('{"tests":[{"command":["uname"],"type":"shell"}]}')
 
 def test_numdiff():
-    sp = spec.SPEC('{"test": 100}')
-    assert_true('test' in sp.diff(spec.SPEC('{"test": 101}')))
-    assert_false('test' in sp.diff(spec.SPEC('{"test": 101}'), min_abs_numdiff=2))
-    assert_true('test' in sp.diff(spec.SPEC('{"test": 102}'), min_abs_numdiff=2))
-    assert_false('test' in sp.diff(spec.SPEC('{"test": 101}'), min_rel_numdiff=.1))
-    assert_true('test' in sp.diff(spec.SPEC('{"test": 101}'), min_rel_numdiff=.01))
+    sp = spec.SPEC('{"tests": 100}')
+    assert_true('tests' in sp.diff(spec.SPEC('{"tests": 101}')))
+    assert_false('tests' in sp.diff(spec.SPEC('{"tests": 101}'), min_abs_numdiff=2))
+    assert_true('tests' in sp.diff(spec.SPEC('{"tests": 102}'), min_abs_numdiff=2))
+    assert_false('tests' in sp.diff(spec.SPEC('{"tests": 101}'), min_rel_numdiff=.1))
+    assert_true('tests' in sp.diff(spec.SPEC('{"tests": 101}'), min_rel_numdiff=.01))
     # check sane behavior from 'fr' is 0
-    sp = spec.SPEC('{"test": 0}')
-    assert_false('test' in sp.diff(spec.SPEC('{"test": 1}'), min_abs_numdiff=2))
-    assert_true('test' in sp.diff(spec.SPEC('{"test": 1}'), min_rel_numdiff=1.0))
-    assert_true('test' in sp.diff(spec.SPEC('{"test": 1}'), min_rel_numdiff=0.00001))
+    sp = spec.SPEC('{"tests": 0}')
+    assert_false('tests' in sp.diff(spec.SPEC('{"tests": 1}'), min_abs_numdiff=2))
+    assert_true('tests' in sp.diff(spec.SPEC('{"tests": 1}'), min_rel_numdiff=1.0))
+    assert_true('tests' in sp.diff(spec.SPEC('{"tests": 1}'), min_rel_numdiff=0.00001))
     # arrays
-    sp = spec.SPEC('{"test": [1,2,3,4]}')
-    assert_true('numdiff' in sp.diff(spec.SPEC('{"test": [1,2,2,4]}'))['test'])
-    assert_false('numdiff' in sp.diff(spec.SPEC('{"test": [1,2,3]}'))['test'])
-    assert_false('numdiff' in sp.diff(spec.SPEC('{"test": [1,2,2,"hello"]}'))['test'])
+    sp = spec.SPEC('{"tests": [1,2,3,4]}')
+    assert_true('numdiff' in sp.diff(spec.SPEC('{"tests": [1,2,2,4]}'))['tests'])
+    assert_false('numdiff' in sp.diff(spec.SPEC('{"tests": [1,2,3]}'))['tests'])
+    assert_false('numdiff' in sp.diff(spec.SPEC('{"tests": [1,2,2,"hello"]}'))['tests'])

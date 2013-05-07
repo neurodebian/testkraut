@@ -84,14 +84,16 @@
       "uses": []
     }
   }, 
-  "test": {
-    "command": [
-      "$FSLDIR/bin/bet", 
-      "head.nii.gz", 
-      "brain", 
-      "-m"
-    ], 
-    "type": "shell_command"
-  }, 
+  "tests": [
+    {
+      "code": [
+        "$FSLDIR/bin/bet", 
+        "head.nii.gz", 
+        "brain", 
+        "-m"
+      ], 
+      "type": "shell"
+    }
+  ],
   "version": 0
 }
