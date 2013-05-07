@@ -195,6 +195,8 @@ class TestFromSPEC(TestCase):
             self._workdir = None
 
     def _execute_any_test_implementation(self, testid, testspec):
+        # NOTE: Any test execution implementation needs to handle
+        # expected failures individually
         type_ = testspec['type']
         try:
             test_exec = getattr(self, '_execute_%s_test' % type_)
@@ -220,14 +222,21 @@ class TestFromSPEC(TestCase):
             else:
                 raise ValueError("no test code found")
         except Exception, e:
-            lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+            if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
+                lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+                self.assertThat(e,
+                    Annotate("exception occured while executing Python test code in test '%s': %s (%s)"
+                             % (testid, str(e), e.__class__.__name__), Equals(None)))
+            return
+        if 'shouldfail' in testspec and testspec['shouldfail'] == True:
             self.assertThat(e,
-                Annotate("exception occured while executing Python test code in test '%s': %s (%s)"
-                         % (testid, str(e), e.__class__.__name__), Equals(None)))
+                Annotate("an expected failure did not occur in test '%s': %s (%s)"
+                             % (testid, str(e), e.__class__.__name__), Equals(None)))
+
 
     def _execute_shell_test(self, testid, testspec):
         import subprocess
-        cmd = testspec['command']
+        cmd = testspec['code']
         if isinstance(cmd, list):
             # convert into a cmd string to execute via shell
             # to get all envvar expansion ...
@@ -246,15 +255,24 @@ class TestFromSPEC(TestCase):
             for chan in ('stderr', 'stdout'):
                 testspec[chan] = getattr(texec, chan).read()
                 lgr.debug('%s: %s' % (chan, testspec[chan]))
+            if texec.returncode != 0 and 'shouldfail' in testspec \
+               and testspec['shouldfail'] == True:
+                   # failure is expected
+                   return
             self.assertThat(
                 texec.returncode,
                 Annotate("test shell command '%s' yielded non-zero exit code" % cmd,
                          Equals(0)))
         except OSError, e:
             lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+            if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
+                self.assertThat(e,
+                    Annotate("test command execution failed: %s (%s)"
+                             % (e.__class__.__name__, str(e)), Equals(None)))
+        if 'shouldfail' in testspec and testspec['shouldfail'] == True:
             self.assertThat(e,
-                Annotate("test command execution failed: %s (%s)"
-                         % (e.__class__.__name__, str(e)), Equals(None)))
+                Annotate("an expected failure did not occur in test '%s': %s (%s)"
+                             % (testid, str(e), e.__class__.__name__), Equals(None)))
 
     def _check_output_presence(self, spec):
         outspec = spec.get('outputs', {})

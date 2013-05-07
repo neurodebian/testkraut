@@ -364,14 +364,16 @@ field identifies the kind of test case and the possible content of this section
 changes accordingly. Supported scenarios are described in the following
 subsections.
 
-``type``: ``shell_command``
----------------------------
+For any test type, a test can be marked as an expected failure by adding a field
+``shouldfail`` and setting its value to ``true``.
 
-The test case is a single shell command. The command is specified in a field
-``command`` that has a value of type :term:`JSON array` containing the command
-in the form of an ``argv`` list, such as::
+``type``: ``shell``
+-------------------
 
-  "command": ["$FSLDIR/bin/bet", "head.nii.gz", "brain", "-m"]
+The test case is a shell command. The command is specified in a text field
+``code``, such as::
+
+  "code": "$FSLDIR/bin/bet head.nii.gz brain -m"
 
 In the output SPEC of a test run this section is amended with the
 following fields:
@@ -379,17 +381,10 @@ following fields:
 ``exitcode`` (:term:`JSON number`; integer)
   Exit code for the executed command.
 
-``duration`` (:term:`JSON number`; float)
-  Duration of the test run in seconds.
+``type``: ``python``
+--------------------
 
-``stderr`` (:term:`JSON string`)
-  Full dump of ``stderr`` output.
-
-``stdout`` (:term:`JSON string`)
-  Full dump of ``stdout`` output.
-
-``starttime`` (:term:`JSON array`)
-  Time of the test run start (year, month, day, hour, minute, second).
+Explain me
 
 ``version``
 ===========
