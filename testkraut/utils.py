@@ -565,3 +565,65 @@ def get_filecache_dir():
             testkraut.cfg.get('cache', 'files',
                               default=opj(cacheroot, 'testkraut', 'filecache')))
     return cachepath
+
+
+def describe_binary(type_, location, entities, pkgdb=None):
+    spec = dict(location=location)
+    actual_path = os.path.expandvars(location)
+    if not os.path.exists(actual_path):
+        # maybe just a command, get first in search path
+        actual_path = which(location)
+        if actual_path is None:
+            lgr.debug("cannot find %s for path/command '%s' -> '%s'"
+                      % (type_, location, actual_path))
+
+            return None
+    fpath = os.path.realpath(actual_path)
+    spec['realpath'] = fpath
+    fhash = sha1sum(fpath)
+    spec['sha1sum'] = fhash
+    if fhash in entities:
+        # do not process twice
+        return fhash
+    else:
+        entities[fhash] = spec
+    lgr.debug("describe %s at '%s' (%s)" % (type_, fpath, fhash))
+    spec['type'] = type_
+    # try capturing dependencies
+    try:
+        shlibdeps = get_shlibdeps(fpath)
+        if len(shlibdeps):
+            spec['shlibdeps'] = []
+    except RuntimeError:
+        shlibdeps = list()
+    # maybe not a binary, but could be a script
+    try:
+        interpreter_path = get_script_interpreter(fpath)
+        spec['type'] = 'script'
+        spec['shebang'] = interpreter_path
+        spec['interpreter'] = describe_binary('executable',
+                                              interpreter_path.split()[0],
+                                              entities,
+                                              pkgdb=pkgdb)
+    except ValueError:
+        # not sure what this was
+        pass
+    for dep in shlibdeps:
+        spec['shlibdeps'].append(
+                describe_binary('library', dep, entities,
+                                pkgdb=pkgdb))
+#    # provided by a package?
+#    pkgname = self._pkg_mngr.get_pkg_name(fpath)
+#    if not pkgname is None:
+#        pkg_pltf = self._pkg_mngr.get_platform_name()
+#        pkginfo = dict(type=pkg_pltf, name=pkgname)
+#        pkginfo.update(self._pkg_mngr.get_pkg_info(pkgname))
+#        if 'sha1sum' in pkginfo and len(pkginfo['sha1sum']):
+#            pkghash = pkginfo['sha1sum']
+#        else:
+#            pkghash = uuid().hex
+#        entities[pkghash] = pkginfo
+#        spec['provider'] = pkghash
+    return fhash
+
+
