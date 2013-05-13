@@ -17,6 +17,7 @@ install:
     - sudo easy_install$PYSUF nibabel # Latest pypi
     - sudo apt-get install $PYTHON-nose
     - sudo apt-get install $PYTHON-pydot
+    - sudo apt-get install $PYTHON-testtools
 script:
     - ls -l
     - $PYTHON -c 'from testkraut import cfg; print cfg'
