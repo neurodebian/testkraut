@@ -134,6 +134,11 @@ class TestFromSPEC(TestCase):
         TestCase.__init__(self, *args, **kwargs)
         self._workdir = None
         self._environ_restore = None
+        # a place to store additional information gather during test execution
+        # added automatically to the test protocol
+        self._exec_info = {}
+        # reference to the currently processed test SPEC
+        self._cur_spec = None
 
 # derived classes should have this
 #    @template_case(discover_specs())
@@ -141,20 +146,27 @@ class TestFromSPEC(TestCase):
         wdir = self._workdir
         # get the SPEC
         spec = SPEC(open(spec_filename))
+        self._cur_spec = spec
         spec_id = spec['id']
         env_info = {}
-        details = self.getDetails()
         ct = ContentType('application', 'json')
-        # for some strange reason doing the following in a loop doesn't work at
-        # all, all details become identical
-        # my current understanding is that these callable will get called when
-        # the details are fed into the test protocol, hence LATER
-        details['sysinfo'] = \
-                Content(ct, lambda: [jds(self._get_system_info())])
-        details['environment'] = \
-                Content(ct, lambda: [jds(env_info)])
-        details['componentinfo'] = \
-                Content(ct, lambda: [jds(self._gather_component_info(spec))])
+        # configure default set of information to be reported for any test run
+        # echo the SPEC
+        self.addDetail('spec_info',
+                       Content(ct, lambda: [jds(self._cur_spec)]))
+        # basic system information
+        self.addDetail('sys_info',
+                       Content(ct, lambda: [jds(self._get_system_info())]))
+        # _relevant_ environment bits (variables mentioned in the SPEC)
+        self.addDetail('env_info',
+                Content(ct, lambda: [jds(env_info)]))
+        # information on test components mentioned in the SPEC
+        self.addDetail('component_info',
+                Content(ct, lambda: [jds(self._gather_component_info())]))
+        # any information reported by the test execution
+        self.addDetail('exec_info',
+                       Content(ct, lambda: [jds(self._exec_info)]))
+
         # prepare the testbed, place test input into testbed
         from .lookup import prepare_local_testbed
         prepare_local_testbed(spec, wdir,
@@ -167,9 +179,9 @@ class TestFromSPEC(TestCase):
         for idx, testspec in enumerate(spec['tests']):
             os.environ['TESTKRAUT_SUBTEST_IDX'] = str(idx)
             if not 'id' in testspec:
-                subtestid = '%s~%s' % (spec_id, idx)
+                subtestid = str(idx)
             else:
-                subtestid = '%s~%s' % (spec_id, testspec['id'])
+                subtestid = testspec['id']
             # execute the actual test implementation
             self._execute_any_test_implementation(subtestid, testspec)
             del os.environ['TESTKRAUT_SUBTEST_IDX']
@@ -183,6 +195,8 @@ class TestFromSPEC(TestCase):
     def setUp(self):
         """Runs prior each test run"""
         super(TestFromSPEC, self).setUp()
+        self._exec_info = {}
+        self._cur_spec = None
         import tempfile
         # check if we have a concurent test run
         assert(self._workdir is None)
@@ -192,6 +206,7 @@ class TestFromSPEC(TestCase):
     def tearDown(self):
         """Runs after each test run"""
         super(TestFromSPEC, self).tearDown()
+        # reset exec info to prevent info leaks into next test protocol
         if not self._workdir is None:
             lgr.debug("remove work dir at '%s'" % self._workdir)
             import shutil
@@ -213,11 +228,15 @@ class TestFromSPEC(TestCase):
         os.chdir(self._workdir)
         # run the test
         try:
+            self._exec_info[testid] = dict(
+                    type=testspec['type']
+                )
             ret = test_exec(testid, testspec)
         finally:
             os.chdir(initial_cwd)
 
     def _execute_python_test(self, testid, testspec):
+        execinfo = self._exec_info[testid]
         try:
             if 'code' in testspec:
                 exec testspec['code'] in {}, {}
@@ -226,6 +245,8 @@ class TestFromSPEC(TestCase):
             else:
                 raise ValueError("no test code found")
         except Exception, e:
+            execinfo['exception'] = dict(type=e.__class__.__name__,
+                                         info=str(e))
             if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
                 lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
                 self.assertThat(e,
@@ -241,6 +262,7 @@ class TestFromSPEC(TestCase):
     def _execute_shell_test(self, testid, testspec):
         import subprocess
         cmd = testspec['code']
+        execinfo = self._exec_info[testid]
         if isinstance(cmd, list):
             # convert into a cmd string to execute via shell
             # to get all envvar expansion ...
@@ -254,11 +276,11 @@ class TestFromSPEC(TestCase):
                                     shell=True)
             texec.wait()
             # record the exit code
-            testspec['exitcode'] = texec.returncode
+            execinfo['exitcode'] = texec.returncode
             # store test output
             for chan in ('stderr', 'stdout'):
-                testspec[chan] = getattr(texec, chan).read()
-                lgr.debug('%s: %s' % (chan, testspec[chan]))
+                execinfo[chan] = getattr(texec, chan).read()
+                #lgr.debug('%s: %s' % (chan, execinfo[chan]))
             if texec.returncode != 0 and 'shouldfail' in testspec \
                and testspec['shouldfail'] == True:
                    # failure is expected
@@ -341,7 +363,8 @@ class TestFromSPEC(TestCase):
                 os.environ[env] = str(val)
         self._environ_restore = None
 
-    def _gather_component_info(self, spec):
+    def _gather_component_info(self):
+        spec = self._cur_spec
         info = {}
         entities = {}
         info['entities'] = entities
