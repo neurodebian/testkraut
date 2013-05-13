@@ -1,0 +1,21 @@
+{
+  "id": "check_nipype_workflow",
+  "inputs": {
+    "workflow script": {
+      "type": "file", 
+      "value": "workflow.py"
+    }
+  }, 
+  "outputs": {
+    "exec_dir": {
+      "type": "directory",
+      "value": "_workflow_exec/demo_wf"
+    }
+  },
+  "tests": [
+    {
+      "type": "nipype"
+    }
+  ],
+  "version": 0
+}

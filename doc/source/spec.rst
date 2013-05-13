@@ -407,6 +407,12 @@ following fields:
 
 Explain me
 
+``type``: ``nipype``
+--------------------
+
+Explain me
+
+
 ``version``
 ===========
 

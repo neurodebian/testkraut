@@ -23,7 +23,7 @@ from testtools import TestCase, RunTest
 from testtools.content import Content, text_content
 from testtools.content_type import ContentType, UTF8_TEXT
 from testtools import matchers as tm
-from testtools.matchers import Equals, Annotate, FileExists, Contains
+from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
 
 from .utils import get_test_library_paths, describe_system, describe_binary, \
         run_command
@@ -169,7 +169,12 @@ class TestFromSPEC(TestCase):
         # restore environment to its previous state
         self._restore_environment()
         # check for expected output
-        self._check_output_presence(spec)
+        initial_cwd = os.getcwdu()
+        os.chdir(self._workdir)
+        try:
+            self._check_output_presence(spec)
+        finally:
+            os.chdir(initial_cwd)
 
     def setUp(self):
         """Runs prior each test run"""
@@ -313,6 +318,80 @@ class TestFromSPEC(TestCase):
                 Annotate("an expected failure did not occur in test '%s': %s (%s)"
                              % (testid, str(e), e.__class__.__name__), Equals(None)))
 
+    def _execute_nipype_test(self, testid, testspec):
+        # TODO merge/refactor this one with the plain python code method
+        from cStringIO import StringIO
+        import sys
+        execinfo = self._details['exec_info'][testid]
+        try:
+            import nipype
+        except ImportError:
+            self.skipTest("Nipype not found, skipping test")
+        # where is the workflow
+        if 'file' in testspec:
+            testwffilepath = testspec['file']
+            lgr.debug("using custom workflow file name '%s'" % testwffilepath)
+        else:
+            testwffilepath = 'workflow.py'
+            lgr.debug("using default workflow file name '%s'" % testwffilepath)
+        # execute the script and extract the workflow
+        locals = dict()
+        try:
+            execfile(testwffilepath, dict(), locals)
+        except Exception, e:
+            lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+            self.assertThat(e,
+                Annotate("test workflow setup failed: %s (%s)"
+                         % (e.__class__.__name__, str(e)), Equals(None)))
+        self.assertThat(locals,
+            Annotate("test workflow script create expected workflow object",
+                     Contains('test_workflow')))
+        workflow = locals['test_workflow']
+        # make sure nipype executes it in the right place
+        workflow.base_dir=os.path.abspath(opj(os.curdir, '_workflow_exec'))
+        # we want content, not time based hashing
+        if 'execution' in workflow.config:
+            workflow.config['execution']['hash_method'] = "content"
+        else:
+            workflow.config['execution'] = dict(hash_method="content")
+        # execution
+        try:
+            rescue_stdout = sys.stdout
+            rescue_stderr = sys.stderr
+            sys.stdout = capture_stdout = StringIO()
+            sys.stderr = capture_stderr = StringIO()
+            try:
+                exec_graph = workflow.run()
+            except Exception, e:
+                execinfo['exception'] = dict(type=e.__class__.__name__,
+                                             info=str(e))
+                if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
+                    lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+                    self.assertThat(e,
+                        Annotate("exception occured while executing Nipype workflow in test '%s': %s (%s)"
+                                 % (testid, str(e), e.__class__.__name__),
+                                 Equals(None)))
+                return
+            if 'shouldfail' in testspec and testspec['shouldfail'] == True:
+                self.assertThat(e,
+                    Annotate("an expected failure did not occur in test '%s': %s (%s)"
+                                 % (testid, str(e), e.__class__.__name__),
+                                 Equals(None)))
+        finally:
+            execinfo['stdout'] = capture_stdout.getvalue()
+            execinfo['stderr'] = capture_stderr.getvalue()
+            sys.stdout = rescue_stdout
+            sys.stderr = rescue_stderr
+
+        # try dumping provenance info
+        try:
+            from nipype.pipeline.utils import write_prov
+            write_prov(exec_graph,
+                       filename=opj(workflow.base_dir, 'provenance.json'))
+        except ImportError:
+            lgr.debug("local nipype version doesn't support provenance capture")
+
+
     def _check_output_presence(self, spec):
         outspec = spec.get('outputs', {})
         unmatched_output = []
@@ -323,6 +402,10 @@ class TestFromSPEC(TestCase):
                 self.assertThat(
                     ospec['value'],
                     Annotate('expected output file missing', FileExists()))
+            if ospectype == 'directory':
+                self.assertThat(
+                    ospec['value'],
+                    Annotate('expected output directory missing', DirExists()))
             elif ospectype == 'string':
                 sec, field = ospec_id.split('::')
                 self.assertThat(

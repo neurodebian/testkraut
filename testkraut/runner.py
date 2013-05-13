@@ -45,62 +45,6 @@ class LocalRunner(BaseRunner):
     def get_testbed_dir(self, spec):
         return opj(self._testbed_basedir, spec['id'])
 
-    def _prepare_testbed(self, spec):
-        testbed_path = opj(self._testbed_basedir, spec['id'])
-        os.environ['TESTKRAUT_TESTBED_PATH'] = testbed_path
-        lgr.debug("prepare testbed at '%s'" % testbed_path)
-        prepare_local_testbed(spec,
-                              testbed_path,
-                              self._testlibdirs,
-                              cachedir=self._cachedir)
-
-    def _run_nipype_workflow(self, spec):
-        testspec = spec['test']
-        testbedpath = opj(self._testbed_basedir, spec['id'])
-        if 'file' in testspec:
-            testwffilepath = testspec['file']
-        else:
-            testwffilepath = 'workflow.py'
-        testwffilepath = opj(testbedpath, testwffilepath)
-        # for the rest we need to execute stuff in the root of the testbed
-        initial_cwd = os.getcwdu()
-        os.chdir(testbedpath)
-        # execute the script and extract the workflow
-        locals = dict()
-        try:
-            execfile(testwffilepath, dict(), locals)
-        except Exception, e:
-            raise e.__class__(
-                    "exception while executing workflow setup script (%s): %s"
-                    % (testwffilepath, str(e)))
-        if not len(locals) or not 'test_workflow' in locals:
-            raise RuntimeError("test workflow script '%s' did not create a 'test_workflow' object"
-                               % testwffilepath)
-        workflow = locals['test_workflow']
-        # make sure nipype executes it in the right place
-        workflow.base_dir=os.path.abspath(opj(testbedpath, '_workflow_exec'))
-        # we want content, not time based hashing
-        if 'execution' in workflow.config:
-            workflow.config['execution']['hash_method'] = "content"
-        else:
-            workflow.config['execution'] = dict(hash_method="content")
-        try:
-            exec_graph = workflow.run()
-            # try dumping provenance info
-            try:
-                from nipype.pipeline.utils import write_prov
-                write_prov(exec_graph,
-                           filename=opj(workflow.base_dir, 'provenance.json'))
-            except ImportError:
-                lgr.debug("local nipype version doesn't support provenance capture")
-            return self._check_output_presence(spec)
-        except RuntimeError, e:
-            lgr.info("%s: %s" % (e.__class__.__name__, str(e)))
-            return False
-        finally:
-            os.chdir(initial_cwd)
-        return False
-
     def _check_output_presence(self, spec):
         testbedpath = opj(self._testbed_basedir, spec['id'])
         outspec = spec.get('outputs', {})
