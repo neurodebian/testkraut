@@ -15,7 +15,7 @@ from os.path import join as opj
 from testkraut import utils
 from testkraut.pkg_mngr import PkgManager
 from nose.tools import *
-from testkraut.tests.test_runner import with_tempdir
+from .utils import with_tempdir
 
 def test_sysinfo():
     sysinfo = utils.describe_system()
