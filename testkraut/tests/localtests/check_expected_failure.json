@@ -1,0 +1,16 @@
+{
+  "id": "check_expected_failure",
+  "tests": [
+    {
+      "code": "raise ValueError",
+      "type": "python",
+      "shouldfail": true
+    },
+    {
+      "code": "funkyfailure_somecommand",
+      "type": "shell",
+      "shouldfail": true
+    }
+  ],
+  "version": 0
+}

@@ -1,0 +1,18 @@
+{
+  "id": "check_file_hashes", 
+  "inputs": {
+    "demofile": {
+      "sha1sum": "ca42187e5bee3d74ae9512147c4f84bfc108b5e5", 
+      "type": "file", 
+      "value": "testfile.txt"
+    }
+  }, 
+  "tests": [
+    {
+      "code": "import os; from testkraut.utils import sha1sum; assert(sha1sum(os.path.join(os.environ['TESTKRAUT_TESTBED_PATH'], 'testfile.txt')) == 'ca42187e5bee3d74ae9512147c4f84bfc108b5e5')",
+      "id": "get hash match for demo file",
+      "type": "python"
+    }
+  ], 
+  "version": 0
+}

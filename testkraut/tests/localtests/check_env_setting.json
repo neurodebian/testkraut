@@ -1,0 +1,24 @@
+{
+  "id": "check_env_setting",
+  "environment": {
+    "myveryown": "quitespecial",
+    "HOME": null,
+    "USER": true,
+    "CRAZYNOTHERE": false
+  },
+  "tests": [
+    {
+      "code": "import os; assert(os.environ['myveryown'] == 'quitespecial')",
+      "type": "python"
+    },
+    {
+      "code": "import os; assert(not 'HOME' in os.environ)",
+      "type": "python"
+    },
+    {
+      "code": "import os; assert(os.environ['USER'].lower() != 'true')",
+      "type": "python"
+    }
+  ],
+  "version": 0
+}
