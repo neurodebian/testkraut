@@ -156,9 +156,10 @@ class TestFromSPEC(TestCase):
         details['componentinfo'] = \
                 Content(ct, lambda: [jds(self._gather_component_info(spec))])
         # prepare the testbed, place test input into testbed
-        from .runner import prepare_local_testbed
-        prepare_local_testbed(spec, wdir, get_test_library_paths(),
-                              cachedir=None, lazy=False)
+        from .lookup import prepare_local_testbed
+        prepare_local_testbed(spec, wdir,
+                              search_dirs=[os.path.dirname(spec_filename)],
+                              cache=None, force_overwrite=True)
         # get the environment in shape, accoridng to SPEC
         env_info.update(self._prepare_environment(spec))
         # post testbed path into the environment
