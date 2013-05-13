@@ -42,33 +42,6 @@ class LocalRunner(BaseRunner):
             self._cachedir = utils.get_filecache_dir()
         self._pkg_mngr = PkgManager()
 
-    def get_testbed_dir(self, spec):
-        return opj(self._testbed_basedir, spec['id'])
-
-    def _check_output_presence(self, spec):
-        testbedpath = opj(self._testbed_basedir, spec['id'])
-        outspec = spec.get('outputs', {})
-        unmatched_output = []
-        for ospec_id in outspec:
-            ospec = outspec[ospec_id]
-            ospectype = ospec['type']
-            if ospectype == 'file':
-                if not os.path.isfile(ospec['value']):
-                    unmatched_output.append(ospec_id)
-            elif ospectype == 'string':
-                sec, field = ospec_id.split('::')
-                if not spec[sec][field] == ospec['value']:
-                    unmatched_output.append(ospec_id)
-            else:
-                raise NotImplementedError(
-                        "dunno how to handle output type '%s' yet"
-                        % ospectype)
-            # TODO check for file type
-        if len(unmatched_output):
-            raise RuntimeError("mismatch in expected output(s): %s"
-                    % ', '.join(unmatched_output))
-        return True
-
     def _evaluate_output(self, spec):
         evalspecs = spec.get('comparisons',{})
         testbedpath = opj(self._testbed_basedir, spec['id'])
@@ -80,7 +53,6 @@ class LocalRunner(BaseRunner):
                 res = self._proc_eval_spec(eid, espec, spec)
         finally:
             os.chdir(initial_cwd)
-
 
     def _proc_eval_spec(self, eid, espec, spec):
         op_spec = espec['operator']
