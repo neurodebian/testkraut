@@ -18,6 +18,7 @@ install:
     - sudo apt-get install $PYTHON-nose
     - sudo apt-get install $PYTHON-pydot
     - sudo apt-get install $PYTHON-testtools
+    - sudo apt-get install strace
 script:
     - ls -l
     - $PYTHON -c 'from testkraut import cfg; print cfg'
