@@ -367,6 +367,10 @@ subsections.
 For any test type, a test can be marked as an expected failure by adding a field
 ``shouldfail`` and setting its value to ``true``.
 
+An optional field ``id`` can be used to assign a meaningful identifier to a
+subtest that is used in the test protocol. If no ``id`` is given, as subtest's
+index in the tests array is used as identifier.
+
 ``type``: ``shell``
 -------------------
 

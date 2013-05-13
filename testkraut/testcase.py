@@ -166,7 +166,10 @@ class TestFromSPEC(TestCase):
         os.environ['TESTKRAUT_TESTBED_PATH'] = wdir
         for idx, testspec in enumerate(spec['tests']):
             os.environ['TESTKRAUT_SUBTEST_IDX'] = str(idx)
-            subtestid = '%s~%s' % (spec_id, idx)
+            if not 'id' in testspec:
+                subtestid = '%s~%s' % (spec_id, idx)
+            else:
+                subtestid = '%s~%s' % (spec_id, testspec['id'])
             # execute the actual test implementation
             self._execute_any_test_implementation(subtestid, testspec)
             del os.environ['TESTKRAUT_SUBTEST_IDX']
