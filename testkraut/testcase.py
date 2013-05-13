@@ -11,6 +11,7 @@
 __docformat__ = 'restructuredtext'
 
 import os
+import re
 from os.path import join as opj
 from json import dumps as jds
 from functools import wraps
@@ -24,7 +25,8 @@ from testtools.content_type import ContentType, UTF8_TEXT
 from testtools import matchers as tm
 from testtools.matchers import Equals, Annotate, FileExists, Contains
 
-from .utils import get_test_library_paths, describe_system
+from .utils import get_test_library_paths, describe_system, describe_binary, \
+        run_command
 #from .utils import run_command, get_shlibdeps, which, sha1sum, \
 #        get_script_interpreter, describe_system, get_test_library_paths
 from .spec import SPEC, SPECJSONEncoder
@@ -134,48 +136,27 @@ class TestFromSPEC(TestCase):
         TestCase.__init__(self, *args, **kwargs)
         self._workdir = None
         self._environ_restore = None
-        # a place to store additional information gather during test execution
-        # added automatically to the test protocol
-        self._exec_info = {}
-        # reference to the currently processed test SPEC
-        self._cur_spec = None
 
 # derived classes should have this
 #    @template_case(discover_specs())
     def _run_spec_test(self, spec_filename):
         wdir = self._workdir
+        self._details['exec_info'] = {}
         # get the SPEC
         spec = SPEC(open(spec_filename))
         self._cur_spec = spec
         spec_id = spec['id']
-        env_info = {}
-        ct = ContentType('application', 'json')
-        # configure default set of information to be reported for any test run
-        # echo the SPEC
-        self.addDetail('spec_info',
-                       Content(ct, lambda: [jds(self._cur_spec)]))
-        # basic system information
-        self.addDetail('sys_info',
-                       Content(ct, lambda: [jds(self._get_system_info())]))
+        self._details['spec_info'] = spec.copy()
         # _relevant_ environment bits (variables mentioned in the SPEC)
-        self.addDetail('env_info',
-                Content(ct, lambda: [jds(env_info)]))
-        # information on test components mentioned in the SPEC
-        self.addDetail('component_info',
-                Content(ct, lambda: [jds(self._gather_component_info())]))
-        # any information reported by the test execution
-        self.addDetail('exec_info',
-                       Content(ct, lambda: [jds(self._exec_info)]))
-
+        env_info = {}
+        self._details['env_info'] = env_info
+        # get the environment in shape, accoridng to SPEC
+        env_info.update(self._prepare_environment(spec))
         # prepare the testbed, place test input into testbed
         from .lookup import prepare_local_testbed
         prepare_local_testbed(spec, wdir,
                               search_dirs=[os.path.dirname(spec_filename)],
                               cache=None, force_overwrite=True)
-        # get the environment in shape, accoridng to SPEC
-        env_info.update(self._prepare_environment(spec))
-        # post testbed path into the environment
-        os.environ['TESTKRAUT_TESTBED_PATH'] = wdir
         for idx, testspec in enumerate(spec['tests']):
             os.environ['TESTKRAUT_SUBTEST_IDX'] = str(idx)
             if not 'id' in testspec:
@@ -185,8 +166,6 @@ class TestFromSPEC(TestCase):
             # execute the actual test implementation
             self._execute_any_test_implementation(subtestid, testspec)
             del os.environ['TESTKRAUT_SUBTEST_IDX']
-        # remove status var again
-        del os.environ['TESTKRAUT_TESTBED_PATH']
         # restore environment to its previous state
         self._restore_environment()
         # check for expected output
@@ -195,18 +174,41 @@ class TestFromSPEC(TestCase):
     def setUp(self):
         """Runs prior each test run"""
         super(TestFromSPEC, self).setUp()
-        self._exec_info = {}
+        # a place to store additional information gather during test execution
+        # added automatically to the test protocol
+        self._details = {}
+        # reference to the currently processed test SPEC
         self._cur_spec = None
         import tempfile
         # check if we have a concurent test run
         assert(self._workdir is None)
         self._workdir = tempfile.mkdtemp(prefix='testkraut')
         lgr.debug("created work dir at '%s'" % self._workdir)
+        # post testbed path into the environment
+        os.environ['TESTKRAUT_TESTBED_PATH'] = self._workdir
 
     def tearDown(self):
         """Runs after each test run"""
         super(TestFromSPEC, self).tearDown()
-        # reset exec info to prevent info leaks into next test protocol
+        ct = ContentType('application', 'json')
+        # information on test dependencies mentioned in the SPEC
+        self._get_dep_info()
+        # configure default set of information to be reported for any test run
+        # still can figure out why this can't be a loop
+        self.addDetail('spec_info',
+                Content(ct, lambda: [self._jds(self._details['spec_info'])]))
+        self.addDetail('dep_info',
+                Content(ct, lambda: [self._jds(self._details['dep_info'])]))
+        self.addDetail('exec_info',
+                Content(ct, lambda: [self._jds(self._details['exec_info'])]))
+        self.addDetail('env_info',
+                Content(ct, lambda: [self._jds(self._details['env_info'])]))
+        self.addDetail('sys_info',
+                Content(ct, lambda: [self._jds(self._get_system_info())]))
+        # after EVERYTHING is done
+        # remove status var again
+        del os.environ['TESTKRAUT_TESTBED_PATH']
+        # wipe out testbed
         if not self._workdir is None:
             lgr.debug("remove work dir at '%s'" % self._workdir)
             import shutil
@@ -228,7 +230,7 @@ class TestFromSPEC(TestCase):
         os.chdir(self._workdir)
         # run the test
         try:
-            self._exec_info[testid] = dict(
+            self._details['exec_info'][testid] = dict(
                     type=testspec['type']
                 )
             ret = test_exec(testid, testspec)
@@ -236,33 +238,44 @@ class TestFromSPEC(TestCase):
             os.chdir(initial_cwd)
 
     def _execute_python_test(self, testid, testspec):
-        execinfo = self._exec_info[testid]
+        from cStringIO import StringIO
+        import sys
+        execinfo = self._details['exec_info'][testid]
         try:
-            if 'code' in testspec:
-                exec testspec['code'] in {}, {}
-            elif 'file' in testspec:
-                execfile(testspec['file'], {}, {})
-            else:
-                raise ValueError("no test code found")
-        except Exception, e:
-            execinfo['exception'] = dict(type=e.__class__.__name__,
-                                         info=str(e))
-            if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
-                lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+            rescue_stdout = sys.stdout
+            rescue_stderr = sys.stderr
+            sys.stdout = capture_stdout = StringIO()
+            sys.stderr = capture_stderr = StringIO()
+            try:
+                if 'code' in testspec:
+                    exec testspec['code'] in {}, {}
+                elif 'file' in testspec:
+                    execfile(testspec['file'], {}, {})
+                else:
+                    raise ValueError("no test code found")
+            except Exception, e:
+                execinfo['exception'] = dict(type=e.__class__.__name__,
+                                             info=str(e))
+                if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
+                    lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
+                    self.assertThat(e,
+                        Annotate("exception occured while executing Python test code in test '%s': %s (%s)"
+                                 % (testid, str(e), e.__class__.__name__), Equals(None)))
+                return
+            if 'shouldfail' in testspec and testspec['shouldfail'] == True:
                 self.assertThat(e,
-                    Annotate("exception occured while executing Python test code in test '%s': %s (%s)"
-                             % (testid, str(e), e.__class__.__name__), Equals(None)))
-            return
-        if 'shouldfail' in testspec and testspec['shouldfail'] == True:
-            self.assertThat(e,
-                Annotate("an expected failure did not occur in test '%s': %s (%s)"
-                             % (testid, str(e), e.__class__.__name__), Equals(None)))
-
+                    Annotate("an expected failure did not occur in test '%s': %s (%s)"
+                                 % (testid, str(e), e.__class__.__name__), Equals(None)))
+        finally:
+            execinfo['stdout'] = capture_stdout.getvalue()
+            execinfo['stderr'] = capture_stderr.getvalue()
+            sys.stdout = rescue_stdout
+            sys.stderr = rescue_stderr
 
     def _execute_shell_test(self, testid, testspec):
         import subprocess
         cmd = testspec['code']
-        execinfo = self._exec_info[testid]
+        execinfo = self._details['exec_info'][testid]
         if isinstance(cmd, list):
             # convert into a cmd string to execute via shell
             # to get all envvar expansion ...
@@ -363,29 +376,28 @@ class TestFromSPEC(TestCase):
                 os.environ[env] = str(val)
         self._environ_restore = None
 
-    def _gather_component_info(self):
+    def _get_dep_info(self):
+        # TODO implement dependency info cache to avoid useless lookups
         spec = self._cur_spec
         info = {}
-        entities = {}
-        info['entities'] = entities
-        # TODO support more than just executables...python modules...
-        for exec_path, espec in spec.get('executables', {}).iteritems():
-            if not os.path.exists(os.path.expandvars(exec_path)):
-                # no executable? is it optional?
-                if not espec.get('optional', False):
-                    lgr.warning("failed to find required executable '%s'"
-                                % exec_path)
-                continue
-            # replace exectutable info with the full picture
-            ehash = self._describe_binary(exec_path,
-                                          entities,
-                                          type_='binary')
-            # link the old info with the new one
-            espec['entity'] = ehash
+        for dep_id, depspec in spec.get('dependencies', {}).iteritems():
+            if not 'type' in depspec or not 'location' in depspec:
+                raise ValueError("dependency SPEC '%s' contains no 'type' or no 'location' field"
+                                 % dep_id)
+            deptype = depspec['type']
+            deploc = depspec['location']
+            # TODO implement support for more dependency types
+            if deptype == 'executable':
+                # gather full picture
+                dephash = describe_binary(deptype, deploc, info)
+            else:
+                raise ValueError("unsupported dependency type '%s' in '%s'"
+                                 % (deptype, dep_id))
+
             # check version information
             have_version = False
-            if 'version_file' in espec:
-                verfilename = espec['version_file']
+            if 'version_file' in depspec:
+                verfilename = depspec['version_file']
                 extract_regex = r'.*'
                 if isinstance(verfilename, list):
                     verfilename, extract_regex = verfilename
@@ -395,13 +407,13 @@ class TestFromSPEC(TestCase):
                     file_content = open(verfilename).read().strip()
                     version = re.findall(extract_regex, file_content)[0]
                     if len(version):
-                        entities[ehash]['version'] = version
+                        info[dephash]['version'] = version
                         have_version = True
                 except:
                     lgr.debug("failed to read version from '%s'"
                               % verfilename)
-            if not have_version and 'version_cmd' in espec:
-                vercmd = espec['version_cmd']
+            if not have_version and 'version_cmd' in depspec:
+                vercmd = depspec['version_cmd']
                 extract_regex = r'.*'
                 if isinstance(vercmd, list):
                     vercmd, extract_regex = vercmd
@@ -410,20 +422,19 @@ class TestFromSPEC(TestCase):
                     # this will throw an exception if nothing is found
                     version = re.findall(extract_regex, '\n'.join(ret['stderr']))[0]
                     if len(version):
-                        entities[ehash]['version'] = version
+                        info[dephash]['version'] = version
                         have_version = True
                 except:
                     try:
                         version = re.findall(extract_regex, '\n'.join(ret['stdout']))[0]
                         if len(version):
-                            entities[ehash]['version'] = version
+                            info[dephash]['version'] = version
                             have_version = True
                     except:
                         lgr.debug("failed to read version from '%s'" % vercmd)
 
-        if not len(entities):
-            # remove unnecessary dict
-            del info['entities']
-        return info
+        self._details['dep_info'] = info
 
+    def _jds(self, content):
+        return jds(content, indent=2, sort_keys=True)
 

@@ -32,28 +32,106 @@ The following sections provide a summary of all SPEC components.
 A :term:`JSON object`, where keys email addresses of authors of a SPEC and
 corresponding values are the authors' names.
 
+..
+  ``dependencies``
+  ================
+..
+  A :term:`JSON object`, where keys are platform IDs and corresponding values are
+  platform-specific descriptions of software dependencies for a test case.
+  The main purpose of this section is to allow for programmatic creation of test
+  environments. Currently defined platforms are:
+..
+  ``deb``
+    Debian-based systems using APT/dpkg as package manager. The dependency
+    description is a :term:`JSON string` with a a package dependency list
+    in the same format as the one used for the ``Depends`` field in the
+    ``debian/control`` file in a Debian source package. For example::
+..
+      "dependencies": {"deb": "fsl (>= 4.0), matlab-spm (> 8)"}
+..
+  ``rpm``
+    RedHat-derived systems using RPM as package manager. The dependency
+    description is a :term:`JSON string` with a package dependency list
+    in the same format as the one used for ```Requires`` lines in an RPM SPEC file.
+..
+  This section is identical in input SPEC and corresponding output SPEC.
+
 ``dependencies``
 ================
 
-A :term:`JSON object`, where keys are platform IDs and corresponding values are
-platform-specific descriptions of software dependencies for a test case.
-The main purpose of this section is to allow for programmatic creation of test
-environments. Currently defined platforms are:
+A :term:`JSON object` where keys are common names for dependencies of a test
+case. Values are :term:`JSON object`\ s with fields described in the following
+subsections.
 
-``deb``
-  Debian-based systems using APT/dpkg as package manager. The dependency
-  description is a :term:`JSON string` with a a package dependency list
-  in the same format as the one used for the ``Depends`` field in the
-  ``debian/control`` file in a Debian source package. For example::
+..
+  The ``executables`` section is altered
+  in an output SPEC by adding an ``entity`` key to each executable's  :term:`JSON
+  object`, with a :term:`JSON string` value, cross-referencing that executable
+  with a corresponding entry in the ``entities`` section.
 
-    "dependencies": {"deb": "fsl (>= 4.0), matlab-spm (> 8)"}
+``location``
+------------
 
-``rpm``
-  RedHat-derived systems using RPM as package manager. The dependency
-  description is a :term:`JSON string` with a package dependency list
-  in the same format as the one used for ```Requires`` lines in an RPM SPEC file.
+Where is the respective namespace?
 
-This section is identical in input SPEC and corresponding output SPEC.
+For executables this may contain absolute paths and/or environment variables
+which will be expanded to their actual values during processing. Such variables
+should be listed in the ``environment`` section.
+
+``type``
+--------
+
+Could be an ``executable`` or a ``python_mod``.
+
+``optional``
+------------
+
+A :term:`JSON boolean` indicating whether an executable is optional (``true``),
+or required (``false``; default). Optional executables are useful for writing
+tests that need to accommodate changes in the implementation of the to-be-tested
+software.
+
+``version_cmd``
+---------------
+
+A :term:`JSON string` specifying a command that will be executed to determine a
+version of an executable that is added as value to the ``version`` field of the
+corresponding entry for this executable in the ``entities`` section.  If an
+output to ``stderr`` is found, it will be used as version. If no ``stderr``
+output is found, the output to ``stdout`` will be used.
+
+Alternatively, this may be a :term:`JSON array` with exactly two values, where
+the first value is, again, the command, and the second value is a regular
+expression used to extract matching content from the output of this command.
+Output channels are evaluated in the same order as above (first ``stderr``, and
+if no match is found ``stdout``).
+
+``version_file``
+----------------
+
+A :term:`JSON string` specifying a file name. The content of this file will be
+added as value to the ``version`` field of the corresponding entry for this
+executable in the ``entities`` section.
+
+Alternatively, this may be a :term:`JSON array` with exactly two values, where
+the first value is, again, a file name, and the second value is a regular
+expression used to extract matching content from this file as a version.
+
+Example
+-------
+::
+
+ "executables": {
+    "$FSLDIR/bin/bet": {
+      "version_cmd": [
+            "$FSLDIR/bin/bet2",
+            "BET \\(Brain Extraction Tool\\) v(\\S+) -"
+      ]
+    }, 
+    "$FSLDIR/bin/bet2": {
+      "version_file": "$FSLDIR/etc/fslversion"
+    }
+
 
 ``description``
 ===============
@@ -159,67 +237,6 @@ value is recorded.
 ===============
 
 yet to be determined
-
-``executables``
-===============
-
-A :term:`JSON object` where keys are executable components for a test case. Keys
-may contain absolute paths and/or environment variables which will be expanded
-to their actual values during processing. Such variables should be listed in
-the ``environment`` section. Values are :term:`JSON object`\ s with fields
-described in the following subsections. The ``executables`` section is altered
-in an output SPEC by adding an ``entity`` key to each executable's  :term:`JSON
-object`, with a :term:`JSON string` value, cross-referencing that executable
-with a corresponding entry in the ``entities`` section.
-
-``optional``
-------------
-
-A :term:`JSON boolean` indicating whether an executable is optional (``true``),
-or required (``false``; default). Optional executables are useful for writing
-tests that need to accommodate changes in the implementation of the to-be-tested
-software.
-
-``version_cmd``
----------------
-
-A :term:`JSON string` specifying a command that will be executed to determine a
-version of an executable that is added as value to the ``version`` field of the
-corresponding entry for this executable in the ``entities`` section.  If an
-output to ``stderr`` is found, it will be used as version. If no ``stderr``
-output is found, the output to ``stdout`` will be used.
-
-Alternatively, this may be a :term:`JSON array` with exactly two values, where
-the first value is, again, the command, and the second value is a regular
-expression used to extract matching content from the output of this command.
-Output channels are evaluated in the same order as above (first ``stderr``, and
-if no match is found ``stdout``).
-
-``version_file``
-----------------
-
-A :term:`JSON string` specifying a file name. The content of this file will be
-added as value to the ``version`` field of the corresponding entry for this
-executable in the ``entities`` section.
-
-Alternatively, this may be a :term:`JSON array` with exactly two values, where
-the first value is, again, a file name, and the second value is a regular
-expression used to extract matching content from this file as a version.
-
-Example
--------
-::
-
- "executables": {
-    "$FSLDIR/bin/bet": {
-      "version_cmd": [
-            "$FSLDIR/bin/bet2",
-            "BET \\(Brain Extraction Tool\\) v(\\S+) -"
-      ]
-    }, 
-    "$FSLDIR/bin/bet2": {
-      "version_file": "$FSLDIR/etc/fslversion"
-    }
 
 ``id``
 ======

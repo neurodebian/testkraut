@@ -1,0 +1,31 @@
+{
+  "id": "check_dep_info",
+  "dependencies": {
+    "Python": {
+      "location": "python",
+      "type": "executable",
+      "version_cmd": [
+            "python --version",
+            "Python (.*)"
+      ]
+    },
+    "myscript": {
+      "location": "$TESTKRAUT_TESTBED_PATH/myownscript",
+      "type": "executable",
+      "version_file": ["$TESTKRAUT_TESTBED_PATH/myownscript", ".*Version (.*)"]
+    }
+  },
+  "inputs": {
+    "isomedummyscript": {
+      "type": "file", 
+      "value": "myownscript"
+    }
+  }, 
+  "tests": [
+    {
+      "code": "print 'I do run'",
+      "type": "python"
+    }
+  ],
+  "version": 0
+}
