@@ -27,9 +27,8 @@ from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
 
 from .utils import get_test_library_paths, describe_system, describe_binary, \
         run_command
-#from .utils import run_command, get_shlibdeps, which, sha1sum, \
-#        get_script_interpreter, describe_system, get_test_library_paths
 from .spec import SPEC, SPECJSONEncoder
+from testkraut import cfg
 
 #
 # Utility code for template-based test cases
@@ -166,8 +165,6 @@ class TestFromSPEC(TestCase):
             # execute the actual test implementation
             self._execute_any_test_implementation(subtestid, testspec)
             del os.environ['TESTKRAUT_SUBTEST_IDX']
-        # restore environment to its previous state
-        self._restore_environment()
         # check for expected output
         initial_cwd = os.getcwdu()
         os.chdir(self._workdir)
@@ -210,6 +207,8 @@ class TestFromSPEC(TestCase):
                 Content(ct, lambda: [self._jds(self._details['env_info'])]))
         self.addDetail('sys_info',
                 Content(ct, lambda: [self._jds(self._get_system_info())]))
+        # restore environment to its previous state
+        self._restore_environment()
         # after EVERYTHING is done
         # remove status var again
         del os.environ['TESTKRAUT_TESTBED_PATH']
@@ -426,11 +425,11 @@ class TestFromSPEC(TestCase):
     def _prepare_environment(self, spec):
         # returns the relevant bits of the environment
         info = {}
-        env_restore = {}
+        self._environ_restore = {}
         env_spec = spec.get('environment', {})
         for env in env_spec:
             # store the current value
-            env_restore[env] = os.environ.get(env, None)
+            self._environ_restore[env] = os.environ.get(env, None)
             if env_spec[env] is None:
                 # unset if null
                 if env in os.environ:
@@ -441,11 +440,17 @@ class TestFromSPEC(TestCase):
                 os.environ[env] = str(env_spec[env])
             elif env_spec[env] is True:
                 # this variable is required to be present
-                self.assertThat(os.environ, Contains(env))
+                if not cfg.getboolean('testrun', 'fail on missing environment',
+                                      default=False) \
+                   and not env in os.environ:
+                    self.skipTest("required environment variable '%s' not set"
+                                  % env)
+                else:
+                    self.assertThat(os.environ, Contains(env))
             # grab envvar values if anyhow listed
             info[env] = os.environ.get(env, None)
-        if len(env_restore):
-            self._environ_restore = env_restore
+        if not len(self._environ_restore):
+            self._environ_restore = None
         return info
 
     def _restore_environment(self):

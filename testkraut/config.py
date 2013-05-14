@@ -132,7 +132,7 @@ class ConfigManager(SafeConfigParser):
         # read local and user-specific config
         files = self.read(cfg_file_candidates)
 
-        # no look for variables in the environment
+        # now look for variables in the environment
         for var in [v for v in os.environ.keys() if v.startswith('TESTKRAUT_')]:
             # strip leading 'TESTKRAUT_' and lower case entries
             svar = var[10:].lower()
