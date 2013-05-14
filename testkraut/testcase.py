@@ -26,7 +26,7 @@ from testtools import matchers as tm
 from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
 
 from .utils import get_test_library_paths, describe_system, describe_binary, \
-        run_command
+        run_command, which
 from .spec import SPEC, SPECJSONEncoder
 from testkraut import cfg
 
@@ -156,6 +156,10 @@ class TestFromSPEC(TestCase):
         prepare_local_testbed(spec, wdir,
                               search_dirs=[os.path.dirname(spec_filename)],
                               cache=None, force_overwrite=True)
+        # final test: do we have all dependencies
+        # NEEDS to be done after testbed setup, in case custom scripts are
+        # listed
+        self._verify_dependencies(spec)
         for idx, testspec in enumerate(spec['tests']):
             os.environ['TESTKRAUT_SUBTEST_IDX'] = str(idx)
             if not 'id' in testspec:
@@ -422,6 +426,19 @@ class TestFromSPEC(TestCase):
             TestFromSPEC._system_info = describe_system()
         return TestFromSPEC._system_info
 
+    def _verify_dependencies(self, spec):
+        for dep_id, depspec in spec.get('dependencies', {}).iteritems():
+            if not 'type' in depspec or not 'location' in depspec:
+                raise ValueError("dependency SPEC '%s' contains no 'type' or no 'location' field"
+                                 % dep_id)
+            if depspec['type'] != 'executable':
+                # only check executables for now
+                continue
+            loc = depspec['location']
+            if not (os.path.exists(os.path.expandvars(loc))
+                    or not which(loc) is None):
+                self.skipTest("cannot find required executable '%s'" % loc)
+
     def _prepare_environment(self, spec):
         # returns the relevant bits of the environment
         info = {}
@@ -465,7 +482,6 @@ class TestFromSPEC(TestCase):
         self._environ_restore = None
 
     def _get_dep_info(self):
-        # TODO implement dependency info cache to avoid useless lookups
         spec = self._cur_spec
         info = {}
         for dep_id, depspec in spec.get('dependencies', {}).iteritems():

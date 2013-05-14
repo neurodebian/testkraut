@@ -110,18 +110,6 @@ lgr = logging.getLogger(__name__)
 #                                  ospec.get('tags', []))
 #            ospec['fingerprints'] = fingerprints
 #        os.chdir(initial_cwd)
-#
-#    def _check_requirements(self, spec):
-#        for env in spec.get('environment', {}):
-#            if not env in os.environ:
-#                raise ValueError("required environment variable '%s' not set"
-#                                 % env)
-#        exes = spec.get('executables', {})
-#        for exe in exes:
-#            optional = exes[exe].get('optional', False)
-#            if not optional and not os.path.isfile(os.path.expandvars(exe)):
-#                raise ValueError("required executable '%s' not found" % exe)
-#
 
 def get_eval_input(inspec, testspec):
     if 'origin' in inspec and inspec['origin'] == 'testoutput':
