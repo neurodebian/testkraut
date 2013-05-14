@@ -11,15 +11,25 @@ env:
     - PYTHON=python PYSUF=''
     # - PYTHON=python3 PYSUF=3 : python3-numpy not currently available
 install:
+    - deactivate
+    - sudo rmdir /dev/shm
+    - sudo ln -Tsf /{run,dev}/shm
+    - sudo apt-get update -qq
+    - sudo apt-get install lsb-release
+    - source /etc/lsb-release
+    - echo ${DISTRIB_CODENAME}
+    - wget -O- http://neuro.debian.net/lists/${DISTRIB_CODENAME}.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+    - sudo apt-key adv --recv-keys --keyserver pgp.mit.edu 2649A5A9
+    - sudo apt-get update -qq
     #- sudo apt-get install $PYTHON-dev
-    - sudo apt-get install $PYTHON-numpy
-    - sudo apt-get install $PYTHON-scipy
-    - sudo easy_install$PYSUF nibabel # Latest pypi
-    - sudo apt-get install $PYTHON-nose
-    - sudo apt-get install $PYTHON-pydot
-    - sudo apt-get install $PYTHON-testtools
-    - sudo apt-get install $PYTHON-nipype
-    - sudo apt-get install strace
+    - sudo apt-get install -qq $PYTHON-numpy
+    - sudo apt-get install -qq $PYTHON-scipy
+    - sudo apt-get install -qq $PYTHON-nibabel
+    - sudo apt-get install -qq $PYTHON-nose
+    - sudo apt-get install -qq $PYTHON-pydot
+    - sudo apt-get install -qq $PYTHON-testtools
+    - sudo apt-get install -qq $PYTHON-nipype
+    - sudo apt-get install -qq strace
 script:
     - ls -l
     - $PYTHON -c 'from testkraut import cfg; print cfg'
