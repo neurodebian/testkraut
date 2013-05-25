@@ -411,7 +411,7 @@ class TestFromSPEC(TestCase):
                 self.assertThat(
                     ospec['value'],
                     Annotate('expected output file missing', FileExists()))
-            if ospectype == 'directory':
+            elif ospectype == 'directory':
                 self.assertThat(
                     ospec['value'],
                     Annotate('expected output directory missing', DirExists()))
