@@ -14,14 +14,13 @@ import os
 from os.path import join as opj
 import re
 import shutil
-import urllib2
 from datetime import datetime
 from uuid import uuid1 as uuid
 from . import utils
 from . import evaluators
 from .utils import run_command, get_shlibdeps, which, sha1sum, \
         get_script_interpreter, describe_system, get_test_library_paths, \
-        get_filecache_dir
+        get_filecache_dir, download_file
 from .pkg_mngr import PkgManager
 from .spec import SPEC
 import testkraut
@@ -105,6 +104,8 @@ def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
     search_dirs += cfg.get('data sources', 'local dirs', default='').split()
 
     fname = filespec['value']
+    # where the file needs to end up in the testbed
+    dest_fname = opj(dest_dir, fname)
     # this will be the discovered file path
     fpath = None
     # first try the cache
@@ -177,35 +178,26 @@ def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
                 shutil.copy(fpath, dst_path)
                 lgr.debug("copy to cache '%s'->'%s'" % (fpath, dst_path))
     # trying external data sources
+    if fpath is None and 'url' in filespec:
+        # url is given
+        fpath = download_file(filespec['url'], dest_fname)
     if fpath is None and 'sha1sum' in filespec:
         # lookup in any configured hash store
         hashpots = cfg.get('data sources', 'hash stores').split()
         sha1 = filespec['sha1sum']
         lgr.debug("local search '%s' unsuccessful, trying hash stores"
                   % fname)
+        dst_path = opj(cache, sha1)
         for hp in hashpots:
-            try:
-                urip = urllib2.urlopen('%s%s' % (hp, sha1))
-                dst_path = opj(cache, sha1)
-                if os.path.exists(dst_path) or os.path.lexists(dst_path):
-                    os.remove(dst_path)
-                    lgr.debug("removing existing cache entry '%s'" % dst_path)
-                fp = open(dst_path, 'wb')
-                lgr.debug("download '%s%s'->'%s'" % (hp, sha1, dst_path))
-                fp.write(urip.read())
-                fp.close()
-                fpath = dst_path
+            fpath = download_file('%s%s' % (hp, sha1), dst_path)
+            if not fpath is None:
                 break
-            except urllib2.HTTPError:
-                lgr.debug("cannot find '%s' at '%s'" % (sha1, hp))
-            except urllib2.URLError:
-                lgr.debug("cannot connect to at '%s'" % hp)
     if fpath is None:
         # out of ideas
         raise LookupError("cannot find file matching spec %s" % filespec)
     # get the file into the dest_dir
-    dest_fname = opj(dest_dir, fname)
-    if force_overwrite or not os.path.isfile(dest_fname):
+    if not fpath == dest_fname \
+       and (force_overwrite or not os.path.isfile(dest_fname)):
         if not os.path.exists(dest_dir):
             os.makedirs(dest_dir)
         shutil.copy(fpath, dest_fname)

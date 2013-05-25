@@ -267,10 +267,11 @@ identifying the type of input. Currently only type ``file`` is supported. For a
   Optional list of :term:`JSON string`\ s with tags categorizing the input
   (see :ref:`tags <chap_output_tags>`).
 
+``url`` (:term:`JSON string`)
+  URL where the respective file can be downloaded.
+
 ``value`` (:term:`JSON string`)
   name of the input file.
-
-This section is identical in input SPEC and corresponding output SPEC.
 
 Example
 -------

@@ -16,6 +16,7 @@ import subprocess
 import select
 import datetime
 import hashlib
+import urllib2
 import platform
 from .pkg_mngr import PkgManager
 import testkraut
@@ -627,3 +628,26 @@ def describe_binary(type_, location, entities, pkgdb=None):
     return fhash
 
 
+def download_file(url, dst):
+    """Download file from a URL to a destination path
+
+    Returns
+    -------
+    None or path
+      None is returned whenever the download failed.
+    """
+    try:
+        urip = urllib2.urlopen(url)
+        if os.path.exists(dst) or os.path.lexists(dst):
+            lgr.debug("removing existing file/link at '%s'" % dst)
+            os.remove(dst)
+        fp = open(dst, 'wb')
+        lgr.debug("download '%s'->'%s'" % (url, dst))
+        fp.write(urip.read())
+        fp.close()
+        return dst
+    except urllib2.HTTPError:
+        lgr.debug("cannot find '%s' at '%s'" % (sha1, hp))
+    except urllib2.URLError:
+        lgr.debug("cannot connect to at '%s'" % hp)
+    return None
