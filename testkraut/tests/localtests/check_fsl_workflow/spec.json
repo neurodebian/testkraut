@@ -1,30 +1,26 @@
 {
-  "authors" : {
-    "michael.hanke@gmail.com": "Michael Hanke"
-  },
-  "dependencies": {
-    "deb": "fsl-5.0"
-  }, 
-  "description": "", 
+  "id": "check_fsl_workflow", 
   "environment": {
-    "FSLDIR": {},
-    "FSLOUTPUTTYPE": {}
+    "FSLDIR": true,
+    "FSLOUTPUTTYPE": false
   }, 
-  "comparisons": {}, 
-  "executables": {
-    "$FSLDIR/bin/bet": {
+  "dependencies": {
+    "bet": {
+      "location": "$FSLDIR/bin/bet",
+      "type": "executable",
       "version_cmd": [
             "$FSLDIR/bin/bet2",
             "BET \\(Brain Extraction Tool\\) v(\\S+) -"
       ]
     }, 
-    "$FSLDIR/bin/bet2": {
+    "bet2": {
+      "location": "$FSLDIR/bin/bet2",
+      "type": "executable",
       "version_file": "$FSLDIR/etc/fslversion"
     }
   }, 
-  "id": "demo", 
   "inputs": {
-    "head.nii.gz": {
+    "head image": {
       "sha1sum": "41d817176ceb99ac051d8bd066b500f3fb89be89", 
       "tags": [
         "3D image", 
@@ -35,7 +31,7 @@
     }
   }, 
   "outputs": {
-    "brain.nii.gz": {
+    "brain image": {
       "tags": [
         "3D image", 
         "nifti1 format", 
@@ -44,7 +40,7 @@
       "type": "file", 
       "value": "brain.nii.gz"
     }, 
-    "brain_mask.nii.gz": {
+    "brain mask image": {
       "tags": [
         "3D image", 
         "nifti1 format", 
@@ -54,44 +50,9 @@
       "value": "brain_mask.nii.gz"
     }
   }, 
-  "processes": {
-    "0": {
-      "argv": [
-        "$FSLDIR/bin/bet2", 
-        "head", 
-        "brain", 
-        "-m"
-      ], 
-      "executable": "$FSLDIR/bin/bet2", 
-      "generates": [
-        "brain.nii.gz", 
-        "brain_mask.nii.gz"
-      ], 
-      "started_by": 1, 
-      "uses": [
-        "head.nii.gz"
-      ]
-    }, 
-    "1": {
-      "argv": [
-        "bet", 
-        "head.nii.gz", 
-        "brain", 
-        "-m"
-      ], 
-      "executable": "$FSLDIR/bin/bet", 
-      "started_by": null, 
-      "uses": []
-    }
-  }, 
   "tests": [
     {
-      "code": [
-        "$FSLDIR/bin/bet", 
-        "head.nii.gz", 
-        "brain", 
-        "-m"
-      ], 
+      "code": "$FSLDIR/bin/bet head brain -m",
       "type": "shell"
     }
   ],
