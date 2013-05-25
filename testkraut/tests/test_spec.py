@@ -17,7 +17,7 @@ import pkgutil
 def test_spec_io():
     assert_raises(ValueError, spec.SPEC)
     # must have default version
-    sp = spec.SPEC(pkgutil.get_data('testkraut', 'library/demo/spec.json'))
+    sp = spec.SPEC(pkgutil.get_data('testkraut', 'tests/localtests/check_fsl_workflow/spec.json'))
     # no unknown keys
     assert_raises(ValueError, sp.__setitem__, 'mike', 0)
     # from a str

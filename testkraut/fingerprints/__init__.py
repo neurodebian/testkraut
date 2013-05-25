@@ -41,3 +41,26 @@ def get_fingerprinters(tag):
     fprinters = _tag2fx.get(tag, set())
     fprinters.add(_fp_file)
     return fprinters
+
+
+def proc_fingerprint(fingerprinter, fingerprints, filename, tags=None):
+    if tags is None:
+        tags = []
+    finger_name = fingerprinter.__name__
+    if finger_name.startswith('fp_'):
+        # strip common name prefix
+        finger_name = finger_name[3:]
+    lgr.debug("generating '%s' fingerprint" % finger_name)
+    # run it, catch any error
+    try:
+        fprint = {}
+        fingerprints[finger_name] = fprint
+        # fill in a dict to get whetever info even if an exception
+        # occurs during a latter stage of the fingerprinting
+        fingerprinter(filename, fprint, tags)
+    except Exception, e:
+        fprint['__exception__'] = '%s: %s' % (type(e), e.message)
+        # XXX maybe better a warning?
+        lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
+                  % (str(e), filename, finger_name))
+

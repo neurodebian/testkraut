@@ -28,6 +28,7 @@ from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
 from .utils import get_test_library_paths, describe_system, describe_binary, \
         run_command, which
 from .spec import SPEC, SPECJSONEncoder
+from .fingerprints import get_fingerprinters, proc_fingerprint
 from testkraut import cfg
 
 #
@@ -154,6 +155,9 @@ class TestFromSPEC(TestCase):
         # _relevant_ environment bits (variables mentioned in the SPEC)
         env_info = {}
         self._details['env_info'] = env_info
+        # fingerprints
+        fingerprints = {}
+        self._details['output_info'] = fingerprints
         # get the environment in shape, accoridng to SPEC
         env_info.update(self._prepare_environment(spec))
         # prepare the testbed, place test input into testbed
@@ -180,6 +184,7 @@ class TestFromSPEC(TestCase):
         os.chdir(self._workdir)
         try:
             self._check_output_presence(spec)
+            self._fingerprint_output(spec, fingerprints)
         finally:
             os.chdir(initial_cwd)
 
@@ -215,6 +220,8 @@ class TestFromSPEC(TestCase):
                 Content(ct, lambda: [self._jds(self._details['exec_info'])]))
         self.addDetail('env_info',
                 Content(ct, lambda: [self._jds(self._details['env_info'])]))
+        self.addDetail('output_info',
+                Content(ct, lambda: [self._jds(self._details['output_info'])]))
         self.addDetail('sys_info',
                 Content(ct, lambda: [self._jds(self._get_system_info())]))
         # restore environment to its previous state
@@ -427,6 +434,37 @@ class TestFromSPEC(TestCase):
                         % ospectype)
             # TODO check for file type
 
+    def _fingerprint_output(self, spec, info):
+        from .utils import sha1sum
+        # for all known outputs
+        ofilespecs = spec.get_outputs('file')
+        # cache fingerprinted files tp avoid duplication for identical files
+        fp_cache = {}
+        # deterministic order to help stabilize reference filename for duplicates
+        for oname in sorted(ofilespecs.keys()):
+            ospec = ofilespecs[oname]
+            filename = ospec['value']
+            sha1 = sha1sum(filename)
+            fingerprints = {}
+            oinfo = {'type': 'file', 'name': filename, 'sha1sum': sha1,
+                     'fingerprints': fingerprints}
+            if sha1 in fp_cache:
+                # we already had this file
+                ospec['identical_with'] = fp_cache[sha1]
+                lgr.debug("'%s' is a duplicate of '%s'" % (oname, fp_cache[sha1]))
+                continue
+            fp_cache[sha1] = oname
+            info[oname] = oinfo
+            lgr.debug("generating fingerprints for '%s'" % filename)
+            # gather fingerprinting callables
+            fingerprinters = set()
+            for tag in ospec.get('tags', []):
+                fingerprinters = fingerprinters.union(get_fingerprinters(tag))
+            # for the unique set of fingerprinting functions
+            for fingerprinter in fingerprinters:
+                proc_fingerprint(fingerprinter, fingerprints, filename,
+                                 ospec.get('tags', []))
+
     def _get_system_info(self):
         if TestFromSPEC._system_info is None:
             TestFromSPEC._system_info = describe_system()
@@ -546,5 +584,5 @@ class TestFromSPEC(TestCase):
         self._details['dep_info'] = info
 
     def _jds(self, content):
-        return jds(content, indent=2, sort_keys=True)
+        return jds(content, indent=2, sort_keys=True, cls=SPECJSONEncoder)
 

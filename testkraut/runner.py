@@ -76,41 +76,6 @@ lgr = logging.getLogger(__name__)
 #                args.append(get_eval_input(ins, spec))
 #        return operator(*args, **kwargs)
 #
-#    def _fingerprint_output(self, spec):
-#        from .fingerprints import get_fingerprinters
-#        from .utils import sha1sum
-#        # all local to the testbed
-#        testbedpath = opj(self._testbed_basedir, spec['id'])
-#        initial_cwd = os.getcwdu()
-#        os.chdir(testbedpath)
-#        # for all known outputs
-#        ofilespecs = spec.get_outputs('file')
-#        # cache fingerprinted files tp avoid duplication for identical files
-#        fp_cache = {}
-#        # deterministic order to help stabilize reference filename for duplicates
-#        for oname in sorted(ofilespecs.keys()):
-#            ospec = ofilespecs[oname]
-#            filename = ospec['value']
-#            sha1 = sha1sum(filename)
-#            ospec['sha1sum'] = sha1
-#            if sha1 in fp_cache:
-#                ospec['identical_with'] = fp_cache[sha1]
-#                lgr.debug("'%s' is a duplicate of '%s'" % (oname, fp_cache[sha1]))
-#                continue
-#            lgr.debug("generating fingerprints for '%s'" % filename)
-#            # gather fingerprinting callables
-#            fingerprinters = set()
-#            for tag in ospec.get('tags', []):
-#                fingerprinters = fingerprinters.union(get_fingerprinters(tag))
-#            # store the fingerprint info in the SPEC of the respective output
-#            fingerprints = ospec.get('fingerprints', {}) 
-#            # for the unique set of fingerprinting functions
-#            for fingerprinter in fingerprinters:
-#                _proc_fingerprint(fingerprinter, fingerprints, filename,
-#                                  ospec.get('tags', []))
-#            ospec['fingerprints'] = fingerprints
-#        os.chdir(initial_cwd)
-
 def get_eval_input(inspec, testspec):
     if 'origin' in inspec and inspec['origin'] == 'testoutput':
         # reference to a test output
@@ -123,24 +88,3 @@ def get_eval_input(inspec, testspec):
                 % inspec['value'])
     else:
         raise NotImplementedError("dunno how to handle anything but output references")
-
-def _proc_fingerprint(fingerprinter, fingerprints, filename, tags=None):
-    if tags is None:
-        tags = []
-    finger_name = fingerprinter.__name__
-    if finger_name.startswith('fp_'):
-        # strip common name prefix
-        finger_name = finger_name[3:]
-    lgr.debug("generating '%s' fingerprint" % finger_name)
-    # run it, catch any error
-    try:
-        fprint = {}
-        fingerprints[finger_name] = fprint
-        # fill in a dict to get whetever info even if an exception
-        # occurs during a latter stage of the fingerprinting
-        fingerprinter(filename, fprint, tags)
-    except Exception, e:
-        fprint['__exception__'] = '%s: %s' % (type(e), e.message)
-        # XXX maybe better a warning?
-        lgr.debug("ignoring exception '%s' while fingerprinting '%s' with '%s'"
-                  % (str(e), filename, finger_name))

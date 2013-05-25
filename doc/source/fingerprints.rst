@@ -61,9 +61,9 @@ an input file could look like this::
   >>> #
   >>> # test it
   >>> #
-  >>> from testkraut.runner import _proc_fingerprint
+  >>> from testkraut.fingerprints import proc_fingerprint
   >>> fingerprints = {}
-  >>> _proc_fingerprint(fp_file_size, fingerprints, 'COPYING')
+  >>> proc_fingerprint(fp_file_size, fingerprints, 'COPYING')
   >>> 'file_size' in fingerprints
   True
   >>> 'size' in fingerprints['file_size']
