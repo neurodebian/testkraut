@@ -21,5 +21,5 @@ datasink = pe.Node(interface=nio.DataSink(parameterization=False),
                    name="datasink")
 datasink.inputs.base_directory = os.path.abspath(os.curdir)
 test_workflow.connect(datasource, 'head', bet, 'in_file')
-test_workflow.connect(bet, 'out_file', datasink, 'output.@brain')
-test_workflow.connect(bet, 'mask_file', datasink, 'output.@brainmask')
+test_workflow.connect(bet, 'out_file', datasink, '@brain')
+test_workflow.connect(bet, 'mask_file', datasink, '@brainmask')

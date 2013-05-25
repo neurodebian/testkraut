@@ -20,6 +20,10 @@
     }
   }, 
   "inputs": {
+    "workflow": {
+      "type": "file",
+      "value": "bet_wf.py"
+    },
     "head image": {
       "sha1sum": "41d817176ceb99ac051d8bd066b500f3fb89be89", 
       "tags": [
@@ -38,7 +42,7 @@
         "volumetric image"
       ], 
       "type": "file", 
-      "value": "brain.nii.gz"
+      "value": "head_brain.nii.gz"
     }, 
     "brain mask image": {
       "tags": [
@@ -47,13 +51,13 @@
         "volumetric image"
       ], 
       "type": "file", 
-      "value": "brain_mask.nii.gz"
+      "value": "head_brain_mask.nii.gz"
     }
   }, 
   "tests": [
     {
-      "code": "$FSLDIR/bin/bet head brain -m",
-      "type": "shell"
+      "file": "bet_wf.py",
+      "type": "nipype"
     }
   ],
   "version": 0
