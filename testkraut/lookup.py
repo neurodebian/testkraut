@@ -92,7 +92,13 @@ def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
     fname = filespec['value']
     # this will be the discovered file path
     fpath = None
+    # first try the cache
+    if fpath is None and not cache is None:
+        lgr.debug("looking for '%s' in the cache" % fname)
+        fpath = locate_file_in_cache(filespec, cache)
     if not search_dirs is None:
+        lgr.debug("cache lookup for '%s' unsuccessful, trying local search"
+                  % fname)
         for ldir in search_dirs:
             cand_path = opj(ldir, fname)
             if not os.path.isfile(cand_path):
@@ -103,9 +109,6 @@ def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
             if hashmatch in (True, None):
                 fpath = cand_path
                 break
-    if fpath is None and not cache is None:
-        lgr.debug("local search for '%s' unsuccessful, trying cache" % fname)
-        fpath = locate_file_in_cache(filespec, cache)
     if fpath is None:
         # out of ideas
         raise LookupError("cannot find file matching spec %s" % filespec)

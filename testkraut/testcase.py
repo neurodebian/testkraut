@@ -131,6 +131,11 @@ class TestFromSPEC(TestCase):
 
     _system_info = None
 
+    # list of paths the search when looking up files. This list is prepended
+    # with the path of the executed test spec and then iterated over in
+    # ascending order
+    search_dirs = []
+
     def __init__(self, *args, **kwargs):
         TestCase.__init__(self, *args, **kwargs)
         self._workdir = None
@@ -153,9 +158,10 @@ class TestFromSPEC(TestCase):
         env_info.update(self._prepare_environment(spec))
         # prepare the testbed, place test input into testbed
         from .lookup import prepare_local_testbed
-        prepare_local_testbed(spec, wdir,
-                              search_dirs=[os.path.dirname(spec_filename)],
-                              cache=None, force_overwrite=True)
+        prepare_local_testbed(
+                spec, wdir,
+                search_dirs=[os.path.dirname(spec_filename)] + self.search_dirs,
+                cache=None, force_overwrite=True)
         # final test: do we have all dependencies
         # NEEDS to be done after testbed setup, in case custom scripts are
         # listed

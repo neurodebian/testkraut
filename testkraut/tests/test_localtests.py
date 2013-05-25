@@ -29,6 +29,7 @@ from testkraut.testcase import TestFromSPEC, discover_specs, template_case, Temp
 
 class LocalDogFoodTests(TestFromSPEC):
     __metaclass__ = TemplateTestCase
+    search_dirs = [os.path.join(os.path.dirname(__file__), 'data')]
     @template_case(discover_specs([op.join(op.dirname(__file__),
                                            'localtests')]))
     def _run_spec_test(self, spec_filename):
