@@ -14,12 +14,14 @@ import os
 from os.path import join as opj
 import re
 import shutil
+import urllib2
 from datetime import datetime
 from uuid import uuid1 as uuid
 from . import utils
 from . import evaluators
 from .utils import run_command, get_shlibdeps, which, sha1sum, \
-        get_script_interpreter, describe_system, get_test_library_paths
+        get_script_interpreter, describe_system, get_test_library_paths, \
+        get_filecache_dir
 from .pkg_mngr import PkgManager
 from .spec import SPEC
 import testkraut
@@ -55,16 +57,19 @@ def locate_file_in_cache(filespec, cache):
         filespec = dict()
     if not 'sha1sum' in filespec:
         # nothing we can do
+        lgr.debug("cannot lookup file in cache without sha1sum")
         return None
-    cand_filename = opj(cache, filespec['sha1sum'])
+    sha1 = filespec['sha1sum']
+    cand_filename = opj(cache, sha1)
     if os.path.isfile(cand_filename):
+        lgr.debug("found file with sha1sum %s in cache" % sha1)
         return cand_filename
     lgr.debug("hash '%s' not present in cache '%s'"
-              % (filespec['sha1sum'], cache))
+              % (sha1, cache))
     return None
 
 def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
-                        force_overwrite=True):
+                        force_overwrite=True, symlink_to_cache=True):
     """Search for a file given a SPEC and place it into a destination directory
 
     Parameters
@@ -75,8 +80,9 @@ def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
     dest_dir : path
       Path of the destination/target directory
     search_dirs : None or sequence
-      If not None, a sequence of local directories to be searched for the
-      desired file
+      If not None, a sequence of additional local directories to be searched for
+      the desired file (tetskraut configuration might provide more locations
+      that will also be searched afterwards)
     cache : None or path
       If not None, a path to a file cache directory where the desired file is
       searched by its sha1sum (if present in the SPEC)
@@ -88,27 +94,110 @@ def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
     if not 'type' in filespec or filespec['type'] != 'file':
         raise ValueError("expected SPEC is not a file SPEC, got : '%s'"
                          % filespec)
+    # have a default cache
+    if cache is None:
+        cache = get_filecache_dir()
+    if not os.path.exists(cache):
+        os.makedirs(cache)
+    # search path
+    if search_dirs is None:
+        search_dirs = []
+    search_dirs += cfg.get('data sources', 'local dirs', default='').split()
 
     fname = filespec['value']
     # this will be the discovered file path
     fpath = None
     # first try the cache
-    if fpath is None and not cache is None:
-        lgr.debug("looking for '%s' in the cache" % fname)
-        fpath = locate_file_in_cache(filespec, cache)
-    if not search_dirs is None:
+    fpath = locate_file_in_cache(filespec, cache)
+    # do a local search
+    if fpath is None and len(search_dirs):
         lgr.debug("cache lookup for '%s' unsuccessful, trying local search"
                   % fname)
-        for ldir in search_dirs:
-            cand_path = opj(ldir, fname)
-            if not os.path.isfile(cand_path):
-                lgr.debug("could not find file '%s' in '%s'" % (fname, ldir))
-                continue
-            lgr.debug("found file '%s' in '%s'" % (fname, ldir))
-            hashmatch = check_file_hash(filespec, cand_path)
-            if hashmatch in (True, None):
-                fpath = cand_path
+        # do a two-pass scan: first try locating the file by name to avoid
+        # sha1-summing all files
+        for search_dir in search_dirs:
+            for root, dirnames, filenames in os.walk(search_dir):
+                cand_path = opj(root, fname)
+                if not os.path.isfile(cand_path):
+                    lgr.debug("could not find file '%s' at '%s'"
+                              % (fname, cand_path))
+                    continue
+                hashmatch = check_file_hash(filespec, cand_path)
+                if hashmatch in (True, None):
+                    lgr.debug("found matching file '%s' at '%s'"
+                              % (fname, cand_path))
+                    # run with the file if there is no hash or it matches
+                    fpath = cand_path
+                    break
+            if not fpath is None:
                 break
+        if fpath is None and ('sha1sum' in filespec or 'md5sum' in filespec):
+            lgr.debug("could not find file '%s' by its name, doing hash lookup"
+                      % fname)
+            # 2nd pass if we have a hash try locating by hash
+            for search_dir in search_dirs:
+                for root, dirnames, filenames in os.walk(search_dir):
+                    for cand_name in filenames:
+                        cand_path = opj(root, cand_name)
+                        if check_file_hash(filespec, cand_path) is True:
+                            lgr.debug("found matching file '%s' at '%s'"
+                                      % (fname, cand_path))
+                            fpath = cand_path
+                            break
+                    if not fpath is None:
+                        break
+                if not fpath is None:
+                    break
+        if not fpath is None:
+            # place in cache
+            if not 'sha1sum' in filespec:
+                sha1 = sha1sum(fpath)
+            else:
+                sha1 = filespec['sha1sum']
+            dst_path = opj(cache, sha1)
+            if os.path.exists(dst_path) or os.path.lexists(dst_path):
+                os.remove(dst_path)
+                lgr.debug("removing existing cache entry '%s'" % dst_path)
+            if symlink_to_cache:
+                os.symlink(fpath, dst_path)
+                lgr.debug("symlink to cache '%s'->'%s'" % (fpath, dst_path))
+            elif hasattr(os, 'link'):
+                # be nice and try hard-linking
+                try:
+                    os.link(fpath, dst_path)
+                    lgr.debug("hardlink to cache '%s'->'%s'" % (fpath, dst_path))
+                except OSError:
+                    # silently fail if linking doesn't work (e.g.
+                    # cross-device link ... will recover later
+                    shutil.copy(fpath, dst_path)
+                    lgr.debug("copy to cache '%s'->'%s'" % (fpath, dst_path))
+            else:
+                shutil.copy(fpath, dst_path)
+                lgr.debug("copy to cache '%s'->'%s'" % (fpath, dst_path))
+    # trying external data sources
+    if fpath is None and 'sha1sum' in filespec:
+        # lookup in any configured hash store
+        hashpots = cfg.get('data sources', 'hash stores').split()
+        sha1 = filespec['sha1sum']
+        lgr.debug("local search '%s' unsuccessful, trying hash stores"
+                  % fname)
+        for hp in hashpots:
+            try:
+                urip = urllib2.urlopen('%s%s' % (hp, sha1))
+                dst_path = opj(cache, sha1)
+                if os.path.exists(dst_path) or os.path.lexists(dst_path):
+                    os.remove(dst_path)
+                    lgr.debug("removing existing cache entry '%s'" % dst_path)
+                fp = open(dst_path, 'wb')
+                lgr.debug("download '%s%s'->'%s'" % (hp, sha1, dst_path))
+                fp.write(urip.read())
+                fp.close()
+                fpath = dst_path
+                break
+            except urllib2.HTTPError:
+                lgr.debug("cannot find '%s' at '%s'" % (sha1, hp))
+            except urllib2.URLError:
+                lgr.debug("cannot connect to at '%s'" % hp)
     if fpath is None:
         # out of ideas
         raise LookupError("cannot find file matching spec %s" % filespec)
