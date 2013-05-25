@@ -35,3 +35,8 @@ company, or site.
 `Documentation <https://testkraut.readthedocs.org>`_ |
 `Downloads <https://github.com/neurodebian/testkraut/tags>`_ |
 `PyPi <http://pypi.python.org/pypi/testkraut>`_
+
+
+.. image:: https://secure.travis-ci.org/neurodebian/testkraut.png
+    :target: http://travis-ci.org/neurodebian/testkraut
+    :alt: Build Status
