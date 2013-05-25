@@ -148,8 +148,10 @@ def place_file_into_dir(filespec, dest_dir, search_dirs=None, cache=None,
                         break
                 if not fpath is None:
                     break
-        if not fpath is None:
-            # place in cache
+        if not fpath is None and ('md5sum' in filespec or 'sha1sum' in filespec):
+            # place in cache -- but only if any hash is given in the file spec
+            # if no hash is given, this file is volatile and it makes no sense
+            # to cache it
             if not 'sha1sum' in filespec:
                 sha1 = sha1sum(fpath)
             else:
