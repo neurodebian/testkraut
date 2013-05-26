@@ -15,6 +15,7 @@ import difflib
 from uuid import uuid1 as uuid
 
 __allowed_spec_keys__ = [
+        'assertions',
         'authors',
         'dependencies',
         'description',

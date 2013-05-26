@@ -24,6 +24,7 @@ from testtools.content import Content, text_content
 from testtools.content_type import ContentType, UTF8_TEXT
 from testtools import matchers as tm
 from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
+import testtools.matchers as tt_matchers
 
 from .utils import get_test_library_paths, describe_system, describe_binary, \
         run_command, which, describe_python_module
@@ -190,6 +191,7 @@ class TestFromSPEC(TestCase):
             self._check_output_presence(spec)
             self._compute_metrics(spec, metric_info)
             self._fingerprint_output(spec, fingerprints)
+            self._check_assertions(spec, metric_info)
         finally:
             os.chdir(initial_cwd)
 
@@ -465,6 +467,37 @@ class TestFromSPEC(TestCase):
             else:
                 val = metric(args)
             info[mid] = val
+
+    def _check_assertions(self, spec, metric_info):
+        specs = spec.get('assertions', {})
+        for aid, aspec in specs.iteritems():
+            # preconditions
+            self.assertThat(aspec, Contains('value'))
+            self.assertThat(aspec, Contains('matcher'))
+            # matcher
+            try:
+                matcher = getattr(tt_matchers, aspec['matcher'])
+            except AttributeError:
+                lgr.warning("unsupported matcher '%s' in spec '%s'" % (matcher, aid))
+                continue
+            # matcher instance
+            args = aspec.get('args', None)
+            if args is None:
+                assertion = matcher()
+            elif isinstance(args, list):
+                assertion = matcher(*args)
+            elif isinstance(args, dict):
+                assertion = matcher(**args)
+            else:
+                assertion = matcher(args)
+            # value to match
+            value = aspec['value']
+            # resolve to a metric?
+            if value.startswith('@metric:'):
+                mid = value[8:]
+                self.assertThat(metric_info, Contains(mid))
+                value = metric_info[mid]
+            self.assertThat(value, assertion)
 
     def _fingerprint_output(self, spec, info):
         from .utils import sha1sum

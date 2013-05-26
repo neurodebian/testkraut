@@ -6,6 +6,13 @@
       "args": "test.txt"
     }
   },
+  "assertions": {
+    "lines correct": {
+      "value": "@metric:howmanylines",
+      "matcher": "Equals",
+      "args": 3
+    }
+  },
   "dependencies": {
     "nibabel": {
       "location": "nibabel",
