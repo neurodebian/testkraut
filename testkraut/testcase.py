@@ -475,13 +475,19 @@ class TestFromSPEC(TestCase):
             if not 'type' in depspec or not 'location' in depspec:
                 raise ValueError("dependency SPEC '%s' contains no 'type' or no 'location' field"
                                  % dep_id)
-            if depspec['type'] != 'executable':
-                # only check executables for now
-                continue
             loc = depspec['location']
-            if not (os.path.exists(os.path.expandvars(loc))
-                    or not which(loc) is None):
-                self.skipTest("cannot find required executable '%s'" % loc)
+            type_ = depspec['type']
+            if type_ == 'executable':
+                if not (os.path.exists(os.path.expandvars(loc))
+                        or not which(loc) is None):
+                    self.skipTest("cannot find required executable '%s'" % loc)
+            elif type_ == 'python_module':
+                try:
+                    _ = __import__(loc)
+                except ImportError:
+                    self.skipTest("cannot import required Python module '%s'" % loc)
+            else:
+                lgr.warning("not verifying unknown dependency type '%s'" % type_)
 
     def _prepare_environment(self, spec):
         # returns the relevant bits of the environment
@@ -543,8 +549,9 @@ class TestFromSPEC(TestCase):
                 try:
                     mfile, mpath, mdescr = find_module(deploc.replace('.', '/'))
                 except ImportError:
-                    raise ValueError("cannot import Python module '%s'"
-                                     % deploc)
+                    # swallow the error -- if it can't be imported the test was
+                    # skipped anyway
+                    continue
                 if mfile is None:
                     # a package
                     mpath = opj(mpath, '__init__.py')

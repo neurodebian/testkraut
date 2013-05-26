@@ -587,7 +587,6 @@ def describe_python_module(type_, location, entities, pkgdb=None):
     spec['type'] = type_
     # find all related modules
     modfind = ModuleFinder()
-    print 'GAGAG', location
     try:
         modfind.run_script(location)
     except ImportError, e:
