@@ -3,7 +3,7 @@
   "metrics": {
     "howmanylines": {
       "metric": "NumberOfLinesInFile",
-      "args": {"fname": "test.txt"}
+      "args": "test.txt"
     }
   },
   "dependencies": {

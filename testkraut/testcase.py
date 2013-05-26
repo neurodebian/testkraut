@@ -455,10 +455,15 @@ class TestFromSPEC(TestCase):
                 lgr.warning("unsupported metric '%s' in spec '%s'" % (metric, mid))
                 continue
             # metric instance
-            if 'args' in mspec:
-                val = metric(**mspec['args'])
-            else:
+            args = mspec.get('args', None)
+            if args is None:
                 val = metric()
+            elif isinstance(args, list):
+                val = metric(*args)
+            elif isinstance(args, dict):
+                val = metric(**args)
+            else:
+                val = metric(args)
             info[mid] = val
 
     def _fingerprint_output(self, spec, info):
