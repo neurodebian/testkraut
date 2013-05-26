@@ -4,6 +4,14 @@
     "howmanylines": {
       "metric": "NumberOfLinesInFile",
       "args": "test.txt"
+    },
+    "RMSD(orig,noise1)": {
+      "metric": "VolumeRMSD",
+      "args": ["orig.nii.gz", "noise_1.nii.gz"]
+    },
+    "RMSD(orig,noise2)": {
+      "metric": "VolumeRMSD",
+      "args": ["orig.nii.gz", "noise_2.nii.gz"]
     }
   },
   "assertions": {
@@ -11,6 +19,11 @@
       "value": "@metric:howmanylines",
       "matcher": "Equals",
       "args": 3
+    },
+    "error increases": {
+      "value": "@metric:RMSD(orig,noise2)",
+      "matcher": "GreaterThan",
+      "args": "@metric:RMSD(orig,noise1)"
     }
   },
   "dependencies": {

@@ -11,3 +11,4 @@
 __docformat__ = 'restructuredtext'
 
 from .files import *
+from .volumeimages import *

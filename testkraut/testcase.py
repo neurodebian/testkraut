@@ -25,9 +25,10 @@ from testtools.content_type import ContentType, UTF8_TEXT
 from testtools import matchers as tm
 from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
 import testtools.matchers as tt_matchers
+from . import matchers as tk_matchers
 
 from .utils import get_test_library_paths, describe_system, describe_binary, \
-        run_command, which, describe_python_module
+        run_command, which, describe_python_module, _resolve_metric_value
 from .spec import SPEC, SPECJSONEncoder
 from .fingerprints import get_fingerprinters, proc_fingerprint
 from testkraut import cfg
@@ -471,33 +472,38 @@ class TestFromSPEC(TestCase):
     def _check_assertions(self, spec, metric_info):
         specs = spec.get('assertions', {})
         for aid, aspec in specs.iteritems():
+            lgr.debug("check assertion '%s'" % aid)
             # preconditions
             self.assertThat(aspec, Contains('value'))
             self.assertThat(aspec, Contains('matcher'))
             # matcher
             try:
-                matcher = getattr(tt_matchers, aspec['matcher'])
+                matcher = getattr(tk_matchers, aspec['matcher'])
             except AttributeError:
-                lgr.warning("unsupported matcher '%s' in spec '%s'" % (matcher, aid))
-                continue
+                try:
+                    matcher = getattr(tt_matchers, aspec['matcher'])
+                except AttributeError:
+                    lgr.warning("unsupported matcher '%s' in spec '%s'" % (matcher, aid))
+                    continue
             # matcher instance
             args = aspec.get('args', None)
             if args is None:
                 assertion = matcher()
             elif isinstance(args, list):
-                assertion = matcher(*args)
+                assertion = matcher(*[_resolve_metric_value(v, metric_info)
+                                            for v in args])
             elif isinstance(args, dict):
-                assertion = matcher(**args)
+                assertion = matcher(
+                        **dict(
+                            zip([(k, _resolve_metric_value(v, metric_info))
+                                            for k, v in args.iteritems()])))
             else:
-                assertion = matcher(args)
+                assertion = matcher(_resolve_metric_value(args, metric_info))
             # value to match
             value = aspec['value']
-            # resolve to a metric?
-            if value.startswith('@metric:'):
-                mid = value[8:]
-                self.assertThat(metric_info, Contains(mid))
-                value = metric_info[mid]
-            self.assertThat(value, assertion)
+            self.assertThat(_resolve_metric_value(value, metric_info),
+                            assertion)
+            lgr.debug("verified assertion '%s'" % aid)
 
     def _fingerprint_output(self, spec, info):
         from .utils import sha1sum

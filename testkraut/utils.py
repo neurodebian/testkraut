@@ -687,3 +687,10 @@ def download_file(url, dst):
     except urllib2.URLError:
         lgr.debug("cannot connect to at '%s'" % hp)
     return None
+
+def _resolve_metric_value(val, metrics):
+    if isinstance(val, basestring) and val.startswith('@metric:'):
+        mid = val[8:]
+        val = metrics[mid]
+    return val
+
