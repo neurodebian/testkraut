@@ -30,6 +30,7 @@ from .utils import get_test_library_paths, describe_system, describe_binary, \
 from .spec import SPEC, SPECJSONEncoder
 from .fingerprints import get_fingerprinters, proc_fingerprint
 from testkraut import cfg
+from . import metrics
 
 #
 # Utility code for template-based test cases
@@ -155,6 +156,9 @@ class TestFromSPEC(TestCase):
         # _relevant_ environment bits (variables mentioned in the SPEC)
         env_info = {}
         self._details['env_info'] = env_info
+        # metrics
+        metric_info = {}
+        self._details['metric_info'] = metric_info
         # fingerprints
         fingerprints = {}
         self._details['output_info'] = fingerprints
@@ -184,6 +188,7 @@ class TestFromSPEC(TestCase):
         os.chdir(self._workdir)
         try:
             self._check_output_presence(spec)
+            self._compute_metrics(spec, metric_info)
             self._fingerprint_output(spec, fingerprints)
         finally:
             os.chdir(initial_cwd)
@@ -220,6 +225,8 @@ class TestFromSPEC(TestCase):
                 Content(ct, lambda: [self._jds(self._details['exec_info'])]))
         self.addDetail('env_info',
                 Content(ct, lambda: [self._jds(self._details['env_info'])]))
+        self.addDetail('metric_info',
+                Content(ct, lambda: [self._jds(self._details['metric_info'])]))
         self.addDetail('output_info',
                 Content(ct, lambda: [self._jds(self._details['output_info'])]))
         self.addDetail('sys_info',
@@ -434,6 +441,26 @@ class TestFromSPEC(TestCase):
                         % ospectype)
             # TODO check for file type
 
+    def _compute_metrics(self, spec, info):
+        metricspecs = spec.get('metrics', {})
+        for mid, mspec in metricspecs.iteritems():
+            metric = mspec.get('metric', None)
+            if metric is None:
+                lgr.warning("broken metric spec '%s': no metric given" % mid)
+                continue
+            # import the metric
+            try:
+                metric = getattr(metrics, metric)
+            except AttributeError:
+                lgr.warning("unsupported metric '%s' in spec '%s'" % (metric, mid))
+                continue
+            # metric instance
+            if 'args' in mspec:
+                val = metric(**mspec['args'])
+            else:
+                val = metric()
+            info[mid] = val
+
     def _fingerprint_output(self, spec, info):
         from .utils import sha1sum
         # for all known outputs
@@ -467,7 +494,11 @@ class TestFromSPEC(TestCase):
 
     def _get_system_info(self):
         if TestFromSPEC._system_info is None:
-            TestFromSPEC._system_info = describe_system()
+            if cfg.getboolean('testrun', 'skip platform description',
+                              default=False):
+                TestFromSPEC._system_info = {}
+            else:
+                TestFromSPEC._system_info = describe_system()
         return TestFromSPEC._system_info
 
     def _verify_dependencies(self, spec):
@@ -532,9 +563,12 @@ class TestFromSPEC(TestCase):
         self._environ_restore = None
 
     def _get_dep_info(self):
-        spec = self._cur_spec
         info = {}
         self._details['dep_info'] = info
+        if cfg.getboolean('testrun', 'skip dependency description',
+                          default=False):
+            return
+        spec = self._cur_spec
         for dep_id, depspec in spec.get('dependencies', {}).iteritems():
             if not 'type' in depspec or not 'location' in depspec:
                 raise ValueError("dependency SPEC '%s' contains no 'type' or no 'location' field"

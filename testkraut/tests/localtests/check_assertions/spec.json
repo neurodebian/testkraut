@@ -1,0 +1,47 @@
+{
+  "id": "check_assertions",
+  "metrics": {
+    "howmanylines": {
+      "metric": "NumberOfLinesInFile",
+      "args": {"fname": "test.txt"}
+    }
+  },
+  "dependencies": {
+    "nibabel": {
+      "location": "nibabel",
+      "type": "python_module"
+    },
+    "numpy": {
+      "location": "numpy",
+      "type": "python_module",
+      "version_file": "$FSLDIR/etc/fslversion"
+    }
+  },
+  "inputs": {
+    "workflow": {
+      "type": "file",
+      "value": "make_stuff.py"
+    }
+  },
+  "outputs": {
+    "orig": {
+      "type": "file",
+      "value": "orig.nii.gz"
+    },
+    "noise_1": {
+      "type": "file",
+      "value": "noise_1.nii.gz"
+    }
+  },
+  "tests": [
+    {
+      "code": "open('test.txt', 'w').write('3\\n4\\n5\\n')",
+      "type": "python"
+    },
+    {
+      "file": "make_stuff.py",
+      "type": "python"
+    }
+  ],
+  "version": 0
+}
