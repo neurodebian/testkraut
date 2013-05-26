@@ -681,3 +681,17 @@ class TestFromSPEC(TestCase):
     def _jds(self, content):
         return jds(content, indent=2, sort_keys=True, cls=SPECJSONEncoder)
 
+
+def generate_testkraut_tests(search_dirs_, discover_dirs_):
+
+    class TestKrautTests(TestFromSPEC):
+        __metaclass__ = TemplateTestCase
+        search_dirs = search_dirs_
+        @template_case(discover_specs(discover_dirs_))
+        def _run_spec_test(self, spec_filename):
+            return TestFromSPEC._run_spec_test(self, spec_filename)
+
+    return TestKrautTests
+
+# The generator itself is not a test function, so please nose here
+generate_testkraut_tests.__test__ = False

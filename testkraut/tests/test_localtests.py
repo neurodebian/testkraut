@@ -25,12 +25,8 @@ if 'TESTKRAUT_LOGGER_VERBOSE' in os.environ:
     else:
         lgr.setLevel(logging.INFO)
 
-from testkraut.testcase import TestFromSPEC, discover_specs, template_case, TemplateTestCase
+from testkraut.testcase import generate_testkraut_tests
 
-class LocalDogFoodTests(TestFromSPEC):
-    __metaclass__ = TemplateTestCase
-    search_dirs = [os.path.join(os.path.dirname(__file__), 'data')]
-    @template_case(discover_specs([op.join(op.dirname(__file__),
-                                           'localtests')]))
-    def _run_spec_test(self, spec_filename):
-        return TestFromSPEC._run_spec_test(self, spec_filename)
+LocalDogFoodTests = generate_testkraut_tests(
+    [os.path.join(os.path.dirname(__file__), 'data')],
+    [op.join(op.dirname(__file__), 'localtests')])
