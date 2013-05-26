@@ -33,4 +33,4 @@ script:
     - ls -l
     - $PYTHON -c 'from testkraut import cfg; print cfg'
     # Run only nonlabile tests
-    - make test
+    - TESTKRAUT_TESTRUN_SKIP_DEPENDENCY_DESCRIPTION=yes make test
