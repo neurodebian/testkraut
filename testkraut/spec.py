@@ -18,15 +18,12 @@ __allowed_spec_keys__ = [
         'authors',
         'dependencies',
         'description',
-        'entities',
         'environment',
-        'comparisons',
-        'executables',
         'id',
         'inputs',
+        'metrics',
         'outputs',
         'processes',
-        'system',
         'tests',
         'version',
     ]
@@ -82,9 +79,6 @@ class SPEC(dict):
 
     def _check(self):
         _verify_tags(self, ('id', 'version', 'tests'), 'SPEC')
-        for i, ev in enumerate(self.get('comparisons', {})):
-            _verify_tags(ev, ('id', 'input spec', 'operator'),
-                         'comparison %i' % i)
         _verify_spec_tags(self.get('outputs', {}), ('type', 'value'),
                           'outputs')
         _verify_spec_tags(self.get('inputs', {}), ('type', 'value'),
