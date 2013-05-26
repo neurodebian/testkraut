@@ -1,6 +1,10 @@
 {
   "id": "check_dep_info",
   "dependencies": {
+    "testtools": {
+      "location": "testtools",
+      "type": "python_module"
+    },
     "Python": {
       "location": "python",
       "type": "executable",

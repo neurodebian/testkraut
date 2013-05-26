@@ -568,6 +568,43 @@ def get_filecache_dir():
     return cachepath
 
 
+def describe_python_module(type_, location, entities, pkgdb=None):
+    from modulefinder import ModuleFinder
+    spec = dict(location=location)
+    if location.endswith('.so'):
+        # treat binary extension as a library
+        return describe_binary(type_, location, entities, pkgdb=pkgdb)
+    fpath = os.path.realpath(location)
+    spec['realpath'] = fpath
+    fhash = sha1sum(fpath)
+    spec['sha1sum'] = fhash
+    if fhash in entities:
+        # do not process twice
+        return fhash
+    else:
+        entities[fhash] = spec
+    lgr.debug("describe %s at '%s' (%s)" % (type_, fpath, fhash))
+    spec['type'] = type_
+    # find all related modules
+    modfind = ModuleFinder()
+    print 'GAGAG', location
+    try:
+        modfind.run_script(location)
+    except ImportError, e:
+        lgr.warning("cannot determine Python module dependencies of %s (%s)"
+                    % (fpath, e))
+
+    if len(modfind.modules):
+        spec['depmods'] = []
+    for modname, mod in modfind.modules.iteritems():
+        if not mod.__file__:
+            # probably builtin
+            continue
+        spec['depmods'].append(
+                describe_python_module('python_module', mod.__file__, entities,
+                                pkgdb=pkgdb))
+    return fhash
+
 def describe_binary(type_, location, entities, pkgdb=None):
     spec = dict(location=location)
     actual_path = os.path.expandvars(location)

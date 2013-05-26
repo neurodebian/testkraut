@@ -26,7 +26,7 @@ from testtools import matchers as tm
 from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
 
 from .utils import get_test_library_paths, describe_system, describe_binary, \
-        run_command, which
+        run_command, which, describe_python_module
 from .spec import SPEC, SPECJSONEncoder
 from .fingerprints import get_fingerprinters, proc_fingerprint
 from testkraut import cfg
@@ -528,6 +528,7 @@ class TestFromSPEC(TestCase):
     def _get_dep_info(self):
         spec = self._cur_spec
         info = {}
+        self._details['dep_info'] = info
         for dep_id, depspec in spec.get('dependencies', {}).iteritems():
             if not 'type' in depspec or not 'location' in depspec:
                 raise ValueError("dependency SPEC '%s' contains no 'type' or no 'location' field"
@@ -536,8 +537,18 @@ class TestFromSPEC(TestCase):
             deploc = depspec['location']
             # TODO implement support for more dependency types
             if deptype == 'executable':
-                # gather full picture
                 dephash = describe_binary(deptype, deploc, info)
+            elif deptype == 'python_module':
+                from imp import find_module
+                try:
+                    mfile, mpath, mdescr = find_module(deploc.replace('.', '/'))
+                except ImportError:
+                    raise ValueError("cannot import Python module '%s'"
+                                     % deploc)
+                if mfile is None:
+                    # a package
+                    mpath = opj(mpath, '__init__.py')
+                dephash = describe_python_module(deptype, mpath, info)
             else:
                 raise ValueError("unsupported dependency type '%s' in '%s'"
                                  % (deptype, dep_id))
@@ -581,7 +592,6 @@ class TestFromSPEC(TestCase):
                     except:
                         lgr.debug("failed to read version from '%s'" % vercmd)
 
-        self._details['dep_info'] = info
 
     def _jds(self, content):
         return jds(content, indent=2, sort_keys=True, cls=SPECJSONEncoder)
