@@ -179,12 +179,12 @@ def run(args):
                 description=args.description,
                 version=args.spec_version,
                 processes={},
-                executables={},
+                dpeendencies={},
                 environment={},
-                test={},
+                tests={},
                 inputs={},
                 outputs={},
-                comparisons={}))
+                ))
 
     stdout = stdout.read()
     if len(stdout):
@@ -193,7 +193,7 @@ def run(args):
     if len(stderr):
         spec['outputs']['test::stderr'] = {'type': 'string', 'value': stderr}
     # in case of a shell command
-    spec['test'] = dict(type='shell_command', command=args.arg)
+    spec['tests'] = [dict(type='shell_command', command=args.arg)]
     # filter files
     if not args.ignore_outputs is None:
         args.ignore_outputs = re.compile(args.ignore_outputs)
@@ -221,11 +221,11 @@ def run(args):
 
     # and now get all info into the SPEC
     dep_mapper = {}
-    spec['dependencies'] = dep_mapper
+    #spec['dependencies'] = dep_mapper
     proc_mapper = {}
     spec['processes'] = proc_mapper
     exec_mapper = {}
-    spec['executables'] = exec_mapper
+    spec['dependencies'] = exec_mapper
     pid_counter = 0
     pid_native2new = {}
     exec2pkg = set()
