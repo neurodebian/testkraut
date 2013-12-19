@@ -599,9 +599,11 @@ def describe_python_module(type_, location, entities, pkgdb=None):
         if not mod.__file__:
             # probably builtin
             continue
-        spec['depmods'].append(
-                describe_python_module('python_module', mod.__file__, entities,
-                                pkgdb=pkgdb))
+        # XXX STOP HERE FOR NOW UNTIL THERE IS A WAY TO CONTROL THE RECURSION DEPTH
+        continue
+        #spec['depmods'].append(
+        #        describe_python_module('python_module', mod.__file__, entities,
+        #                        pkgdb=pkgdb))
     return fhash
 
 def describe_binary(type_, location, entities, pkgdb=None):
