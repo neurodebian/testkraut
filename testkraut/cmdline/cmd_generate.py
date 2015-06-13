@@ -179,7 +179,7 @@ def run(args):
                 description=args.description,
                 version=args.spec_version,
                 processes={},
-                dpeendencies={},
+                dependencies={},
                 environment={},
                 tests={},
                 inputs={},
