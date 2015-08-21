@@ -305,7 +305,7 @@ class TestFromSPEC(TestCase):
 
     def _execute_shell_test(self, testid, testspec):
         import subprocess
-        cmd = testspec['code']
+        cmd = testspec['command']
         execinfo = self._details['exec_info'][testid]
         if isinstance(cmd, list):
             # convert into a cmd string to execute via shell
@@ -432,10 +432,11 @@ class TestFromSPEC(TestCase):
                 self.assertThat(
                     ospec['value'],
                     Annotate('expected output directory missing', DirExists()))
-            elif ospectype == 'string':
-                sec, field = ospec_id.split('::')
+            elif ospectype == 'string' and ospec_id.startswith('tests'):
+                execinfo = self._details['exec_info']
+                sec, idx, field = ospec_id.split('::')
                 self.assertThat(
-                    spec[sec][field],
+                    execinfo[idx][field],
                     Annotate("unexpected output for '%s'" % ospec_id,
                              Equals(ospec['value'])))
             else:

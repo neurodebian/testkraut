@@ -77,6 +77,10 @@ def setup_parser(parser):
              is not available, no minimization is performed anyway. If strace is
              not able to properly track file access, resulting in insufficent
              input SPECs, enable the option.""")
+    parser.add_argument(
+        '--record-checksum', action='store_true', dest='record_checksum',
+        help="""Add the computed checksum of a detected output file to the test
+        SPEC""")
     parser.add_argument('arg', nargs='+', metavar='ARGS',
         help="""command or workflow filename""")
 
@@ -193,7 +197,7 @@ def run(args):
     if len(stderr):
         spec['outputs']['test::stderr'] = {'type': 'string', 'value': stderr}
     # in case of a shell command
-    spec['tests'] = [dict(type='shell_command', command=args.arg)]
+    spec['tests'] = [dict(type='shell', command=args.arg)]
     # filter files
     if not args.ignore_outputs is None:
         args.ignore_outputs = re.compile(args.ignore_outputs)
@@ -217,6 +221,8 @@ def run(args):
             continue
         s = dict(type='file', value=relname,
                  tags=list(guess_file_tags(relname)))
+        if args.record_checksum:
+            s['sha1sum'] = post_test_hashes[opf]
         spec['outputs']['file:%s' % relname] = s
 
     # and now get all info into the SPEC
@@ -282,3 +288,4 @@ def run(args):
             if not re.match(args.dump_env, env) is None:
                 spec['environment'][env] = None
     spec.save(args.ospec_filename, minimize=True)
+    raise
