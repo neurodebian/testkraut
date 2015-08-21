@@ -16,7 +16,12 @@ def with_tempdir(*targs, **tkwargs):
     def decorate(func):
         def newfunc(*arg, **kwargs):
             import tempfile
-            wdir = tempfile.mkdtemp(*targs, **tkwargs)
+            from os.path import realpath
+            # realpath so the logic about relative paths do not break
+            # when TMPDIR is pointing to a directory which is a symlink.
+            # This is just a workaround for
+            # https://github.com/neurodebian/testkraut/issues/24
+            wdir = realpath(tempfile.mkdtemp(*targs, **tkwargs))
             try:
                 func(*((wdir,) + arg), **kwargs)
             finally:
