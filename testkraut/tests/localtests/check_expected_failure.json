@@ -7,7 +7,7 @@
       "shouldfail": true
     },
     {
-      "code": "funkyfailure_somecommand",
+      "command": "funkyfailure_somecommand",
       "type": "shell",
       "shouldfail": true
     }
