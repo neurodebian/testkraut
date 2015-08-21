@@ -16,6 +16,8 @@ from os.path import join as opj
 from json import dumps as jds
 from functools import wraps
 
+from six import string_types, iteritems, text_type
+
 import logging
 lgr = logging.getLogger(__name__)
 
@@ -23,7 +25,21 @@ from testtools import TestCase, RunTest
 from testtools.content import Content, text_content
 from testtools.content_type import ContentType, UTF8_TEXT
 from testtools import matchers as tm
-from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists
+from testtools.matchers import Equals, Annotate, FileExists, Contains, DirExists, \
+     MatchesRegex, StartsWith, EndsWith
+     # To be added whenever testtools gets upgraded (1.5.0 has those already exposed)
+     #DoesNotEndWith, DoesNotStartWith
+
+__spec_matchers__ = {
+    'value': Equals,
+    'contains': Contains,
+    'matches': MatchesRegex,
+    'startswith': StartsWith,
+    'endswith': EndsWith,
+#    'doesnotstartwith': DoesNotStartWith,
+#    'doesnotendwith': DoesNotEndWith,
+    }
+
 import testtools.matchers as tt_matchers
 from . import matchers as tk_matchers
 
@@ -81,7 +97,7 @@ class TemplateTestCase(type):
             if hasattr(attr[method_name], "template"):
                 source = attr[method_name]
                 source_name = method_name.lstrip("_")
-                for test_name, args in source.template.items():
+                for test_name, args in list(source.template.items()):
                     parg, kwargs = args
                     new_name = "test_%s" % test_name
                     new_methods[new_name] = _method_partial(source, *parg, **kwargs)
@@ -122,12 +138,15 @@ def discover_specs(paths=None):
             # we actually found a new one
             lgr.debug("discovered test SPEC '%s'" % spec_id)
             discovered[spec_id] = spec_fname
-        except Exception, e:
+        # TODO: provide configuration variable allowing to avoid this
+        # swallow-everything catcher to troubleshoot problems in the code
+        # inside
+        except Exception as e:
             # not a valid SPEC
             lgr.warning("ignoring '%s': no a valid SPEC file: %s (%s)"
                       % (spec_fname, str(e), e.__class__.__name__))
     # wrap spec file locations in TestArgs
-    return dict([(k, TestArgs(v)) for k, v in discovered.iteritems()])
+    return dict([(k, TestArgs(v)) for k, v in iteritems(discovered)])
 
 
 class TestFromSPEC(TestCase):
@@ -279,12 +298,12 @@ class TestFromSPEC(TestCase):
             sys.stderr = capture_stderr = StringIO()
             try:
                 if 'code' in testspec:
-                    exec testspec['code'] in {}, {}
+                    exec(testspec['code'], {}, {})
                 elif 'file' in testspec:
                     execfile(testspec['file'], {}, {})
                 else:
                     raise ValueError("no test code found")
-            except Exception, e:
+            except Exception as e:
                 execinfo['exception'] = dict(type=e.__class__.__name__,
                                              info=str(e))
                 if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
@@ -333,7 +352,7 @@ class TestFromSPEC(TestCase):
                 texec.returncode,
                 Annotate("test shell command '%s' yielded non-zero exit code" % cmd,
                          Equals(0)))
-        except OSError, e:
+        except OSError as e:
             lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
             if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
                 self.assertThat(e,
@@ -364,7 +383,7 @@ class TestFromSPEC(TestCase):
         locals = dict()
         try:
             execfile(testwffilepath, dict(), locals)
-        except Exception, e:
+        except Exception as e:
             lgr.error("%s: %s" % (e.__class__.__name__, str(e)))
             self.assertThat(e,
                 Annotate("test workflow setup failed: %s (%s)"
@@ -388,7 +407,7 @@ class TestFromSPEC(TestCase):
             sys.stderr = capture_stderr = StringIO()
             try:
                 exec_graph = workflow.run()
-            except Exception, e:
+            except Exception as e:
                 execinfo['exception'] = dict(type=e.__class__.__name__,
                                              info=str(e))
                 if not 'shouldfail' in testspec or testspec['shouldfail'] == False:
@@ -435,10 +454,22 @@ class TestFromSPEC(TestCase):
             elif ospectype == 'string' and ospec_id.startswith('tests'):
                 execinfo = self._details['exec_info']
                 sec, idx, field = ospec_id.split('::')
-                self.assertThat(
-                    execinfo[idx][field],
-                    Annotate("unexpected output for '%s'" % ospec_id,
-                             Equals(ospec['value'])))
+                for f, matcher in iteritems(__spec_matchers__):
+                    if f in ospec:
+                        # allow for multiple target values (given a matcher) being
+                        # specified.  For some matchers it might make no sense
+                        # (e.g. "endswith")
+                        targets = ospec[f]
+                        for target in (targets if isinstance(targets, list) else [targets]):
+                            target = text_type.replace(target, "<NEWLINE>", os.linesep)
+                            # TODO: This replacement may be should be done elsewhere
+                            # to have a general solution. It's now affecting string-type only.
+                            # Additionally, "<NEWLINE>" may appear in some output intentionally,
+                            # so let's find sth closer to be 'unique'.
+                            self.assertThat(
+                                 execinfo[idx][field],
+                                 Annotate("unexpected output for '%s'" % ospec_id,
+                                           matcher(target)))
             else:
                 raise NotImplementedError(
                         "dunno how to handle output type '%s' yet"
@@ -447,7 +478,7 @@ class TestFromSPEC(TestCase):
 
     def _compute_metrics(self, spec, info):
         metricspecs = spec.get('metrics', {})
-        for mid, mspec in metricspecs.iteritems():
+        for mid, mspec in iteritems(metricspecs):
             metric = mspec.get('metric', None)
             if metric is None:
                 lgr.warning("broken metric spec '%s': no metric given" % mid)
@@ -472,7 +503,7 @@ class TestFromSPEC(TestCase):
 
     def _check_assertions(self, spec, metric_info):
         specs = spec.get('assertions', {})
-        for aid, aspec in specs.iteritems():
+        for aid, aspec in iteritems(specs):
             lgr.debug("check assertion '%s'" % aid)
             # preconditions
             self.assertThat(aspec, Contains('value'))
@@ -497,7 +528,7 @@ class TestFromSPEC(TestCase):
                 assertion = matcher(
                         **dict(
                             zip([(k, _resolve_metric_value(v, metric_info))
-                                            for k, v in args.iteritems()])))
+                                            for k, v in iteritems(args)])))
             else:
                 assertion = matcher(_resolve_metric_value(args, metric_info))
             # value to match
@@ -547,7 +578,7 @@ class TestFromSPEC(TestCase):
         return TestFromSPEC._system_info
 
     def _verify_dependencies(self, spec):
-        for dep_id, depspec in spec.get('dependencies', {}).iteritems():
+        for dep_id, depspec in iteritems(spec.get('dependencies', {})):
             if not 'type' in depspec or not 'location' in depspec:
                 raise ValueError("dependency SPEC '%s' contains no 'type' or no 'location' field"
                                  % dep_id)
@@ -577,7 +608,7 @@ class TestFromSPEC(TestCase):
                 # unset if null
                 if env in os.environ:
                     del os.environ[env]
-            elif isinstance(env_spec[env], basestring):
+            elif isinstance(env_spec[env], string_types):
                 # set if string
                 # set the new one
                 os.environ[env] = str(env_spec[env])
@@ -599,7 +630,7 @@ class TestFromSPEC(TestCase):
     def _restore_environment(self):
         if self._environ_restore is None:
             return
-        for env, val in self._environ_restore.iteritems():
+        for env, val in iteritems(self._environ_restore):
             if val is None:
                 if env in os.environ:
                     del os.environ[env]
@@ -614,7 +645,7 @@ class TestFromSPEC(TestCase):
                           default=False):
             return
         spec = self._cur_spec
-        for dep_id, depspec in spec.get('dependencies', {}).iteritems():
+        for dep_id, depspec in iteritems(spec.get('dependencies', {})):
             if not 'type' in depspec or not 'location' in depspec:
                 raise ValueError("dependency SPEC '%s' contains no 'type' or no 'location' field"
                                  % dep_id)

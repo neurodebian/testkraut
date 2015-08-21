@@ -14,6 +14,9 @@ import json
 import difflib
 from uuid import uuid1 as uuid
 
+from six import string_types, iteritems
+from six.moves import xrange
+
 __allowed_spec_keys__ = [
         'assertions',
         'authors',
@@ -38,9 +41,14 @@ def _raise(exception, why, input=None):
 
 def _verify_tags(struct, tags, name):
     for tag in tags:
-        if not tag in struct:
-            _raise(ValueError,
-                        "mandatory key '%s' is not in %s" % (tag, name))
+        if isinstance(tag, set):
+            if not tag.intersection(struct):
+                _raise(ValueError,
+                       "at least one of the keys %s must be in %s" % (tag, name))
+        else:
+            if not tag in struct:
+                _raise(ValueError,
+                       "mandatory key '%s' is not in %s" % (tag, name))
 
 def _verify_spec_tags(specs, tags, name):
     for i, os_id in enumerate(specs):
@@ -67,7 +75,7 @@ class SPEC(dict):
         dict.__init__(self)
         if isinstance(src, file):
             self.update(json.load(src))
-        elif isinstance(src, basestring):
+        elif isinstance(src, string_types):
             self.update(json.loads(src))
         elif isinstance(src, dict):
             self.update(src)
@@ -79,8 +87,10 @@ class SPEC(dict):
         self._check()
 
     def _check(self):
+        # Late import to prevent circular imports
+        from .testcase import __spec_matchers__
         _verify_tags(self, ('id', 'version', 'tests'), 'SPEC')
-        _verify_spec_tags(self.get('outputs', {}), ('type', 'value'),
+        _verify_spec_tags(self.get('outputs', {}), ('type', set(__spec_matchers__.keys())),
                           'outputs')
         _verify_spec_tags(self.get('inputs', {}), ('type', 'value'),
                           'inputs')
@@ -111,7 +121,7 @@ class SPEC(dict):
         spec_file = open(filename, 'w')
         if minimize:
             # don't write empty containers
-            towrite = dict([(k, v) for k, v in self.iteritems()
+            towrite = dict([(k, v) for k, v in iteritems(self)
                                 if not (isSequenceType(v) or isMappingType(v)) \
                                    or len(v)])
         else:
@@ -194,7 +204,7 @@ def diff(fr, to, recursive_list=False, min_abs_numdiff=None,
             return dtree
         else:
             return None
-    elif isinstance(fr, basestring):
+    elif isinstance(fr, string_types):
         # any string
         if not fr == to:
             return {'ndiff': difflib.ndiff(('%s\n' % fr).splitlines(True),
