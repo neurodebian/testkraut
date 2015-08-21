@@ -30,6 +30,9 @@ script:
     - $PYTHON -c 'from testkraut import cfg; print cfg'
     # Run only nonlabile tests
     - TESTKRAUT_TESTRUN_SKIP_DEPENDENCY_DESCRIPTION=yes make test
+after_success:
+ # apparently needed for deployment. See https://travis-ci.org/neurodebian/testkraut/builds/76649548#L1166
+ - sudo pip install twine
 deploy:
   provider: pypi
   distributions: sdist
