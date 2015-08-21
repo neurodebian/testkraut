@@ -30,3 +30,14 @@ script:
     - $PYTHON -c 'from testkraut import cfg; print cfg'
     # Run only nonlabile tests
     - TESTKRAUT_TESTRUN_SKIP_DEPENDENCY_DESCRIPTION=yes make test
+deploy:
+  provider: pypi
+  distributions: sdist
+  user: Michael.Hanke
+  password:
+    secure: Vpl696ZM7Wm2RhRsTdchZPgIC6dhaTDwr2u6evwUvwsMhZBmSwba2oNMeP9oBtFAJe+SA9m5RhqJr0+3UGjQc9DyapGLoyXdhbRLgWyO6o8lJCoQEfr9VxZ93oeAaEpOGLY39HKc+KU/jg/1pSVeczK7abiQHCwEWbrHZy/jd2M=
+  on:
+    tags: true
+    branch: master
+    repo: neurodebian/testkraut
+    condition: "$PYTHON == python && $TRAVIS_TAG =~ ^release/[0-9][.][.0-9]*"
